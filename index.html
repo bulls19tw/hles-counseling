@@ -1049,7 +1049,102 @@
     <!-- FIREBASE MODULE & APPLICATION SCRIPTS -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        // 更新管理員按鈕外觀與狀態顏色
+
+        // 全域帳號庫預設值
+        const defaultAccounts = {
+            'admin': { pass: 'pcdiy4519', role: 'admin', name: '最高管理員' },
+            '5303': { pass: '29420451', role: 'editor_5303', name: '親師組長' }
+        };
+
+        function loadAccounts() {
+            try {
+                const saved = localStorage.getItem('hles_accounts');
+                if (saved) return JSON.parse(saved);
+            } catch(e) {}
+            return defaultAccounts;
+        }
+
+        function saveAccounts(accs) {
+            try {
+                localStorage.setItem('hles_accounts', JSON.stringify(accs));
+            } catch(e) {}
+        }
+
+        window.appData = {
+            currentUser: null,
+            newsletterHidden: localStorage.getItem('hles_newsletter_hidden') !== 'false', // 預設隱藏
+            accounts: loadAccounts(),
+            honorList: [
+                { badge: '家庭教育', title: '114學年度家庭教育檢核榮獲「優良學校」', tag: '校園榮耀', desc: '賀本校榮獲新北市114學年度公私立高級中等以下學校家庭教育檢核工作評選「優良學校」殊榮！' },
+                { badge: 'SUPER教師', title: '115年新北市SUPER教師獎', tag: '教師榮耀', desc: '賀本校莊慧娟老師獲得殊榮，並將代表新北市角逐全國SUPER教師獎！' },
+                { badge: '福和盃', title: '第一屆福和盃自由探究榮獲佳績', tag: '學生競賽', desc: '賀資優班應其家同學榮獲「金獎」、邱已家同學榮獲「創新表現獎」！（感謝胡菲茜老師辛勤指導）' },
+                { badge: '圖文創作', title: '2026年第24屆扶輪社電腦圖文創作比賽', tag: '資訊圖文', desc: '恭喜本校榮獲「佳作」殊榮！（感謝陳琬婷老師辛勤指導）' },
+                { badge: '愛在畫中', title: '新北市第28屆「愛在畫中」巡迴畫展暨藝術創作展', tag: '藝術美展', desc: '本校榮獲「績優團體」！優秀作品：孫鞅《昆蟲派對》、許桓睿《我喜愛的飛機》、陳秉緯《打籃球的貓》、陳宥昌《SPRUNKI》、葉俊麟《我要當航海家》、鄭屹辰《跟海豚去游泳》。（感謝黃湘芸、張淑慧、廖英淇、陳琬婷及黃唯寧老師辛勤指導）' }
+            ],
+            quoteList: [
+                { content: '「每個孩子都是一顆種子，只是花期不同。有的花一開就是燦爛，有的種子需要時間成長為參天大樹。」' },
+                { content: '「陪伴孩子成長的過程，也是重新遇見與療癒自己的溫暖旅程。」' },
+                { content: '「傾聽是愛的起點，理解是溝通的橋樑。」' },
+                { content: '「肯定孩子的每一個微小進步，就是給他飛翔的羽翼。」' }
+            ],
+            newsletterList: [
+                { issue: 148, term: '114學年度第二期', title: '數位時代下的親子溝通與網路素養', link: 'https://www.hles.ntpc.edu.tw' },
+                { issue: 147, term: '114學年度第一期', title: '如何協助孩子建立良好的學習與生活作息', link: 'https://www.hles.ntpc.edu.tw' },
+                { issue: 146, term: '113學年度第二期', title: '情緒管理與親職同理心實踐', link: 'https://www.hles.ntpc.edu.tw' },
+                { issue: 145, term: '113學年度第一期', title: '幼小銜接與新學期適應指南', link: 'https://www.hles.ntpc.edu.tw' },
+                { issue: 144, term: '112學年度第二期', title: '打造溫馨家庭談話時光', link: 'https://www.hles.ntpc.edu.tw' },
+                { issue: 143, term: '112學年度第一期', title: '同理陪伴：理解孩子的挫折與壓力', link: 'https://www.hles.ntpc.edu.tw' },
+                { issue: 142, term: '111學年度第二期', title: '正向教養：獎勵與管教的智慧平衡', link: 'https://www.hles.ntpc.edu.tw' },
+                { issue: 141, term: '111學年度第一期', title: '攜手成長：建立良好親師溝通夥伴關係', link: 'https://www.hles.ntpc.edu.tw' },
+                { issue: 140, term: '110學年度第二期', title: '發現孩子的優勢多元潛能', link: 'https://www.hles.ntpc.edu.tw' }
+            ]
+        };
+
+        // 1. 頁面導覽切換 (showPage)
+        window.showPage = function(pageId) {
+            document.querySelectorAll('.page-section').forEach(sec => sec.classList.add('hidden'));
+            const target = document.getElementById('page-' + pageId);
+            if (target) {
+                target.classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            // 選單按鈕高亮 active 效果
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('text-warm-orange', 'bg-orange-100'));
+            const activeNav = document.getElementById('nav-' + pageId);
+            if (activeNav) activeNav.classList.add('text-warm-orange', 'bg-orange-100');
+
+            // 關閉手機版選單
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+                mobileMenu.classList.add('hidden');
+            }
+        };
+
+        // 2. 手機選單切換
+        window.toggleMobileMenu = function() {
+            const menu = document.getElementById('mobile-menu');
+            if (menu) menu.classList.toggle('hidden');
+        };
+
+        // 3. Modal 視窗開啟與關閉
+        window.openModal = function(id) {
+            const modal = document.getElementById(id);
+            if (modal) modal.classList.remove('hidden');
+        };
+        window.closeModal = function(id) {
+            const modal = document.getElementById(id);
+            if (modal) modal.classList.add('hidden');
+        };
+        window.openLoginModal = function() {
+            if (window.appData.currentUser) {
+                window.openAdminPanel();
+            } else {
+                window.openModal('modal-login');
+            }
+        };
+
+        // 4. 更新管理員按鈕外觀與狀態顏色
         window.updateAdminButtonUI = function() {
             const btnDesktop = document.getElementById('btn-admin-login');
             const btnMobile = document.getElementById('mobile-btn-admin-login');
@@ -1099,7 +1194,80 @@
             }
         };
 
-        // 5. 處理帳號登入 (動態驗證帳號庫)
+        // 5. 畫面渲染與心靈雞湯機制
+        window.renderHonorRoll = function() {
+            const container = document.getElementById('honor-roll-container');
+            if (!container) return;
+            const items = window.appData.honorList;
+            if (!items || items.length === 0) {
+                container.innerHTML = `<p class="text-sm text-gray-500 text-center py-4">目前尚無榮譽事項紀錄。</p>`;
+                return;
+            }
+            container.innerHTML = items.map(item => `
+                <div class="p-4 rounded-2xl bg-amber-50/70 hover:bg-amber-50 border border-amber-200 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="flex items-start gap-3">
+                        <span class="bg-amber-500 text-white text-xs font-bold px-2.5 py-1 rounded-lg shrink-0 mt-0.5">${escapeHtml(item.badge)}</span>
+                        <div>
+                            <h3 class="font-bold text-gray-800">${escapeHtml(item.title)}</h3>
+                            <p class="text-xs text-gray-600 mt-1 leading-relaxed">${escapeHtml(item.desc)}</p>
+                        </div>
+                    </div>
+                    <span class="text-xs font-bold text-amber-600 bg-amber-100 px-2.5 py-1 rounded-full self-start sm:self-center shrink-0">${escapeHtml(item.tag)}</span>
+                </div>
+            `).join('');
+        };
+
+        window.setDailyQuote = function() {
+            const el = document.getElementById('quote-text');
+            if (!el) return;
+            const quotes = window.appData.quoteList;
+            if (!quotes || quotes.length === 0) return;
+            const today = new Date();
+            const startOfYear = new Date(today.getFullYear(), 0, 0);
+            const diff = today - startOfYear;
+            const oneDay = 1000 * 60 * 60 * 24;
+            const dayOfYear = Math.floor(diff / oneDay);
+            const index = dayOfYear % quotes.length;
+            el.textContent = quotes[index].content;
+        };
+
+        window.scheduleMidnightQuoteUpdate = function() {
+            const now = new Date();
+            const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 5);
+            const timeToMidnight = tomorrow.getTime() - now.getTime();
+            setTimeout(() => {
+                window.setDailyQuote();
+                window.scheduleMidnightQuoteUpdate();
+            }, timeToMidnight);
+        };
+
+        window.renderBookshelfGrid = function() {
+            const grid = document.getElementById('bookshelf-grid');
+            if (!grid) return;
+            const list = window.appData.newsletterList;
+            if (!list || list.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-8 text-gray-500">目前尚無期刊上架。</div>`;
+                return;
+            }
+            grid.innerHTML = list.map(item => `
+                <div class="bg-white rounded-3xl p-6 border-2 border-pink-100 shadow-sm hover:shadow-lg transition-all book-spine flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="bg-pink-100 text-soft-pink text-xs font-black px-3 py-1 rounded-full">第 ${item.issue} 期</span>
+                            <span class="text-xs text-gray-400 font-bold">${escapeHtml(item.term)}</span>
+                        </div>
+                        <h3 class="text-lg font-bold font-rounded text-gray-800 mb-3 leading-snug">${escapeHtml(item.title)}</h3>
+                    </div>
+                    <div class="pt-4 border-t border-gray-100 mt-2">
+                        <a href="${escapeHtml(item.link)}" target="_blank" rel="noopener noreferrer" class="w-full bg-soft-pink hover:bg-pink-600 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm transition-colors">
+                            <i class="fa-solid fa-file-pdf"></i> 線上閱讀期刊 (PDF)
+                        </a>
+                    </div>
+                </div>
+            `).join('');
+        };
+
+        // 6. 處理帳號登入 (動態驗證帳號庫)
         window.handleLogin = function(e) {
             e.preventDefault();
             const user = document.getElementById('login-user').value.trim();
@@ -1142,7 +1310,7 @@
             window.showToast(`歡迎登入：${window.appData.currentUser.name}`);
         };
 
-        // 6. 登出
+        // 7. 登出
         window.handleLogout = function() {
             window.appData.currentUser = null;
             window.updateAdminButtonUI();
@@ -1153,7 +1321,7 @@
             window.showToast('已成功登出');
         };
 
-        // 7. 開啟後台控制中心
+        // 8. 開啟後台控制中心
         window.openAdminPanel = function() {
             window.openModal('modal-admin-panel');
             const currentUser = window.appData.currentUser;
@@ -1174,7 +1342,7 @@
             }
         };
 
-        // 8. 後台 Tab 切換
+        // 9. 後台 Tab 切換
         window.switchAdminTab = function(tabName) {
             document.querySelectorAll('.admin-tab-btn').forEach(btn => {
                 btn.classList.remove('border-warm-orange', 'text-warm-orange');
@@ -1202,7 +1370,7 @@
             window.switchAdminTab(tabName);
         };
 
-        // 9. 親子橋公開/隱藏切換
+        // 10. 親子橋公開/隱藏切換
         window.toggleNewsletterMode = function() {
             window.appData.newsletterHidden = !window.appData.newsletterHidden;
             localStorage.setItem('hles_newsletter_hidden', window.appData.newsletterHidden);
@@ -1211,7 +1379,7 @@
             window.showToast(window.appData.newsletterHidden ? '已切換為【隱藏模式】' : '已切換為【公開上架模式】');
         };
 
-        // 10. 親子橋可見度更新 (嚴格依照公開與登入權限)
+        // 11. 親子橋可見度更新 (嚴格依照公開與登入權限)
         window.updateNewsletterVisibility = function() {
             const isHidden = window.appData.newsletterHidden;
             const isLoggedIn = window.appData.currentUser !== null;
@@ -1249,7 +1417,7 @@
             }
         };
 
-        // 11. 密碼與協助帳號管理功能
+        // 12. 密碼與協助帳號管理功能
         window.handleAdminChangeSelfPassword = function(e) {
             e.preventDefault();
             const newPass = document.getElementById('admin-new-pass').value.trim();
@@ -1335,14 +1503,13 @@
             `).join('');
         };
 
-
         // 後台管理列表渲染
         window.renderAdminHonorList = function() {
             const listEl = document.getElementById('admin-honor-list');
             if (!listEl) return;
             listEl.innerHTML = window.appData.honorList.map((item, i) => `
                 <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-gray-200 text-xs">
-                    <span class="font-bold text-gray-800 truncate max-w-xs">${item.badge} | ${item.title}</span>
+                    <span class="font-bold text-gray-800 truncate max-w-xs">${escapeHtml(item.badge)} | ${escapeHtml(item.title)}</span>
                     <div class="flex gap-2 shrink-0">
                         <button onclick="deleteHonorItem(${i})" class="text-rose-500 hover:text-rose-700 font-bold px-2 py-1 bg-rose-50 rounded-lg">刪除</button>
                     </div>
@@ -1355,7 +1522,7 @@
             if (!listEl) return;
             listEl.innerHTML = window.appData.quoteList.map((item, i) => `
                 <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-gray-200 text-xs">
-                    <span class="font-bold text-gray-800 truncate max-w-sm">${item.content}</span>
+                    <span class="font-bold text-gray-800 truncate max-w-sm">${escapeHtml(item.content)}</span>
                     <button onclick="deleteQuoteItem(${i})" class="text-rose-500 hover:text-rose-700 font-bold px-2 py-1 bg-rose-50 rounded-lg shrink-0">刪除</button>
                 </div>
             `).join('');
@@ -1366,7 +1533,7 @@
             if (!listEl) return;
             listEl.innerHTML = window.appData.newsletterList.map((item, i) => `
                 <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-gray-200 text-xs">
-                    <span class="font-bold text-gray-800">第 ${item.issue} 期 - ${item.title}</span>
+                    <span class="font-bold text-gray-800">第 ${item.issue} 期 - ${escapeHtml(item.title)}</span>
                     <button onclick="deleteNewsletterItem(${i})" class="text-rose-500 hover:text-rose-700 font-bold px-2 py-1 bg-rose-50 rounded-lg shrink-0">刪除</button>
                 </div>
             `).join('');
