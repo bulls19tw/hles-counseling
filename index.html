@@ -838,15 +838,23 @@
             </div>
 
             <!-- 後台分頁標籤 (Tabs) -->
-            <div class="flex border-b border-gray-200 mb-6 gap-2">
-                <button id="tab-btn-honor" onclick="switchAdminTab('honor')" class="admin-tab-btn border-b-4 border-warm-orange text-warm-orange font-bold px-4 py-2 text-sm flex items-center gap-2">
+            <div class="flex border-b border-gray-200 mb-6 gap-2 overflow-x-auto custom-scrollbar">
+                <button id="tab-btn-honor" onclick="switchAdminTab('honor')" class="admin-tab-btn border-b-4 border-warm-orange text-warm-orange font-bold px-4 py-2 text-sm flex items-center gap-2 shrink-0">
                     <i class="fa-solid fa-trophy"></i> 榮譽榜管理
                 </button>
-                <button id="tab-btn-quotes" onclick="switchAdminTab('quotes')" class="admin-tab-btn border-b-4 border-transparent text-gray-500 hover:text-gray-700 font-bold px-4 py-2 text-sm flex items-center gap-2">
+                <button id="tab-btn-quotes" onclick="switchAdminTab('quotes')" class="admin-tab-btn border-b-4 border-transparent text-gray-500 hover:text-gray-700 font-bold px-4 py-2 text-sm flex items-center gap-2 shrink-0">
                     <i class="fa-solid fa-quote-left"></i> 心靈雞湯管理
                 </button>
-                <button id="tab-btn-newsletter" onclick="switchAdminTab('newsletter')" class="admin-tab-btn border-b-4 border-transparent text-gray-500 hover:text-gray-700 font-bold px-4 py-2 text-sm flex items-center gap-2">
+                <button id="tab-btn-newsletter" onclick="switchAdminTab('newsletter')" class="admin-tab-btn border-b-4 border-transparent text-gray-500 hover:text-gray-700 font-bold px-4 py-2 text-sm flex items-center gap-2 shrink-0">
                     <i class="fa-solid fa-book"></i> 親子橋期刊管理
+                </button>
+                <!-- ADMIN 專屬：帳號與權限管理 -->
+                <button id="tab-btn-accounts" onclick="switchAdminTab('accounts')" class="admin-tab-btn border-b-4 border-transparent text-gray-500 hover:text-gray-700 font-bold px-4 py-2 text-sm flex items-center gap-2 shrink-0">
+                    <i class="fa-solid fa-users-gear"></i> 帳號權限管理
+                </button>
+                <!-- 一般權限專屬：修改密碼 -->
+                <button id="tab-btn-changepass" onclick="switchAdminTab('changepass')" class="admin-tab-btn border-b-4 border-transparent text-gray-500 hover:text-gray-700 font-bold px-4 py-2 text-sm flex items-center gap-2 shrink-0 hidden">
+                    <i class="fa-solid fa-key"></i> 修改個人密碼
                 </button>
             </div>
 
@@ -876,7 +884,7 @@
                 </div>
             </div>
 
-            <!-- TAB 3: 親子橋電子報期刊管理 (admin & 5303) -->
+            <!-- TAB 3: 親子橋電子報期刊管理 (admin & 5303 & 協助帳號) -->
             <div id="admin-tab-newsletter" class="admin-tab-content hidden space-y-4">
                 <div class="flex justify-between items-center bg-pink-50 p-3 rounded-xl">
                     <span class="text-xs font-bold text-soft-pink">管理《親子橋》電子書架刊物內容</span>
@@ -886,6 +894,65 @@
                 </div>
                 <div id="admin-newsletter-list" class="space-y-3 max-h-80 overflow-y-auto custom-scrollbar p-1">
                     <!-- 動態渲染列表 -->
+                </div>
+            </div>
+
+            <!-- TAB 4-A: ADMIN 帳號權限管理與密碼修改 -->
+            <div id="admin-tab-accounts" class="admin-tab-content hidden space-y-6">
+                <!-- A1. 修改管理員自身密碼 -->
+                <div class="bg-orange-50/60 p-4 rounded-2xl border border-orange-200 space-y-3">
+                    <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-user-lock text-warm-orange"></i> 修改最高管理員 (admin) 登入密碼
+                    </h3>
+                    <form onsubmit="handleAdminChangeSelfPassword(event)" class="flex flex-col sm:flex-row gap-2">
+                        <input type="password" id="admin-new-pass" required placeholder="請輸入新密碼" class="px-3 py-2 rounded-xl border border-gray-300 text-xs font-bold flex-1">
+                        <button type="submit" class="bg-warm-orange hover:bg-orange-600 text-white text-xs font-bold px-4 py-2 rounded-xl shrink-0">
+                            更新管理員密碼
+                        </button>
+                    </form>
+                </div>
+
+                <!-- A2. 新增協助帳號 -->
+                <div class="bg-blue-50/60 p-4 rounded-2xl border border-blue-200 space-y-3">
+                    <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-user-plus text-soft-blue"></i> 新增協助管理帳號 (如: 其他組長/助理)
+                    </h3>
+                    <form onsubmit="handleAddAssistantAccount(event)" class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        <input type="text" id="new-user-id" required placeholder="帳號 (如: 5302)" class="px-3 py-2 rounded-xl border border-gray-300 text-xs font-bold">
+                        <input type="text" id="new-user-name" required placeholder="顯示名稱 (如: 輔導組長)" class="px-3 py-2 rounded-xl border border-gray-300 text-xs font-bold">
+                        <input type="password" id="new-user-pass" required placeholder="登入密碼" class="px-3 py-2 rounded-xl border border-gray-300 text-xs font-bold">
+                        <div class="sm:col-span-3 flex justify-end">
+                            <button type="submit" class="bg-soft-blue hover:bg-blue-600 text-white text-xs font-bold px-5 py-2 rounded-xl">
+                                新增協助帳號
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- A3. 現有協助帳號清單 -->
+                <div class="space-y-2">
+                    <h4 class="font-bold text-xs text-gray-600">現有協助帳號清單</h4>
+                    <div id="admin-assistant-account-list" class="space-y-2 max-h-48 overflow-y-auto custom-scrollbar p-1">
+                        <!-- 動態渲染協助帳號清單 -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4-B: 5303 / 協助帳號 專用個人密碼修改 -->
+            <div id="admin-tab-changepass" class="admin-tab-content hidden space-y-4">
+                <div class="bg-pink-50/60 p-5 rounded-2xl border border-pink-200 space-y-3 max-w-md mx-auto">
+                    <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-key text-soft-pink"></i> 修改目前帳號密碼
+                    </h3>
+                    <form onsubmit="handleUserChangeSelfPassword(event)" class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 mb-1">新密碼</label>
+                            <input type="password" id="user-new-pass" required placeholder="請輸入新密碼" class="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs font-bold">
+                        </div>
+                        <button type="submit" class="w-full bg-soft-pink hover:bg-pink-600 text-white text-xs font-bold py-2.5 rounded-xl shadow-sm">
+                            確認更新密碼
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -985,9 +1052,30 @@
         import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+        // 初始化帳號庫 (儲存於 localStorage)
+        const defaultAccounts = {
+            'admin': { pass: 'pcdiy4519', role: 'admin', name: '最高管理員 (admin)' },
+            '5303': { pass: '29420451', role: 'editor_5303', name: '親師組長 (5303)' }
+        };
+
+        function getSavedAccounts() {
+            try {
+                const stored = localStorage.getItem('hles_user_accounts');
+                if (stored) return JSON.parse(stored);
+            } catch (e) {
+                console.error(e);
+            }
+            return defaultAccounts;
+        }
+
+        function saveAccounts(accs) {
+            localStorage.setItem('hles_user_accounts', JSON.stringify(accs));
+        }
+
         // 全域資料與狀態儲存
         window.appData = {
-            userRole: null, // 'admin' | 'editor_5303' | null
+            currentUser: null, // { username, role, name }
+            accounts: getSavedAccounts(),
             newsletterHidden: localStorage.getItem('hles_newsletter_hidden') !== 'false', // 預設隱藏
             honorList: [],
             quoteList: [],
@@ -1034,7 +1122,6 @@
         window.appData.quoteList = defaultQuotes.map(content => ({ content }));
         window.appData.newsletterList = defaultNewsletters;
 
-
         // 1. 頁面切換控制
         window.showPage = function(pageId) {
             const sections = document.querySelectorAll('.page-section');
@@ -1072,24 +1159,27 @@
 
         // 4. 登入按鈕邏輯
         window.openLoginModal = function() {
-            if (window.appData.userRole) {
+            if (window.appData.currentUser) {
                 window.openAdminPanel();
             } else {
                 window.openModal('modal-login');
             }
         };
 
-        // 5. 處理帳號登入
+        // 5. 處理帳號登入 (動態驗證帳號庫)
         window.handleLogin = function(e) {
             e.preventDefault();
             const user = document.getElementById('login-user').value.trim();
             const pass = document.getElementById('login-pass').value.trim();
             const errEl = document.getElementById('login-error');
 
-            if (user === 'admin' && pass === 'pcdiy4519') {
-                window.appData.userRole = 'admin';
-            } else if (user === '5303' && pass === '29420451') {
-                window.appData.userRole = 'editor_5303';
+            const accs = window.appData.accounts;
+            if (accs[user] && accs[user].pass === pass) {
+                window.appData.currentUser = {
+                    username: user,
+                    role: accs[user].role || 'assistant',
+                    name: accs[user].name || user
+                };
             } else {
                 if (errEl) errEl.classList.remove('hidden');
                 return;
@@ -1102,24 +1192,26 @@
 
             // 更新介面身分與按鈕狀態
             const roleLabel = document.getElementById('current-user-role-label');
-            if (roleLabel) roleLabel.textContent = window.appData.userRole === 'admin' ? '最高管理員 (admin)' : '親師組長 (5303)';
+            if (roleLabel) roleLabel.textContent = `${window.appData.currentUser.name}`;
             
             document.getElementById('admin-btn-text').textContent = '後台控制中心';
             document.getElementById('mobile-admin-btn-text').textContent = '後台控制中心';
 
             // 顯示受限編輯按鈕
-            if (window.appData.userRole === 'admin') {
+            if (window.appData.currentUser.role === 'admin') {
                 document.querySelectorAll('#btn-edit-honor, #btn-edit-quote, #btn-manage-bookshelf').forEach(b => b.classList.remove('hidden'));
+            } else {
+                document.querySelectorAll('#btn-manage-bookshelf').forEach(b => b.classList.remove('hidden'));
             }
 
             window.updateNewsletterVisibility();
             window.openAdminPanel();
-            window.showToast('登入成功！');
+            window.showToast(`歡迎登入：${window.appData.currentUser.name}`);
         };
 
         // 6. 登出
         window.handleLogout = function() {
-            window.appData.userRole = null;
+            window.appData.currentUser = null;
             document.getElementById('admin-btn-text').textContent = '管理員登入';
             document.getElementById('mobile-admin-btn-text').textContent = '管理員登入';
             document.querySelectorAll('#btn-edit-honor, #btn-edit-quote, #btn-manage-bookshelf').forEach(b => b.classList.add('hidden'));
@@ -1132,14 +1224,21 @@
         // 7. 開啟後台控制中心
         window.openAdminPanel = function() {
             window.openModal('modal-admin-panel');
-            if (window.appData.userRole === 'editor_5303') {
-                window.switchAdminTab('newsletter');
-                document.getElementById('tab-btn-honor').classList.add('hidden');
-                document.getElementById('tab-btn-quotes').classList.add('hidden');
-            } else {
-                document.getElementById('tab-btn-honor').classList.remove('hidden');
-                document.getElementById('tab-btn-quotes').classList.remove('hidden');
+            const currentUser = window.appData.currentUser;
+            if (!currentUser) return;
+
+            const isPageAdmin = currentUser.role === 'admin';
+
+            // 控制分頁按鈕顯示權限
+            document.getElementById('tab-btn-honor').classList.toggle('hidden', !isPageAdmin);
+            document.getElementById('tab-btn-quotes').classList.toggle('hidden', !isPageAdmin);
+            document.getElementById('tab-btn-accounts').classList.toggle('hidden', !isPageAdmin);
+            document.getElementById('tab-btn-changepass').classList.toggle('hidden', isPageAdmin);
+
+            if (isPageAdmin) {
                 window.switchAdminTab('honor');
+            } else {
+                window.switchAdminTab('newsletter');
             }
         };
 
@@ -1163,6 +1262,7 @@
             if (tabName === 'honor') window.renderAdminHonorList();
             if (tabName === 'quotes') window.renderAdminQuoteList();
             if (tabName === 'newsletter') window.renderAdminNewsletterList();
+            if (tabName === 'accounts') window.renderAdminAssistantList();
         };
 
         window.openAdminTab = function(tabName) {
@@ -1179,10 +1279,11 @@
             window.showToast(window.appData.newsletterHidden ? '已切換為【隱藏模式】' : '已切換為【公開上架模式】');
         };
 
-        // 10. 親子橋可見度更新
+        // 10. 親子橋可見度更新 (嚴格依照公開與登入權限)
         window.updateNewsletterVisibility = function() {
             const isHidden = window.appData.newsletterHidden;
-            const isLoggedIn = window.appData.userRole !== null;
+            const isLoggedIn = window.appData.currentUser !== null;
+            // 只要設定為公開，或是管理者登入，即可看見連結
             const isVisible = !isHidden || isLoggedIn;
 
             const navNL = document.getElementById('nav-newsletter');
@@ -1201,108 +1302,103 @@
 
             if (modeStatus) {
                 if (isHidden) {
-                    modeStatus.textContent = '隱藏中 (未公開)';
+                    modeStatus.textContent = '隱藏中 (僅登入者可見)';
                     modeStatus.className = 'text-xs font-black text-rose-500 px-2';
                 } else {
-                    modeStatus.textContent = '已公開上架 (全站可見)';
+                    modeStatus.textContent = '已公開上架 (全站訪客皆可見)';
                     modeStatus.className = 'text-xs font-black text-emerald-600 px-2';
                 }
             }
 
-            // 若在親子橋頁面且隱藏無權限，回首頁
+            // 若目前正停留在《親子橋》頁面，且登出後處於隱藏模式，自動平滑退回首頁
             const nlPage = document.getElementById('page-newsletter');
             if (nlPage && !nlPage.classList.contains('hidden') && !isVisible) {
                 window.showPage('home');
             }
         };
 
+        // 11. 密碼與協助帳號管理功能
+        window.handleAdminChangeSelfPassword = function(e) {
+            e.preventDefault();
+            const newPass = document.getElementById('admin-new-pass').value.trim();
+            if (!newPass) return;
 
-        // 11. 心靈雞湯日期輪播
-        window.setDailyQuote = function() {
-            const quoteEl = document.getElementById('quote-text');
-            if (quoteEl && window.appData.quoteList.length > 0) {
-                const now = new Date();
-                // 依據當地時間的年月日計算出天數索引 (凌晨 00:00 自動切換天數)
-                const days = Math.floor((now.getTime() - (now.getTimezoneOffset() * 60000)) / 86400000);
-                const idx = days % window.appData.quoteList.length;
-                quoteEl.textContent = window.appData.quoteList[idx].content || defaultQuotes[0];
+            window.appData.accounts['admin'].pass = newPass;
+            saveAccounts(window.appData.accounts);
+            document.getElementById('admin-new-pass').value = '';
+            window.showToast('admin 密碼修改成功！');
+        };
+
+        window.handleUserChangeSelfPassword = function(e) {
+            e.preventDefault();
+            const user = window.appData.currentUser ? window.appData.currentUser.username : null;
+            const newPass = document.getElementById('user-new-pass').value.trim();
+            if (!user || !newPass) return;
+
+            window.appData.accounts[user].pass = newPass;
+            saveAccounts(window.appData.accounts);
+            document.getElementById('user-new-pass').value = '';
+            window.showToast('個人密碼修改成功！');
+        };
+
+        window.handleAddAssistantAccount = function(e) {
+            e.preventDefault();
+            const uid = document.getElementById('new-user-id').value.trim();
+            const name = document.getElementById('new-user-name').value.trim();
+            const pass = document.getElementById('new-user-pass').value.trim();
+
+            if (!uid || !pass) return;
+
+            if (window.appData.accounts[uid]) {
+                window.showToast('該帳號已經存在！', true);
+                return;
             }
+
+            window.appData.accounts[uid] = {
+                pass: pass,
+                role: 'editor_' + uid,
+                name: name || uid
+            };
+
+            saveAccounts(window.appData.accounts);
+            document.getElementById('new-user-id').value = '';
+            document.getElementById('new-user-name').value = '';
+            document.getElementById('new-user-pass').value = '';
+
+            window.renderAdminAssistantList();
+            window.showToast(`已成功建立協助帳號：${name || uid}`);
         };
 
-        // 每日凌晨 00:00 自動定時更新心靈雞湯 (跨日免重新整理)
-        window.scheduleMidnightQuoteUpdate = function() {
-            const now = new Date();
-            // 計算距離下一個凌晨 00:00:05 的毫秒數
-            const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 5);
-            const msUntilMidnight = tomorrow.getTime() - now.getTime();
-            
-            setTimeout(() => {
-                window.setDailyQuote();
-                window.scheduleMidnightQuoteUpdate(); // 自動預約下一個凌晨
-            }, msUntilMidnight);
+        window.deleteAssistantAccount = function(uid) {
+            if (uid === 'admin') {
+                window.showToast('無法刪除最高管理員帳號！', true);
+                return;
+            }
+            delete window.appData.accounts[uid];
+            saveAccounts(window.appData.accounts);
+            window.renderAdminAssistantList();
+            window.showToast(`已刪除帳號：${uid}`);
         };
 
-        // 12. 渲染榮譽榜
-        window.renderHonorRoll = function() {
-            const container = document.getElementById('honor-roll-container');
-            if (!container) return;
+        window.renderAdminAssistantList = function() {
+            const listEl = document.getElementById('admin-assistant-account-list');
+            if (!listEl) return;
 
-            const list = window.appData.honorList;
-            if (list.length === 0) return;
+            const accs = window.appData.accounts;
+            const keys = Object.keys(accs).filter(k => k !== 'admin');
 
-            const colorSchemes = [
-                { bg: 'bg-emerald-50/70 hover:bg-emerald-50 border-emerald-200', badge: 'bg-mint-green', tag: 'text-emerald-600 bg-emerald-100' },
-                { bg: 'bg-amber-50/70 hover:bg-amber-50 border-amber-200', badge: 'bg-amber-500', tag: 'text-amber-600 bg-amber-100' },
-                { bg: 'bg-blue-50/70 hover:bg-blue-50 border-blue-200', badge: 'bg-soft-blue', tag: 'text-blue-600 bg-blue-100' },
-                { bg: 'bg-pink-50/70 hover:bg-pink-50 border-pink-200', badge: 'bg-soft-pink', tag: 'text-pink-600 bg-pink-100' }
-            ];
+            if (keys.length === 0) {
+                listEl.innerHTML = `<div class="text-xs text-gray-400 p-2 text-center">目前無其他協助帳號</div>`;
+                return;
+            }
 
-            container.innerHTML = list.map((item, index) => {
-                const scheme = colorSchemes[index % colorSchemes.length];
-                return `
-                    <div class="p-4 rounded-2xl ${scheme.bg} border transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                        <div class="flex items-start gap-3">
-                            <span class="${scheme.badge} text-white text-xs font-bold px-2.5 py-1 rounded-lg shrink-0 mt-0.5">${escapeHtml(item.badge || '賀喜')}</span>
-                            <div>
-                                <h3 class="font-bold text-gray-800">${escapeHtml(item.title)}</h3>
-                                <p class="text-xs text-gray-600 mt-1 leading-relaxed">${escapeHtml(item.desc)}</p>
-                            </div>
-                        </div>
-                        <span class="text-xs font-bold ${scheme.tag} px-2.5 py-1 rounded-full self-start sm:self-center shrink-0">${escapeHtml(item.tag || '校園榮耀')}</span>
-                    </div>
-                `;
-            }).join('');
-        };
-
-        // 13. 渲染親子橋電子書架 (140~148期)
-        window.renderBookshelfGrid = function() {
-            const grid = document.getElementById('bookshelf-grid');
-            if (!grid) return;
-
-            const list = window.appData.newsletterList;
-            if (list.length === 0) return;
-
-            grid.innerHTML = list.map(item => `
-                <div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-3xl p-6 border-2 border-orange-200 shadow-md hover:shadow-xl transition-all flex flex-col justify-between group">
+            listEl.innerHTML = keys.map(k => `
+                <div class="flex items-center justify-between bg-white p-2.5 rounded-xl border border-gray-200 text-xs">
                     <div>
-                        <div class="flex items-center justify-between mb-4">
-                            <span class="bg-warm-orange text-white text-xs font-black px-3 py-1 rounded-full shadow-sm">
-                                第 ${item.issue} 期
-                            </span>
-                            <span class="text-xs font-bold text-orange-700 bg-orange-100 px-2.5 py-1 rounded-full">
-                                ${escapeHtml(item.term)}
-                            </span>
-                        </div>
-                        <div class="text-4xl text-center my-3 group-hover:scale-110 transition-transform">📖</div>
-                        <h3 class="font-bold font-rounded text-gray-800 text-base mb-2 text-center group-hover:text-warm-orange transition-colors">
-                            ${escapeHtml(item.title)}
-                        </h3>
+                        <span class="font-bold text-gray-800 mr-2">${escapeHtml(accs[k].name)}</span>
+                        <span class="font-mono text-gray-400">(${escapeHtml(k)})</span>
                     </div>
-                    <div class="pt-4 border-t border-orange-200/60 mt-4 text-center">
-                        <a href="${escapeHtml(item.link)}" target="_blank" class="inline-flex items-center justify-center gap-2 w-full bg-warm-orange hover:bg-orange-600 text-white font-bold py-2.5 rounded-xl text-xs transition-colors shadow-sm">
-                            <i class="fa-solid fa-file-pdf"></i> 線上閱讀期刊 PDF
-                        </a>
-                    </div>
+                    <button onclick="deleteAssistantAccount('${k}')" class="text-rose-500 hover:text-rose-700 font-bold px-2 py-1 bg-rose-50 rounded-lg">刪除</button>
                 </div>
             `).join('');
         };
