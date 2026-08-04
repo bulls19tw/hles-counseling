@@ -59,61 +59,55 @@
             background: #FFAA8A;
             border-radius: 10px;
         }
-                    <!-- 榮譽清單容器 (預先渲染，秒開零等待，繽紛多色風格) -->
-                    <div id="honor-roll-container" class="space-y-4">
-                        <div class="p-4 rounded-2xl bg-emerald-50/70 hover:bg-emerald-50 border border-emerald-200 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                            <div class="flex items-start gap-3">
-                                <span class="bg-mint-green text-white text-xs font-bold px-2.5 py-1 rounded-lg shrink-0 mt-0.5">家庭教育</span>
-                                <div>
-                                    <h3 class="font-bold text-gray-800">114學年度家庭教育檢核榮獲「優良學校」</h3>
-                                    <p class="text-xs text-gray-600 mt-1 leading-relaxed">賀本校榮獲新北市114學年度公私立高級中等以下學校家庭教育檢核工作評選「優良學校」殊榮！</p>
-                                </div>
-                            </div>
-                            <span class="text-xs font-bold text-emerald-600 bg-emerald-100 px-2.5 py-1 rounded-full self-start sm:self-center shrink-0">校園榮耀</span>
-                        </div>
 
-                        <div class="p-4 rounded-2xl bg-amber-50/70 hover:bg-amber-50 border border-amber-200 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                            <div class="flex items-start gap-3">
-                                <span class="bg-amber-500 text-white text-xs font-bold px-2.5 py-1 rounded-lg shrink-0 mt-0.5">SUPER教師</span>
-                                <div>
-                                    <h3 class="font-bold text-gray-800">115年新北市SUPER教師獎</h3>
-                                    <p class="text-xs text-gray-600 mt-1 leading-relaxed">賀本校莊慧娟老師獲得殊榮，並將代表新北市角逐全國SUPER教師獎！</p>
-                                </div>
-                            </div>
-                            <span class="text-xs font-bold text-amber-600 bg-amber-100 px-2.5 py-1 rounded-full self-start sm:self-center shrink-0">教師榮耀</span>
-                        </div>
+        /* 浮動動畫效果 */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+        .float-animation {
+            animation: float 4s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col custom-scrollbar">
 
-                        <div class="p-4 rounded-2xl bg-blue-50/70 hover:bg-blue-50 border border-blue-200 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                            <div class="flex items-start gap-3">
-                                <span class="bg-soft-blue text-white text-xs font-bold px-2.5 py-1 rounded-lg shrink-0 mt-0.5">福和盃</span>
-                                <div>
-                                    <h3 class="font-bold text-gray-800">第一屆福和盃自由探究榮獲佳績</h3>
-                                    <p class="text-xs text-gray-600 mt-1 leading-relaxed">賀資優班應其家同學榮獲「金獎」、邱已家同學榮獲「創新表現獎」！（感謝胡菲茜老師辛勤指導）</p>
-                                </div>
-                            </div>
-                            <span class="text-xs font-bold text-blue-600 bg-blue-100 px-2.5 py-1 rounded-full self-start sm:self-center shrink-0">學生競賽</span>
-                        </div>
+    <!-- 頂部導覽列 Header -->
+    <header class="bg-white/95 backdrop-blur-md sticky top-0 z-40 border-b border-orange-100 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                
+                <!-- Logo 品牌名稱 -->
+                <button onclick="showPage('home')" class="flex items-center gap-3 group text-left">
+                    <div class="w-12 h-12 bg-gradient-to-br from-warm-orange to-warm-yellow rounded-2xl flex items-center justify-center text-white text-2xl shadow-md group-hover:scale-105 transition-transform">
+                        <i class="fa-solid fa-seedling"></i>
+                    </div>
+                    <div>
+                        <span class="block text-xl font-black font-rounded text-gray-800 tracking-wide group-hover:text-warm-orange transition-colors">秀朗國小輔導處</span>
+                        <span class="block text-xs font-bold text-gray-600">Counseling Office</span>
+                    </div>
+                </button>
 
-                        <div class="p-4 rounded-2xl bg-pink-50/70 hover:bg-pink-50 border border-pink-200 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                            <div class="flex items-start gap-3">
-                                <span class="bg-soft-pink text-white text-xs font-bold px-2.5 py-1 rounded-lg shrink-0 mt-0.5">圖文創作</span>
-                                <div>
-                                    <h3 class="font-bold text-gray-800">2026年第24屆扶輪社電腦圖文創作比賽</h3>
-                                    <p class="text-xs text-gray-600 mt-1 leading-relaxed">恭喜本校榮獲「佳作」殊榮！（感謝陳琬婷老師辛勤指導）</p>
-                                </div>
-                            </div>
-                            <span class="text-xs font-bold text-pink-600 bg-pink-100 px-2.5 py-1 rounded-full self-start sm:self-center shrink-0">資訊圖文</span>
-                        </div>
+                <!-- 電腦版導覽選單 -->
+                <nav class="hidden md:flex items-center gap-1.5 font-bold text-sm">
+                    <button onclick="showPage('home')" id="nav-home" class="nav-btn px-3.5 py-2 rounded-2xl text-warm-orange bg-orange-100 hover:bg-orange-100 transition-colors flex items-center gap-1.5">
+                        <i class="fa-solid fa-house"></i> 首頁
+                    </button>
 
-                        <div class="p-4 rounded-2xl bg-purple-50/70 hover:bg-purple-50 border border-purple-200 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                            <div class="flex items-start gap-3">
-                                <span class="bg-purple-500 text-white text-xs font-bold px-2.5 py-1 rounded-lg shrink-0 mt-0.5">愛在畫中</span>
-                                <div>
-                                    <h3 class="font-bold text-gray-800">新北市第28屆「愛在畫中」巡迴畫展暨藝術創作展</h3>
-                                    <p class="text-xs text-gray-600 mt-1 leading-relaxed">本校榮獲「績優團體」！優秀作品：孫鞅《昆蟲派對》、許桓睿《我喜愛的飛機》、陳秉緯《打籃球的貓》、陳宥昌《SPRUNKI》、葉俊麟《我要當航海家》、鄭屹辰《跟海豚去游泳》。（感謝黃湘芸、張淑慧、廖英淇、陳琬婷及黃唯寧老師辛勤指導）</p>
-                                </div>
-                            </div>
-                            <span class="text-xs font-bold text-purple-600 bg-purple-100 px-2.5 py-1 rounded-full self-start sm:self-center shrink-0">藝術美展</span>
+                    <!-- 下拉選單：認識我們 (無縫懸停結構) -->
+                    <div class="relative group py-2">
+                        <button class="nav-btn px-3.5 py-2 rounded-2xl text-gray-700 hover:bg-orange-100 hover:text-warm-orange transition-colors flex items-center gap-1.5">
+                            <i class="fa-solid fa-heart"></i> 認識我們 <i class="fa-solid fa-chevron-down text-xs opacity-60"></i>
+                        </button>
+                        
+                        <!-- 下拉式功能選單容器 -->
+                        <div class="absolute left-0 top-full hidden group-hover:block w-48 bg-white border-2 border-orange-100 rounded-2xl shadow-xl p-2 z-50 space-y-1">
+                            <button onclick="showPage('about-vision')" class="w-full text-left px-3 py-2 rounded-xl text-gray-700 hover:bg-orange-50 hover:text-warm-orange transition-colors flex items-center gap-2">
+                                <i class="fa-solid fa-seedling text-mint-green"></i> 願景目標
+                            </button>
+                            <button onclick="showPage('about-duties')" class="w-full text-left px-3 py-2 rounded-xl text-gray-700 hover:bg-orange-50 hover:text-warm-orange transition-colors flex items-center gap-2">
+                                <i class="fa-solid fa-clipboard-list text-soft-blue"></i> 工作職掌
+                            </button>
                         </div>
                     </div>
 
@@ -132,7 +126,7 @@
                         <i class="fa-solid fa-globe"></i> 相關網站
                     </button>
 
-                    <!-- 後台登入 / 管理狀態按鈕 -->
+                    <!-- 後台登入 / 管理狀態按鈕 (動態變色) -->
                     <button onclick="openLoginModal()" id="btn-admin-login" class="bg-amber-100 hover:bg-amber-200 text-amber-900 px-3.5 py-2 rounded-2xl font-bold transition-all flex items-center gap-1.5 ml-2 border border-amber-300">
                         <i id="admin-btn-icon" class="fa-solid fa-user-lock"></i> <span id="admin-btn-text">管理員登入</span>
                     </button>
@@ -243,7 +237,7 @@
 
             <!-- 榮譽榜與心靈雞湯欄位 -->
             <div class="grid md:grid-cols-3 gap-8">
-                <!-- 輔導處榮譽榜 (佔2欄，動態由 Firebase 渲染) -->
+                <!-- 輔導處榮譽榜 (佔2欄，預先渲染與繽紛色彩) -->
                 <div class="md:col-span-2 bg-white rounded-3xl p-6 sm:p-8 border-2 border-orange-100 shadow-sm">
                     <div class="flex items-center justify-between mb-6 border-b-2 border-orange-100 pb-4">
                         <h2 class="text-2xl font-bold font-rounded text-gray-800 flex items-center gap-2">
@@ -283,37 +277,37 @@
                             <span class="text-xs font-bold text-amber-600 bg-amber-100 px-2.5 py-1 rounded-full self-start sm:self-center shrink-0">教師榮耀</span>
                         </div>
 
-                        <div class="p-4 rounded-2xl bg-emerald-50/70 hover:bg-emerald-50 border border-emerald-200 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="p-4 rounded-2xl bg-blue-50/70 hover:bg-blue-50 border border-blue-200 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                             <div class="flex items-start gap-3">
-                                <span class="bg-mint-green text-white text-xs font-bold px-2.5 py-1 rounded-lg shrink-0 mt-0.5">福和盃</span>
+                                <span class="bg-soft-blue text-white text-xs font-bold px-2.5 py-1 rounded-lg shrink-0 mt-0.5">福和盃</span>
                                 <div>
                                     <h3 class="font-bold text-gray-800">第一屆福和盃自由探究榮獲佳績</h3>
                                     <p class="text-xs text-gray-600 mt-1 leading-relaxed">賀資優班應其家同學榮獲「金獎」、邱已家同學榮獲「創新表現獎」！（感謝胡菲茜老師辛勤指導）</p>
                                 </div>
                             </div>
-                            <span class="text-xs font-bold text-emerald-600 bg-emerald-100 px-2.5 py-1 rounded-full self-start sm:self-center shrink-0">學生競賽</span>
+                            <span class="text-xs font-bold text-blue-600 bg-blue-100 px-2.5 py-1 rounded-full self-start sm:self-center shrink-0">學生競賽</span>
                         </div>
 
-                        <div class="p-4 rounded-2xl bg-blue-50/70 hover:bg-blue-50 border border-blue-200 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="p-4 rounded-2xl bg-pink-50/70 hover:bg-pink-50 border border-pink-200 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                             <div class="flex items-start gap-3">
-                                <span class="bg-soft-blue text-white text-xs font-bold px-2.5 py-1 rounded-lg shrink-0 mt-0.5">圖文創作</span>
+                                <span class="bg-soft-pink text-white text-xs font-bold px-2.5 py-1 rounded-lg shrink-0 mt-0.5">圖文創作</span>
                                 <div>
                                     <h3 class="font-bold text-gray-800">2026年第24屆扶輪社電腦圖文創作比賽</h3>
                                     <p class="text-xs text-gray-600 mt-1 leading-relaxed">恭喜本校榮獲「佳作」殊榮！（感謝陳琬婷老師辛勤指導）</p>
                                 </div>
                             </div>
-                            <span class="text-xs font-bold text-blue-600 bg-blue-100 px-2.5 py-1 rounded-full self-start sm:self-center shrink-0">資訊圖文</span>
+                            <span class="text-xs font-bold text-pink-600 bg-pink-100 px-2.5 py-1 rounded-full self-start sm:self-center shrink-0">資訊圖文</span>
                         </div>
 
-                        <div class="p-4 rounded-2xl bg-pink-50/70 hover:bg-pink-50 border border-pink-200 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="p-4 rounded-2xl bg-purple-50/70 hover:bg-purple-50 border border-purple-200 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                             <div class="flex items-start gap-3">
-                                <span class="bg-soft-pink text-white text-xs font-bold px-2.5 py-1 rounded-lg shrink-0 mt-0.5">愛在畫中</span>
+                                <span class="bg-purple-500 text-white text-xs font-bold px-2.5 py-1 rounded-lg shrink-0 mt-0.5">愛在畫中</span>
                                 <div>
                                     <h3 class="font-bold text-gray-800">新北市第28屆「愛在畫中」巡迴畫展暨藝術創作展</h3>
                                     <p class="text-xs text-gray-600 mt-1 leading-relaxed">本校榮獲「績優團體」！優秀作品：孫鞅《昆蟲派對》、許桓睿《我喜愛的飛機》、陳秉緯《打籃球的貓》、陳宥昌《SPRUNKI》、葉俊麟《我要當航海家》、鄭屹辰《跟海豚去游泳》。（感謝黃湘芸、張淑慧、廖英淇、陳琬婷及黃唯寧老師辛勤指導）</p>
                                 </div>
                             </div>
-                            <span class="text-xs font-bold text-pink-600 bg-pink-100 px-2.5 py-1 rounded-full self-start sm:self-center shrink-0">藝術美展</span>
+                            <span class="text-xs font-bold text-purple-600 bg-purple-100 px-2.5 py-1 rounded-full self-start sm:self-center shrink-0">藝術美展</span>
                         </div>
                     </div>
                 </div>
@@ -579,7 +573,7 @@
             </div>
         </section>
 
-        <!-- ================= PAGE 4: 親子橋電子報 (立體木質電子書架頁面) ================= -->
+        <!-- ================= PAGE 4: 親子橋電子報 (電子書架頁面) ================= -->
         <section id="page-newsletter" class="page-section hidden space-y-8">
             <!-- 管理員預覽時顯示的提示 Banner -->
             <div id="admin-hidden-notice" class="bg-amber-100 border-2 border-amber-300 rounded-2xl p-4 flex items-center justify-between text-amber-900 hidden">
@@ -722,14 +716,14 @@
                             </a>
                         </li>
                         <li>
-                            <a href="https://specialeduelearning.moe.edu.tw/mooc/index.php" target="_blank" rel="noopener noreferrer" class="p-2.5 rounded-xl hover:bg-blue-50 text-gray-700 hover:text-soft-blue flex items-center justify-between transition-colors">
-                                <span>教育部特殊教育專業發展數位課程平臺</span>
+                            <a href="https://sencir.spc.ntnu.edu.tw/GoWeb/include/index.php" target="_blank" rel="noopener noreferrer" class="p-2.5 rounded-xl hover:bg-blue-50 text-gray-700 hover:text-soft-blue flex items-center justify-between transition-colors">
+                                <span>優質特教發展網絡系統暨教學支援平臺</span>
                                 <i class="fa-solid fa-chevron-right text-xs text-gray-300"></i>
                             </a>
                         </li>
                         <li>
-                            <a href="https://sencir.spc.ntnu.edu.tw/GoWeb/include/index.php" target="_blank" rel="noopener noreferrer" class="p-2.5 rounded-xl hover:bg-blue-50 text-gray-700 hover:text-soft-blue flex items-center justify-between transition-colors">
-                                <span>優質特教發展網絡系統暨教學支援平臺</span>
+                            <a href="https://specialeduelearning.moe.edu.tw/mooc/index.php" target="_blank" rel="noopener noreferrer" class="p-2.5 rounded-xl hover:bg-blue-50 text-gray-700 hover:text-soft-blue flex items-center justify-between transition-colors">
+                                <span>教育部特殊教育專業發展數位課程平臺</span>
                                 <i class="fa-solid fa-chevron-right text-xs text-gray-300"></i>
                             </a>
                         </li>
@@ -757,7 +751,7 @@
 
     <!-- ================= MODALS & OVERLAYS ================= -->
 
-    <!-- 1. 管理員登入 Modal -->
+    <!-- 1. 管理員登入 Modal (無資安字數提示) -->
     <div id="modal-login" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 border-4 border-warm-orange shadow-2xl relative">
             <button onclick="closeModal('modal-login')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
@@ -1071,7 +1065,7 @@
             console.warn("Firebase 初始化失敗，預設改用本地記憶模式:", e);
         }
 
-        // 全域帳號庫預設值
+        // 全域帳號庫預設值 (admin 密碼: pcdiy4519)
         const defaultAccounts = {
             'admin': { pass: 'pcdiy4519', role: 'admin', name: '最高管理員' },
             '5303': { pass: '29420451', role: 'editor_5303', name: '親師組長' }
@@ -1280,7 +1274,7 @@
                 return;
             }
             grid.innerHTML = list.map(item => `
-                <div class="bg-white rounded-3xl p-6 border-2 border-pink-100 shadow-sm hover:shadow-lg transition-all book-spine flex flex-col justify-between">
+                <div class="bg-white rounded-3xl p-6 border-2 border-pink-100 shadow-sm hover:shadow-lg transition-all flex flex-col justify-between">
                     <div>
                         <div class="flex items-center justify-between mb-3">
                             <span class="bg-pink-100 text-soft-pink text-xs font-black px-3 py-1 rounded-full">第 ${item.issue} 期</span>
