@@ -100,18 +100,20 @@
                         <i class="fa-solid fa-house"></i> 首頁
                     </button>
                     
-                    <!-- 認識我們 Dropdown/Group -->
+                    <!-- 認識我們 Dropdown/Group (已修復間隙無縫連接) -->
                     <div class="relative group">
                         <button onclick="showPage('about-vision')" id="nav-about" class="nav-btn px-3.5 py-2 rounded-2xl text-gray-700 hover:bg-orange-100 hover:text-warm-orange transition-colors flex items-center gap-1.5">
                             <i class="fa-solid fa-hand-holding-heart"></i> 認識我們 <i class="fa-solid fa-chevron-down text-xs ml-1"></i>
                         </button>
-                        <div class="absolute left-0 mt-1 w-48 bg-white rounded-2xl shadow-xl border-2 border-orange-100 p-2 hidden group-hover:block z-50">
-                            <button onclick="showPage('about-vision')" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-warm-orange rounded-xl font-bold flex items-center gap-2">
-                                <i class="fa-solid fa-seedling text-mint-green"></i> 願景目標
-                            </button>
-                            <button onclick="showPage('about-duties')" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-warm-orange rounded-xl font-bold flex items-center gap-2">
-                                <i class="fa-solid fa-clipboard-list text-soft-blue"></i> 工作執掌
-                            </button>
+                        <div class="absolute left-0 top-full pt-2 w-48 hidden group-hover:block z-50">
+                            <div class="bg-white rounded-2xl shadow-xl border-2 border-orange-100 p-2">
+                                <button onclick="showPage('about-vision')" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-warm-orange rounded-xl font-bold flex items-center gap-2">
+                                    <i class="fa-solid fa-seedling text-mint-green"></i> 願景目標
+                                </button>
+                                <button onclick="showPage('about-duties')" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-warm-orange rounded-xl font-bold flex items-center gap-2">
+                                    <i class="fa-solid fa-clipboard-list text-soft-blue"></i> 工作職掌
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -152,7 +154,7 @@
                 <i class="fa-solid fa-seedling text-mint-green"></i> 認識我們 - 願景目標
             </button>
             <button onclick="showPage('about-duties')" class="w-full text-left px-4 py-3 rounded-xl hover:bg-orange-50 text-gray-700 font-bold flex items-center gap-3">
-                <i class="fa-solid fa-clipboard-list text-soft-blue"></i> 認識我們 - 工作執掌
+                <i class="fa-solid fa-clipboard-list text-soft-blue"></i> 認識我們 - 工作職掌
             </button>
             <button onclick="showPage('newsletter')" id="mobile-nav-newsletter" class="w-full text-left px-4 py-3 rounded-xl hover:bg-orange-50 text-gray-700 font-bold flex items-center gap-3 hidden">
                 <i class="fa-solid fa-book-open text-soft-pink"></i> 親子橋電子報
@@ -221,7 +223,7 @@
                     <div class="w-14 h-14 bg-blue-100 rounded-2xl flex items-center justify-center text-soft-blue text-2xl mx-auto mb-3 group-hover:scale-110 transition-transform">
                         <i class="fa-solid fa-users-gear"></i>
                     </div>
-                    <span class="font-bold text-gray-800 group-hover:text-soft-blue">工作執掌</span>
+                    <span class="font-bold text-gray-800 group-hover:text-soft-blue">工作職掌</span>
                 </button>
 
                 <button id="quick-btn-newsletter" onclick="showPage('newsletter')" class="bg-white p-5 rounded-3xl border-2 border-pink-100 hover:border-soft-pink shadow-sm hover:shadow-md transition-all text-center group hidden">
@@ -359,15 +361,15 @@
             </div>
         </section>
 
-        <!-- ================= PAGE 2: 認識我們 - 願景目標 ================= -->
-        <section id="page-about-vision" class="page-section hidden space-y-8">
+        <!-- ================= PAGE 3: 認識我們 - 工作職掌 ================= -->
+        <section id="page-about-duties" class="page-section hidden space-y-8">
             <div class="text-center max-w-2xl mx-auto space-y-3">
-                <span class="bg-amber-100 text-warm-orange px-4 py-1.5 rounded-full text-xs font-black tracking-wider uppercase">About Us</span>
-                <h1 class="text-3xl sm:text-4xl font-black font-rounded text-gray-800">認識我們 —— 願景與目標</h1>
-                <p class="text-gray-600 text-sm sm:text-base">用愛心營造友善校園，以專業陪伴孩子快樂自信成長</p>
+                <span class="bg-blue-100 text-soft-blue px-4 py-1.5 rounded-full text-xs font-black tracking-wider uppercase">Organization</span>
+                <h1 class="text-3xl sm:text-4xl font-black font-rounded text-gray-800">輔導處團隊與工作職掌</h1>
+                <p class="text-gray-600 text-sm sm:text-base">專業分工，攜手打造友善溫馨校園</p>
             </div>
 
-            <!-- 六大願景目標卡片 -->
+            <!-- 職掌卡片列表 -->
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <!-- 目標 1 -->
                 <div class="bg-white rounded-3xl p-6 border-2 border-orange-100 shadow-sm hover:shadow-md transition-all">
@@ -1220,10 +1222,24 @@
             const quoteEl = document.getElementById('quote-text');
             if (quoteEl && window.appData.quoteList.length > 0) {
                 const now = new Date();
+                // 依據當地時間的年月日計算出天數索引 (凌晨 00:00 自動切換天數)
                 const days = Math.floor((now.getTime() - (now.getTimezoneOffset() * 60000)) / 86400000);
                 const idx = days % window.appData.quoteList.length;
                 quoteEl.textContent = window.appData.quoteList[idx].content || defaultQuotes[0];
             }
+        };
+
+        // 每日凌晨 00:00 自動定時更新心靈雞湯 (跨日免重新整理)
+        window.scheduleMidnightQuoteUpdate = function() {
+            const now = new Date();
+            // 計算距離下一個凌晨 00:00:05 的毫秒數
+            const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 5);
+            const msUntilMidnight = tomorrow.getTime() - now.getTime();
+            
+            setTimeout(() => {
+                window.setDailyQuote();
+                window.scheduleMidnightQuoteUpdate(); // 自動預約下一個凌晨
+            }, msUntilMidnight);
         };
 
         // 12. 渲染榮譽榜
@@ -1415,6 +1431,7 @@
         window.addEventListener('DOMContentLoaded', () => {
             window.renderHonorRoll();
             window.setDailyQuote();
+            window.scheduleMidnightQuoteUpdate(); // 啟用跨日自動切換計時器
             window.renderBookshelfGrid();
             window.updateNewsletterVisibility();
         });
