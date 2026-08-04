@@ -257,11 +257,61 @@
                         </div>
                     </div>
 
-                    <!-- 榮譽清單容器 -->
+                    <!-- 榮譽清單容器 (預先渲染，秒開零等待) -->
                     <div id="honor-roll-container" class="space-y-4">
-                        <div class="text-center py-8 text-gray-400">
-                            <i class="fa-solid fa-spinner fa-spin text-2xl mb-2"></i>
-                            <p class="text-sm">載入最新榮譽榜資料中...</p>
+                        <div class="p-4 rounded-2xl bg-emerald-50/70 hover:bg-emerald-50 border border-emerald-200 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div class="flex items-start gap-3">
+                                <span class="bg-mint-green text-white text-xs font-bold px-2.5 py-1 rounded-lg shrink-0 mt-0.5">家庭教育</span>
+                                <div>
+                                    <h3 class="font-bold text-gray-800">114學年度家庭教育檢核榮獲「優良學校」</h3>
+                                    <p class="text-xs text-gray-600 mt-1 leading-relaxed">賀本校榮獲新北市114學年度公私立高級中等以下學校家庭教育檢核工作評選「優良學校」殊榮！</p>
+                                </div>
+                            </div>
+                            <span class="text-xs font-bold text-emerald-600 bg-emerald-100 px-2.5 py-1 rounded-full self-start sm:self-center shrink-0">校園榮耀</span>
+                        </div>
+
+                        <div class="p-4 rounded-2xl bg-amber-50/70 hover:bg-amber-50 border border-amber-200 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div class="flex items-start gap-3">
+                                <span class="bg-amber-500 text-white text-xs font-bold px-2.5 py-1 rounded-lg shrink-0 mt-0.5">SUPER教師</span>
+                                <div>
+                                    <h3 class="font-bold text-gray-800">115年新北市SUPER教師獎</h3>
+                                    <p class="text-xs text-gray-600 mt-1 leading-relaxed">賀本校莊慧娟老師獲得殊榮，並將代表新北市角逐全國SUPER教師獎！</p>
+                                </div>
+                            </div>
+                            <span class="text-xs font-bold text-amber-600 bg-amber-100 px-2.5 py-1 rounded-full self-start sm:self-center shrink-0">教師榮耀</span>
+                        </div>
+
+                        <div class="p-4 rounded-2xl bg-emerald-50/70 hover:bg-emerald-50 border border-emerald-200 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div class="flex items-start gap-3">
+                                <span class="bg-mint-green text-white text-xs font-bold px-2.5 py-1 rounded-lg shrink-0 mt-0.5">福和盃</span>
+                                <div>
+                                    <h3 class="font-bold text-gray-800">第一屆福和盃自由探究榮獲佳績</h3>
+                                    <p class="text-xs text-gray-600 mt-1 leading-relaxed">賀資優班應其家同學榮獲「金獎」、邱已家同學榮獲「創新表現獎」！（感謝胡菲茜老師辛勤指導）</p>
+                                </div>
+                            </div>
+                            <span class="text-xs font-bold text-emerald-600 bg-emerald-100 px-2.5 py-1 rounded-full self-start sm:self-center shrink-0">學生競賽</span>
+                        </div>
+
+                        <div class="p-4 rounded-2xl bg-blue-50/70 hover:bg-blue-50 border border-blue-200 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div class="flex items-start gap-3">
+                                <span class="bg-soft-blue text-white text-xs font-bold px-2.5 py-1 rounded-lg shrink-0 mt-0.5">圖文創作</span>
+                                <div>
+                                    <h3 class="font-bold text-gray-800">2026年第24屆扶輪社電腦圖文創作比賽</h3>
+                                    <p class="text-xs text-gray-600 mt-1 leading-relaxed">恭喜本校榮獲「佳作」殊榮！（感謝陳琬婷老師辛勤指導）</p>
+                                </div>
+                            </div>
+                            <span class="text-xs font-bold text-blue-600 bg-blue-100 px-2.5 py-1 rounded-full self-start sm:self-center shrink-0">資訊圖文</span>
+                        </div>
+
+                        <div class="p-4 rounded-2xl bg-pink-50/70 hover:bg-pink-50 border border-pink-200 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div class="flex items-start gap-3">
+                                <span class="bg-soft-pink text-white text-xs font-bold px-2.5 py-1 rounded-lg shrink-0 mt-0.5">愛在畫中</span>
+                                <div>
+                                    <h3 class="font-bold text-gray-800">新北市第28屆「愛在畫中」巡迴畫展暨藝術創作展</h3>
+                                    <p class="text-xs text-gray-600 mt-1 leading-relaxed">本校榮獲「績優團體」！優秀作品：孫鞅《昆蟲派對》、許桓睿《我喜愛的飛機》、陳秉緯《打籃球的貓》、陳宥昌《SPRUNKI》、葉俊麟《我要當航海家》、鄭屹辰《跟海豚去游泳》。（感謝黃湘芸、張淑慧、廖英淇、陳琬婷及黃唯寧老師辛勤指導）</p>
+                                </div>
+                            </div>
+                            <span class="text-xs font-bold text-pink-600 bg-pink-100 px-2.5 py-1 rounded-full self-start sm:self-center shrink-0">藝術美展</span>
                         </div>
                     </div>
                 </div>
@@ -944,9 +994,14 @@
             appId: "1:123456789:web:abcdef"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        let app, auth, db;
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+        } catch(e) {
+            console.warn("Firebase initialization skipped or failed:", e);
+        }
 
         // 全域狀態控制
         window.appData = {
@@ -999,9 +1054,11 @@
         // 步驟 1：完成 Firebase 驗證
         async function initAuth() {
             // 立即渲染畫面，不等待網路回應
-            renderHonorRoll();
-            setDailyQuote();
-            renderBookshelfGrid();
+            if (window.renderHonorRoll) window.renderHonorRoll();
+            if (window.setDailyQuote) window.setDailyQuote();
+            if (window.renderBookshelfGrid) window.renderBookshelfGrid();
+
+            if (!auth || !db) return;
 
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
@@ -1009,24 +1066,23 @@
                 } else {
                     await signInAnonymously(auth);
                 }
+                setupFirestoreListeners();
             } catch (err) {
                 console.warn("Auth initialization fallback:", err);
             }
-            setupFirestoreListeners();
         }
 
         // 步驟 2：設定 Firestore 即時監聽
         function setupFirestoreListeners() {
+            if (!db) return;
             // A. 監聽全站設定 (親子橋公開/隱藏狀態)
             const settingsDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'config');
             onSnapshot(settingsDocRef, (snap) => {
                 if (snap.exists()) {
                     window.appData.newsletterHidden = snap.data().newsletterHidden ?? true;
                     localStorage.setItem('hles_newsletter_hidden', window.appData.newsletterHidden);
-                } else {
-                    setDoc(settingsDocRef, { newsletterHidden: true });
                 }
-                updateNewsletterVisibility();
+                if (window.updateNewsletterVisibility) window.updateNewsletterVisibility();
             }, (error) => console.log("Settings listener warning:", error));
 
             // B. 監聽榮譽榜
@@ -1034,17 +1090,13 @@
             onSnapshot(honorColRef, (snap) => {
                 const list = [];
                 snap.forEach(d => list.push({ id: d.id, ...d.data() }));
-                if (list.length === 0) {
-                    defaultHonors.forEach(item => addDoc(honorColRef, item));
-                    window.appData.honorList = defaultHonors;
-                } else {
+                if (list.length > 0) {
                     window.appData.honorList = list;
+                    if (window.renderHonorRoll) window.renderHonorRoll();
+                    if (window.renderAdminHonorList) window.renderAdminHonorList();
                 }
-                renderHonorRoll();
-                renderAdminHonorList();
             }, (error) => {
                 console.log("Honor listener warning:", error);
-                renderHonorRoll(); // 連線異常時保持顯示預設資料
             });
 
             // C. 監聽心靈雞湯
@@ -1052,35 +1104,33 @@
             onSnapshot(quoteColRef, (snap) => {
                 const list = [];
                 snap.forEach(d => list.push({ id: d.id, ...d.data() }));
-                if (list.length === 0) {
-                    defaultQuotes.forEach(content => addDoc(quoteColRef, { content }));
-                } else {
+                if (list.length > 0) {
                     window.appData.quoteList = list;
+                    if (window.setDailyQuote) window.setDailyQuote();
+                    if (window.renderAdminQuoteList) window.renderAdminQuoteList();
                 }
-                setDailyQuote();
-                renderAdminQuoteList();
             }, (error) => {
                 console.log("Quote listener warning:", error);
-                setDailyQuote();
             });
 
-            // D. 監聽親子橋期刊 (預設 140~148 期)
+            // D. 監聽親子橋期刊
             const newsletterColRef = collection(db, 'artifacts', appId, 'public', 'data', 'newsletters');
             onSnapshot(newsletterColRef, (snap) => {
                 const list = [];
                 snap.forEach(d => list.push({ id: d.id, ...d.data() }));
-                if (list.length === 0) {
-                    defaultNewsletters.forEach(item => addDoc(newsletterColRef, item));
-                } else {
+                if (list.length > 0) {
                     list.sort((a, b) => Number(b.issue) - Number(a.issue));
                     window.appData.newsletterList = list;
+                    if (window.renderBookshelfGrid) window.renderBookshelfGrid();
+                    if (window.renderAdminNewsletterList) window.renderAdminNewsletterList();
                 }
-                renderBookshelfGrid();
-                renderAdminNewsletterList();
             }, (error) => {
                 console.log("Newsletter listener warning:", error);
-                renderBookshelfGrid();
             });
+        }
+
+        // 啟動流程
+        initAuth();
         }
 
         function showToast(msg, isError = false) {
