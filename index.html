@@ -983,48 +983,16 @@
         import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Firebase 配置與 App ID 初始化
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'hles-counseling-app';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            apiKey: "demo-api-key",
-            authDomain: "demo-app.firebaseapp.com",
-            projectId: "demo-app",
-            storageBucket: "demo-app.appspot.com",
-            messagingSenderId: "123456789",
-            appId: "1:123456789:web:abcdef"
-        };
-
-        let app, auth, db;
-        try {
-            app = initializeApp(firebaseConfig);
-            auth = getAuth(app);
-            db = getFirestore(app);
-        } catch(e) {
-            console.warn("Firebase initialization skipped or failed:", e);
-        }
-
-        // 全域狀態控制
+        // 全域資料與狀態儲存
         window.appData = {
             userRole: null, // 'admin' | 'editor_5303' | null
-            newsletterHidden: localStorage.getItem('hles_newsletter_hidden') !== 'false', // 預設隱藏模式
+            newsletterHidden: localStorage.getItem('hles_newsletter_hidden') !== 'false', // 預設隱藏
             honorList: [],
             quoteList: [],
             newsletterList: []
         };
 
-        // 預設資料庫 (預設載入 140~148 期)
-        const defaultNewsletters = [
-            { issue: 148, term: "114學年度第二期", title: "陪伴孩子建立健康的網路使用習慣", link: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
-            { issue: 147, term: "114學年度第一期", title: "溫柔而堅定的情緒陪伴指南", link: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
-            { issue: 146, term: "113學年度第四期", title: "傾聽孩子的心聲：培養良好的親子溝通", link: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
-            { issue: 145, term: "113學年度第三期", title: "發現孩子的獨特天賦與自信關卡", link: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
-            { issue: 144, term: "113學年度第二期", title: "從挫折中學習：培養孩子的心理韌性", link: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
-            { issue: 143, term: "113學年度第一期", title: "幼小銜接與適應新環境的親職智慧", link: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
-            { issue: 142, term: "112學年度第四期", title: "友善校園與同儕相處的小技巧", link: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
-            { issue: 141, term: "112學年度第三期", title: "點亮希望：生命教育與感恩同行", link: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
-            { issue: 140, term: "112學年度第二期", title: "攜手營造溫暖包容的家庭學習氛圍", link: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" }
-        ];
-
+        // 預設榮譽榜清單 (秒開快照)
         const defaultHonors = [
             { badge: "家庭教育", title: "114學年度家庭教育檢核榮獲「優良學校」", tag: "校園榮耀", desc: "賀本校榮獲新北市114學年度公私立高級中等以下學校家庭教育檢核工作評選「優良學校」殊榮！" },
             { badge: "SUPER教師", title: "115年新北市SUPER教師獎", tag: "教師榮耀", desc: "賀本校莊慧娟老師獲得殊榮，並將代表新北市角逐全國SUPER教師獎！" },
@@ -1033,6 +1001,7 @@
             { badge: "愛在畫中", title: "新北市第28屆「愛在畫中」巡迴畫展暨藝術創作展", tag: "藝術美展", desc: "本校榮獲「績優團體」！優秀作品：孫鞅《昆蟲派對》、許桓睿《我喜愛的飛機》、陳秉緯《打籃球的貓》、陳宥昌《SPRUNKI》、葉俊麟《我要當航海家》、鄭屹辰《跟海豚去游泳》。（感謝黃湘芸、張淑慧、廖英淇、陳琬婷及黃唯寧老師辛勤指導）" }
         ];
 
+        // 預設金句庫
         const defaultQuotes = [
             "「每個孩子都是一顆種子，只是花期不同。有的花一開就是燦爛，有的種子需要時間成長為參天大樹。」",
             "「陪伴孩子成長的過程，也是重新遇見與療癒自己的溫暖旅程。」",
@@ -1046,123 +1015,409 @@
             "「好的親子關係，是給予孩子探索世界的勇氣與安全感。」"
         ];
 
-        // 預先載入預設資料，達到「秒開零轉圈」體驗
+        // 預設《親子橋》刊物庫 (140~148期)
+        const defaultNewsletters = [
+            { issue: 148, term: "114學年度第二期", title: "陪伴孩子建立健康的網路使用習慣", link: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
+            { issue: 147, term: "114學年度第一期", title: "溫柔而堅定的情緒陪伴指南", link: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
+            { issue: 146, term: "113學年度第四期", title: "傾聽孩子的心聲：培養良好的親子溝通", link: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
+            { issue: 145, term: "113學年度第三期", title: "發現孩子的獨特天賦與自信關卡", link: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
+            { issue: 144, term: "113學年度第二期", title: "從挫折中學習：培養孩子的心理韌性", link: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
+            { issue: 143, term: "113學年度第一期", title: "幼小銜接與適應新環境的親職智慧", link: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
+            { issue: 142, term: "112學年度第四期", title: "友善校園與同儕相處的小技巧", link: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
+            { issue: 141, term: "112學年度第三期", title: "點亮希望：生命教育與感恩同行", link: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
+            { issue: 140, term: "112學年度第二期", title: "攜手營造溫暖包容的家庭學習氛圍", link: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" }
+        ];
+
         window.appData.honorList = defaultHonors;
         window.appData.quoteList = defaultQuotes.map(content => ({ content }));
         window.appData.newsletterList = defaultNewsletters;
 
-        // 步驟 1：完成 Firebase 驗證
-        async function initAuth() {
-            // 立即渲染畫面，不等待網路回應
-            if (window.renderHonorRoll) window.renderHonorRoll();
-            if (window.setDailyQuote) window.setDailyQuote();
-            if (window.renderBookshelfGrid) window.renderBookshelfGrid();
 
-            if (!auth || !db) return;
+        // 1. 頁面切換控制
+        window.showPage = function(pageId) {
+            const sections = document.querySelectorAll('.page-section');
+            sections.forEach(sec => sec.classList.add('hidden'));
 
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-                setupFirestoreListeners();
-            } catch (err) {
-                console.warn("Auth initialization fallback:", err);
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (mobileMenu) mobileMenu.classList.add('hidden');
+
+            const targetSec = document.getElementById('page-' + pageId);
+            if (targetSec) {
+                targetSec.classList.remove('hidden');
+            } else {
+                document.getElementById('page-home').classList.remove('hidden');
             }
-        }
 
-        // 步驟 2：設定 Firestore 即時監聽
-        function setupFirestoreListeners() {
-            if (!db) return;
-            // A. 監聽全站設定 (親子橋公開/隱藏狀態)
-            const settingsDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'config');
-            onSnapshot(settingsDocRef, (snap) => {
-                if (snap.exists()) {
-                    window.appData.newsletterHidden = snap.data().newsletterHidden ?? true;
-                    localStorage.setItem('hles_newsletter_hidden', window.appData.newsletterHidden);
-                }
-                if (window.updateNewsletterVisibility) window.updateNewsletterVisibility();
-            }, (error) => console.log("Settings listener warning:", error));
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
 
-            // B. 監聽榮譽榜
-            const honorColRef = collection(db, 'artifacts', appId, 'public', 'data', 'honorRoll');
-            onSnapshot(honorColRef, (snap) => {
-                const list = [];
-                snap.forEach(d => list.push({ id: d.id, ...d.data() }));
-                if (list.length > 0) {
-                    window.appData.honorList = list;
-                    if (window.renderHonorRoll) window.renderHonorRoll();
-                    if (window.renderAdminHonorList) window.renderAdminHonorList();
-                }
-            }, (error) => {
-                console.log("Honor listener warning:", error);
+        // 2. 手機版選單切換
+        window.toggleMobileMenu = function() {
+            const menu = document.getElementById('mobile-menu');
+            if (menu) menu.classList.toggle('hidden');
+        };
+
+        // 3. Modal 彈窗控制
+        window.openModal = function(modalId) {
+            const m = document.getElementById(modalId);
+            if (m) m.classList.remove('hidden');
+        };
+
+        window.closeModal = function(modalId) {
+            const m = document.getElementById(modalId);
+            if (m) m.classList.add('hidden');
+        };
+
+        // 4. 登入按鈕邏輯
+        window.openLoginModal = function() {
+            if (window.appData.userRole) {
+                window.openAdminPanel();
+            } else {
+                window.openModal('modal-login');
+            }
+        };
+
+        // 5. 處理帳號登入
+        window.handleLogin = function(e) {
+            e.preventDefault();
+            const user = document.getElementById('login-user').value.trim();
+            const pass = document.getElementById('login-pass').value.trim();
+            const errEl = document.getElementById('login-error');
+
+            if (user === 'admin' && pass === 'pcdiy4519') {
+                window.appData.userRole = 'admin';
+            } else if (user === '5303' && pass === '29420451') {
+                window.appData.userRole = 'editor_5303';
+            } else {
+                if (errEl) errEl.classList.remove('hidden');
+                return;
+            }
+
+            if (errEl) errEl.classList.add('hidden');
+            window.closeModal('modal-login');
+            document.getElementById('login-user').value = '';
+            document.getElementById('login-pass').value = '';
+
+            // 更新介面身分與按鈕狀態
+            const roleLabel = document.getElementById('current-user-role-label');
+            if (roleLabel) roleLabel.textContent = window.appData.userRole === 'admin' ? '最高管理員 (admin)' : '親師組長 (5303)';
+            
+            document.getElementById('admin-btn-text').textContent = '後台控制中心';
+            document.getElementById('mobile-admin-btn-text').textContent = '後台控制中心';
+
+            // 顯示受限編輯按鈕
+            if (window.appData.userRole === 'admin') {
+                document.querySelectorAll('#btn-edit-honor, #btn-edit-quote, #btn-manage-bookshelf').forEach(b => b.classList.remove('hidden'));
+            }
+
+            window.updateNewsletterVisibility();
+            window.openAdminPanel();
+            window.showToast('登入成功！');
+        };
+
+        // 6. 登出
+        window.handleLogout = function() {
+            window.appData.userRole = null;
+            document.getElementById('admin-btn-text').textContent = '管理員登入';
+            document.getElementById('mobile-admin-btn-text').textContent = '管理員登入';
+            document.querySelectorAll('#btn-edit-honor, #btn-edit-quote, #btn-manage-bookshelf').forEach(b => b.classList.add('hidden'));
+
+            window.closeModal('modal-admin-panel');
+            window.updateNewsletterVisibility();
+            window.showToast('已成功登出');
+        };
+
+        // 7. 開啟後台控制中心
+        window.openAdminPanel = function() {
+            window.openModal('modal-admin-panel');
+            if (window.appData.userRole === 'editor_5303') {
+                window.switchAdminTab('newsletter');
+                document.getElementById('tab-btn-honor').classList.add('hidden');
+                document.getElementById('tab-btn-quotes').classList.add('hidden');
+            } else {
+                document.getElementById('tab-btn-honor').classList.remove('hidden');
+                document.getElementById('tab-btn-quotes').classList.remove('hidden');
+                window.switchAdminTab('honor');
+            }
+        };
+
+        // 8. 後台 Tab 切換
+        window.switchAdminTab = function(tabName) {
+            document.querySelectorAll('.admin-tab-btn').forEach(btn => {
+                btn.classList.remove('border-warm-orange', 'text-warm-orange');
+                btn.classList.add('border-transparent', 'text-gray-500');
             });
+            document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.add('hidden'));
 
-            // C. 監聽心靈雞湯
-            const quoteColRef = collection(db, 'artifacts', appId, 'public', 'data', 'quotes');
-            onSnapshot(quoteColRef, (snap) => {
-                const list = [];
-                snap.forEach(d => list.push({ id: d.id, ...d.data() }));
-                if (list.length > 0) {
-                    window.appData.quoteList = list;
-                    if (window.setDailyQuote) window.setDailyQuote();
-                    if (window.renderAdminQuoteList) window.renderAdminQuoteList();
+            const activeBtn = document.getElementById('tab-btn-' + tabName);
+            const activeTab = document.getElementById('admin-tab-' + tabName);
+
+            if (activeBtn) {
+                activeBtn.classList.remove('border-transparent', 'text-gray-500');
+                activeBtn.classList.add('border-warm-orange', 'text-warm-orange');
+            }
+            if (activeTab) activeTab.classList.remove('hidden');
+
+            if (tabName === 'honor') window.renderAdminHonorList();
+            if (tabName === 'quotes') window.renderAdminQuoteList();
+            if (tabName === 'newsletter') window.renderAdminNewsletterList();
+        };
+
+        window.openAdminTab = function(tabName) {
+            window.openAdminPanel();
+            window.switchAdminTab(tabName);
+        };
+
+        // 9. 親子橋公開/隱藏切換
+        window.toggleNewsletterMode = function() {
+            window.appData.newsletterHidden = !window.appData.newsletterHidden;
+            localStorage.setItem('hles_newsletter_hidden', window.appData.newsletterHidden);
+            
+            window.updateNewsletterVisibility();
+            window.showToast(window.appData.newsletterHidden ? '已切換為【隱藏模式】' : '已切換為【公開上架模式】');
+        };
+
+        // 10. 親子橋可見度更新
+        window.updateNewsletterVisibility = function() {
+            const isHidden = window.appData.newsletterHidden;
+            const isLoggedIn = window.appData.userRole !== null;
+            const isVisible = !isHidden || isLoggedIn;
+
+            const navNL = document.getElementById('nav-newsletter');
+            const mobileNL = document.getElementById('mobile-nav-newsletter');
+            const heroNL = document.getElementById('hero-btn-newsletter');
+            const quickNL = document.getElementById('quick-btn-newsletter');
+            const noticeNL = document.getElementById('admin-hidden-notice');
+            const modeStatus = document.getElementById('mode-status-text');
+
+            if (navNL) navNL.classList.toggle('hidden', !isVisible);
+            if (mobileNL) mobileNL.classList.toggle('hidden', !isVisible);
+            if (heroNL) heroNL.classList.toggle('hidden', !isVisible);
+            if (quickNL) quickNL.classList.toggle('hidden', !isVisible);
+
+            if (noticeNL) noticeNL.classList.toggle('hidden', !(isHidden && isLoggedIn));
+
+            if (modeStatus) {
+                if (isHidden) {
+                    modeStatus.textContent = '隱藏中 (未公開)';
+                    modeStatus.className = 'text-xs font-black text-rose-500 px-2';
+                } else {
+                    modeStatus.textContent = '已公開上架 (全站可見)';
+                    modeStatus.className = 'text-xs font-black text-emerald-600 px-2';
                 }
-            }, (error) => {
-                console.log("Quote listener warning:", error);
-            });
+            }
 
-            // D. 監聽親子橋期刊
-            const newsletterColRef = collection(db, 'artifacts', appId, 'public', 'data', 'newsletters');
-            onSnapshot(newsletterColRef, (snap) => {
-                const list = [];
-                snap.forEach(d => list.push({ id: d.id, ...d.data() }));
-                if (list.length > 0) {
-                    list.sort((a, b) => Number(b.issue) - Number(a.issue));
-                    window.appData.newsletterList = list;
-                    if (window.renderBookshelfGrid) window.renderBookshelfGrid();
-                    if (window.renderAdminNewsletterList) window.renderAdminNewsletterList();
-                }
-            }, (error) => {
-                console.log("Newsletter listener warning:", error);
-            });
-        }
+            // 若在親子橋頁面且隱藏無權限，回首頁
+            const nlPage = document.getElementById('page-newsletter');
+            if (nlPage && !nlPage.classList.contains('hidden') && !isVisible) {
+                window.showPage('home');
+            }
+        };
 
-        // 啟動流程
-        initAuth();
-        }
 
-        function showToast(msg, isError = false) {
+        // 11. 心靈雞湯日期輪播
+        window.setDailyQuote = function() {
+            const quoteEl = document.getElementById('quote-text');
+            if (quoteEl && window.appData.quoteList.length > 0) {
+                const now = new Date();
+                const days = Math.floor((now.getTime() - (now.getTimezoneOffset() * 60000)) / 86400000);
+                const idx = days % window.appData.quoteList.length;
+                quoteEl.textContent = window.appData.quoteList[idx].content || defaultQuotes[0];
+            }
+        };
+
+        // 12. 渲染榮譽榜
+        window.renderHonorRoll = function() {
+            const container = document.getElementById('honor-roll-container');
+            if (!container) return;
+
+            const list = window.appData.honorList;
+            if (list.length === 0) return;
+
+            const colorSchemes = [
+                { bg: 'bg-emerald-50/70 hover:bg-emerald-50 border-emerald-200', badge: 'bg-mint-green', tag: 'text-emerald-600 bg-emerald-100' },
+                { bg: 'bg-amber-50/70 hover:bg-amber-50 border-amber-200', badge: 'bg-amber-500', tag: 'text-amber-600 bg-amber-100' },
+                { bg: 'bg-blue-50/70 hover:bg-blue-50 border-blue-200', badge: 'bg-soft-blue', tag: 'text-blue-600 bg-blue-100' },
+                { bg: 'bg-pink-50/70 hover:bg-pink-50 border-pink-200', badge: 'bg-soft-pink', tag: 'text-pink-600 bg-pink-100' }
+            ];
+
+            container.innerHTML = list.map((item, index) => {
+                const scheme = colorSchemes[index % colorSchemes.length];
+                return `
+                    <div class="p-4 rounded-2xl ${scheme.bg} border transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="flex items-start gap-3">
+                            <span class="${scheme.badge} text-white text-xs font-bold px-2.5 py-1 rounded-lg shrink-0 mt-0.5">${escapeHtml(item.badge || '賀喜')}</span>
+                            <div>
+                                <h3 class="font-bold text-gray-800">${escapeHtml(item.title)}</h3>
+                                <p class="text-xs text-gray-600 mt-1 leading-relaxed">${escapeHtml(item.desc)}</p>
+                            </div>
+                        </div>
+                        <span class="text-xs font-bold ${scheme.tag} px-2.5 py-1 rounded-full self-start sm:self-center shrink-0">${escapeHtml(item.tag || '校園榮耀')}</span>
+                    </div>
+                `;
+            }).join('');
+        };
+
+        // 13. 渲染親子橋電子書架 (140~148期)
+        window.renderBookshelfGrid = function() {
+            const grid = document.getElementById('bookshelf-grid');
+            if (!grid) return;
+
+            const list = window.appData.newsletterList;
+            if (list.length === 0) return;
+
+            grid.innerHTML = list.map(item => `
+                <div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-3xl p-6 border-2 border-orange-200 shadow-md hover:shadow-xl transition-all flex flex-col justify-between group">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="bg-warm-orange text-white text-xs font-black px-3 py-1 rounded-full shadow-sm">
+                                第 ${item.issue} 期
+                            </span>
+                            <span class="text-xs font-bold text-orange-700 bg-orange-100 px-2.5 py-1 rounded-full">
+                                ${escapeHtml(item.term)}
+                            </span>
+                        </div>
+                        <div class="text-4xl text-center my-3 group-hover:scale-110 transition-transform">📖</div>
+                        <h3 class="font-bold font-rounded text-gray-800 text-base mb-2 text-center group-hover:text-warm-orange transition-colors">
+                            ${escapeHtml(item.title)}
+                        </h3>
+                    </div>
+                    <div class="pt-4 border-t border-orange-200/60 mt-4 text-center">
+                        <a href="${escapeHtml(item.link)}" target="_blank" class="inline-flex items-center justify-center gap-2 w-full bg-warm-orange hover:bg-orange-600 text-white font-bold py-2.5 rounded-xl text-xs transition-colors shadow-sm">
+                            <i class="fa-solid fa-file-pdf"></i> 線上閱讀期刊 PDF
+                        </a>
+                    </div>
+                </div>
+            `).join('');
+        };
+
+
+        // 後台管理列表渲染
+        window.renderAdminHonorList = function() {
+            const listEl = document.getElementById('admin-honor-list');
+            if (!listEl) return;
+            listEl.innerHTML = window.appData.honorList.map((item, i) => `
+                <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-gray-200 text-xs">
+                    <span class="font-bold text-gray-800 truncate max-w-xs">${item.badge} | ${item.title}</span>
+                    <div class="flex gap-2 shrink-0">
+                        <button onclick="deleteHonorItem(${i})" class="text-rose-500 hover:text-rose-700 font-bold px-2 py-1 bg-rose-50 rounded-lg">刪除</button>
+                    </div>
+                </div>
+            `).join('');
+        };
+
+        window.renderAdminQuoteList = function() {
+            const listEl = document.getElementById('admin-quote-list');
+            if (!listEl) return;
+            listEl.innerHTML = window.appData.quoteList.map((item, i) => `
+                <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-gray-200 text-xs">
+                    <span class="font-bold text-gray-800 truncate max-w-sm">${item.content}</span>
+                    <button onclick="deleteQuoteItem(${i})" class="text-rose-500 hover:text-rose-700 font-bold px-2 py-1 bg-rose-50 rounded-lg shrink-0">刪除</button>
+                </div>
+            `).join('');
+        };
+
+        window.renderAdminNewsletterList = function() {
+            const listEl = document.getElementById('admin-newsletter-list');
+            if (!listEl) return;
+            listEl.innerHTML = window.appData.newsletterList.map((item, i) => `
+                <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-gray-200 text-xs">
+                    <span class="font-bold text-gray-800">第 ${item.issue} 期 - ${item.title}</span>
+                    <button onclick="deleteNewsletterItem(${i})" class="text-rose-500 hover:text-rose-700 font-bold px-2 py-1 bg-rose-50 rounded-lg shrink-0">刪除</button>
+                </div>
+            `).join('');
+        };
+
+        // CRUD 觸發表單
+        window.openHonorForm = function() { window.openModal('modal-honor-form'); };
+        window.saveHonorItem = function(e) {
+            e.preventDefault();
+            const badge = document.getElementById('honor-badge').value;
+            const title = document.getElementById('honor-title').value;
+            const tag = document.getElementById('honor-tag').value;
+            const desc = document.getElementById('honor-desc').value;
+
+            window.appData.honorList.unshift({ badge, title, tag, desc });
+            window.renderHonorRoll();
+            window.renderAdminHonorList();
+            window.closeModal('modal-honor-form');
+            window.showToast('榮譽事項新增成功！');
+        };
+        window.deleteHonorItem = function(index) {
+            window.appData.honorList.splice(index, 1);
+            window.renderHonorRoll();
+            window.renderAdminHonorList();
+            window.showToast('已刪除該筆事項');
+        };
+
+        window.openQuoteForm = function() { window.openModal('modal-quote-form'); };
+        window.saveQuoteItem = function(e) {
+            e.preventDefault();
+            const content = document.getElementById('quote-content').value;
+            window.appData.quoteList.unshift({ content });
+            window.setDailyQuote();
+            window.renderAdminQuoteList();
+            window.closeModal('modal-quote-form');
+            window.showToast('心靈金句新增成功！');
+        };
+        window.deleteQuoteItem = function(index) {
+            window.appData.quoteList.splice(index, 1);
+            window.setDailyQuote();
+            window.renderAdminQuoteList();
+            window.showToast('已刪除該金句');
+        };
+
+        window.openNewsletterForm = function() { window.openModal('modal-newsletter-form'); };
+        window.saveNewsletterItem = function(e) {
+            e.preventDefault();
+            const issue = Number(document.getElementById('newsletter-issue').value);
+            const term = document.getElementById('newsletter-term').value;
+            const title = document.getElementById('newsletter-title').value;
+            const link = document.getElementById('newsletter-link').value;
+
+            window.appData.newsletterList.unshift({ issue, term, title, link });
+            window.appData.newsletterList.sort((a,b) => b.issue - a.issue);
+            window.renderBookshelfGrid();
+            window.renderAdminNewsletterList();
+            window.closeModal('modal-newsletter-form');
+            window.showToast('《親子橋》新期刊上架成功！');
+        };
+        window.deleteNewsletterItem = function(index) {
+            window.appData.newsletterList.splice(index, 1);
+            window.renderBookshelfGrid();
+            window.renderAdminNewsletterList();
+            window.showToast('已刪除該期刊');
+        };
+
+        // Toast 訊息
+        window.showToast = function(msg, isError = false) {
             const toast = document.getElementById('toast-message');
             const toastText = document.getElementById('toast-text');
             const toastIcon = document.getElementById('toast-icon');
 
+            if (!toast || !toastText) return;
             toastText.textContent = msg;
-            if (isError) {
-                toastIcon.className = "fa-solid fa-circle-xmark text-rose-400 text-base";
-            } else {
-                toastIcon.className = "fa-solid fa-circle-check text-mint-green text-base";
+            if (toastIcon) {
+                toastIcon.className = isError ? "fa-solid fa-circle-xmark text-rose-400 text-base" : "fa-solid fa-circle-check text-mint-green text-base";
             }
-
             toast.classList.remove('translate-x-72');
-            setTimeout(() => {
-                toast.classList.add('translate-x-72');
-            }, 3000);
-        }
+            setTimeout(() => toast.classList.add('translate-x-72'), 3000);
+        };
 
         function escapeHtml(str) {
             if (typeof str !== 'string') return str;
             return str.replace(/[&<>"']/g, function(m) {
-                return {
-                    '&': '&amp;',
-                    '<': '&lt;',
-                    '>': '&gt;',
-                    '"': '&quot;',
-                    "'": '&#039;'
-                }[m];
+                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
             });
         }
+
+        // 初始化載入
+        window.addEventListener('DOMContentLoaded', () => {
+            window.renderHonorRoll();
+            window.setDailyQuote();
+            window.renderBookshelfGrid();
+            window.updateNewsletterVisibility();
+        });
     </script>
 </body>
 </html>
