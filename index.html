@@ -951,7 +951,7 @@
         // 全域狀態控制
         window.appData = {
             userRole: null, // 'admin' | 'editor_5303' | null
-            newsletterHidden: true, // 預設隱藏模式 (未公開)
+            newsletterHidden: localStorage.getItem('hles_newsletter_hidden') !== 'false', // 預設隱藏模式
             honorList: [],
             quoteList: [],
             newsletterList: []
@@ -991,8 +991,18 @@
             "「好的親子關係，是給予孩子探索世界的勇氣與安全感。」"
         ];
 
+        // 預先載入預設資料，達到「秒開零轉圈」體驗
+        window.appData.honorList = defaultHonors;
+        window.appData.quoteList = defaultQuotes.map(content => ({ content }));
+        window.appData.newsletterList = defaultNewsletters;
+
         // 步驟 1：完成 Firebase 驗證
         async function initAuth() {
+            // 立即渲染畫面，不等待網路回應
+            renderHonorRoll();
+            setDailyQuote();
+            renderBookshelfGrid();
+
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
@@ -1012,6 +1022,7 @@
             onSnapshot(settingsDocRef, (snap) => {
                 if (snap.exists()) {
                     window.appData.newsletterHidden = snap.data().newsletterHidden ?? true;
+                    localStorage.setItem('hles_newsletter_hidden', window.appData.newsletterHidden);
                 } else {
                     setDoc(settingsDocRef, { newsletterHidden: true });
                 }
@@ -1025,12 +1036,16 @@
                 snap.forEach(d => list.push({ id: d.id, ...d.data() }));
                 if (list.length === 0) {
                     defaultHonors.forEach(item => addDoc(honorColRef, item));
+                    window.appData.honorList = defaultHonors;
                 } else {
                     window.appData.honorList = list;
-                    renderHonorRoll();
-                    renderAdminHonorList();
                 }
-            }, (error) => console.log("Honor listener warning:", error));
+                renderHonorRoll();
+                renderAdminHonorList();
+            }, (error) => {
+                console.log("Honor listener warning:", error);
+                renderHonorRoll(); // 連線異常時保持顯示預設資料
+            });
 
             // C. 監聽心靈雞湯
             const quoteColRef = collection(db, 'artifacts', appId, 'public', 'data', 'quotes');
@@ -1041,10 +1056,13 @@
                     defaultQuotes.forEach(content => addDoc(quoteColRef, { content }));
                 } else {
                     window.appData.quoteList = list;
-                    setDailyQuote();
-                    renderAdminQuoteList();
                 }
-            }, (error) => console.log("Quote listener warning:", error));
+                setDailyQuote();
+                renderAdminQuoteList();
+            }, (error) => {
+                console.log("Quote listener warning:", error);
+                setDailyQuote();
+            });
 
             // D. 監聽親子橋期刊 (預設 140~148 期)
             const newsletterColRef = collection(db, 'artifacts', appId, 'public', 'data', 'newsletters');
@@ -1056,496 +1074,12 @@
                 } else {
                     list.sort((a, b) => Number(b.issue) - Number(a.issue));
                     window.appData.newsletterList = list;
-                    renderBookshelfGrid();
-                    renderAdminNewsletterList();
                 }
-            }, (error) => console.log("Newsletter listener warning:", error));
-        }
-
-        // 頁面渲染：首頁榮譽榜
-        function renderHonorRoll() {
-            const container = document.getElementById('honor-roll-container');
-            if (!container) return;
-            const items = window.appData.honorList;
-            if (items.length === 0) {
-                container.innerHTML = `<div class="text-center py-6 text-gray-400">尚無榮譽事項</div>`;
-                return;
-            }
-
-            container.innerHTML = items.map(item => `
-                <div class="p-4 rounded-2xl bg-amber-50/70 hover:bg-amber-50 border border-amber-200 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div class="flex items-start gap-3">
-                        <span class="bg-amber-500 text-white text-xs font-bold px-2.5 py-1 rounded-lg shrink-0 mt-0.5">${escapeHtml(item.badge || '榮譽榜')}</span>
-                        <div>
-                            <h3 class="font-bold text-gray-800 hover:text-amber-600 transition-colors">
-                                ${escapeHtml(item.title || '')}
-                            </h3>
-                            <p class="text-xs text-gray-600 mt-1 leading-relaxed">
-                                ${escapeHtml(item.desc || '')}
-                            </p>
-                        </div>
-                    </div>
-                    <span class="text-xs text-amber-600 font-bold bg-amber-100 px-2.5 py-1 rounded-full self-start sm:self-center shrink-0">${escapeHtml(item.tag || '榮耀紀錄')}</span>
-                </div>
-            `).join('');
-        }
-
-        // 頁面渲染：每日心靈雞湯
-        function setDailyQuote() {
-            const quoteEl = document.getElementById('quote-text');
-            const quotes = window.appData.quoteList;
-            if (!quoteEl || quotes.length === 0) return;
-
-            const now = new Date();
-            const daysSinceEpoch = Math.floor((now.getTime() - (now.getTimezoneOffset() * 60000)) / (1000 * 60 * 60 * 24));
-            const index = daysSinceEpoch % quotes.length;
-            quoteEl.textContent = quotes[index].content;
-        }
-
-        // 頁面渲染與控制：更新親子橋選單與連結的顯示/隱藏狀態
-        window.updateNewsletterVisibility = function() {
-            const isHidden = window.appData.newsletterHidden;
-            const isLoggedIn = !!window.appData.userRole;
-
-            // 若為「公開」模式，或「已登入管理員」，則顯示選單及按鈕
-            const shouldShow = !isHidden || isLoggedIn;
-
-            const targetBtns = [
-                document.getElementById('nav-newsletter'),
-                document.getElementById('mobile-nav-newsletter'),
-                document.getElementById('hero-btn-newsletter'),
-                document.getElementById('quick-btn-newsletter')
-            ];
-
-            targetBtns.forEach(btn => {
-                if (btn) {
-                    if (shouldShow) {
-                        btn.classList.remove('hidden');
-                    } else {
-                        btn.classList.add('hidden');
-                    }
-                }
-            });
-
-            // 後台狀態列文字
-            const statusText = document.getElementById('mode-status-text');
-            if (statusText) {
-                if (isHidden) {
-                    statusText.textContent = "隱藏中 (未公開，僅管理員可見)";
-                    statusText.className = "text-xs font-black text-rose-500 px-2";
-                } else {
-                    statusText.textContent = "公開中 (親職書架 A版)";
-                    statusText.className = "text-xs font-black text-emerald-600 px-2";
-                }
-            }
-
-            // 書架頁面頂部管理員提醒 Banner
-            const hiddenNotice = document.getElementById('admin-hidden-notice');
-            if (hiddenNotice) {
-                if (isHidden && isLoggedIn) {
-                    hiddenNotice.classList.remove('hidden');
-                } else {
-                    hiddenNotice.classList.add('hidden');
-                }
-            }
-        };
-
-        // 頁面渲染：木質電子書架繪製 (140~148期)
-        function renderBookshelfGrid() {
-            const grid = document.getElementById('bookshelf-grid');
-            if (!grid) return;
-            const newsletters = window.appData.newsletterList;
-
-            if (newsletters.length === 0) {
-                grid.innerHTML = `<div class="col-span-full text-center py-12 text-gray-400">目前書架尚無電子報上架</div>`;
-                return;
-            }
-
-            grid.innerHTML = newsletters.map(item => `
-                <div class="bg-white rounded-3xl p-6 border-2 border-orange-100 shadow-sm relative flex flex-col justify-between group hover:shadow-xl transition-all duration-300">
-                    <div>
-                        <div class="w-full h-44 bg-gradient-to-br from-amber-100 via-orange-100 to-rose-100 rounded-2xl p-4 flex flex-col justify-between mb-4 border-2 border-orange-200 relative overflow-hidden book-spine">
-                            <div class="flex justify-between items-center">
-                                <span class="bg-warm-orange text-white text-xs font-black px-3 py-1 rounded-full shadow-sm">
-                                    第 ${item.issue} 期
-                                </span>
-                                <span class="text-xs font-bold text-gray-500">${escapeHtml(item.term || '')}</span>
-                            </div>
-                            <div class="my-auto text-center px-2">
-                                <div class="text-3xl mb-1">📖</div>
-                                <h3 class="font-bold text-gray-800 text-sm line-clamp-2">${escapeHtml(item.title || '')}</h3>
-                            </div>
-                            <div class="text-right text-[10px] text-orange-800/60 font-bold">秀朗國小輔導處</div>
-                        </div>
-
-                        <h4 class="font-bold text-gray-800 text-base mb-2 group-hover:text-warm-orange transition-colors">
-                            《親子橋》第 ${item.issue} 期
-                        </h4>
-                        <p class="text-xs text-gray-500 line-clamp-2 leading-relaxed mb-4">
-                            ${escapeHtml(item.title || '')}
-                        </p>
-                    </div>
-
-                    <div class="pt-2">
-                        <a href="${escapeHtml(item.link || '#')}" target="_blank" rel="noopener noreferrer" class="w-full bg-warm-orange hover:bg-orange-600 text-white font-bold py-2.5 rounded-xl shadow transition-all flex items-center justify-center gap-2 text-xs">
-                            <i class="fa-solid fa-file-pdf"></i> 線上閱讀 PDF 專刊
-                        </a>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // 後台管理渲染
-        function renderAdminHonorList() {
-            const listEl = document.getElementById('admin-honor-list');
-            if (!listEl) return;
-            const items = window.appData.honorList;
-
-            listEl.innerHTML = items.map(item => `
-                <div class="flex items-center justify-between p-3 bg-white border rounded-xl shadow-sm">
-                    <div class="text-xs space-y-1 max-w-[70%]">
-                        <span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded font-bold">${escapeHtml(item.badge)}</span>
-                        <p class="font-bold text-gray-800 truncate">${escapeHtml(item.title)}</p>
-                    </div>
-                    <div class="flex items-center gap-1">
-                        <button onclick="editHonorItem('${item.id}')" class="text-xs bg-blue-50 text-blue-600 px-2.5 py-1 rounded-lg font-bold hover:bg-blue-100">編輯</button>
-                        <button onclick="deleteHonorItem('${item.id}')" class="text-xs bg-rose-50 text-rose-600 px-2.5 py-1 rounded-lg font-bold hover:bg-rose-100">刪除</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function renderAdminQuoteList() {
-            const listEl = document.getElementById('admin-quote-list');
-            if (!listEl) return;
-            const items = window.appData.quoteList;
-
-            listEl.innerHTML = items.map(item => `
-                <div class="flex items-center justify-between p-3 bg-white border rounded-xl shadow-sm">
-                    <p class="text-xs font-bold text-amber-900 max-w-[75%] truncate">${escapeHtml(item.content)}</p>
-                    <div class="flex items-center gap-1">
-                        <button onclick="editQuoteItem('${item.id}')" class="text-xs bg-blue-50 text-blue-600 px-2.5 py-1 rounded-lg font-bold hover:bg-blue-100">編輯</button>
-                        <button onclick="deleteQuoteItem('${item.id}')" class="text-xs bg-rose-50 text-rose-600 px-2.5 py-1 rounded-lg font-bold hover:bg-rose-100">刪除</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function renderAdminNewsletterList() {
-            const listEl = document.getElementById('admin-newsletter-list');
-            if (!listEl) return;
-            const items = window.appData.newsletterList;
-
-            listEl.innerHTML = items.map(item => `
-                <div class="flex items-center justify-between p-3 bg-white border rounded-xl shadow-sm">
-                    <div class="text-xs space-y-1 max-w-[70%]">
-                        <span class="bg-pink-100 text-soft-pink px-2 py-0.5 rounded font-bold">第 ${item.issue} 期</span>
-                        <p class="font-bold text-gray-800 truncate">${escapeHtml(item.title)}</p>
-                    </div>
-                    <div class="flex items-center gap-1">
-                        <button onclick="editNewsletterItem('${item.id}')" class="text-xs bg-blue-50 text-blue-600 px-2.5 py-1 rounded-lg font-bold hover:bg-blue-100">編輯</button>
-                        <button onclick="deleteNewsletterItem('${item.id}')" class="text-xs bg-rose-50 text-rose-600 px-2.5 py-1 rounded-lg font-bold hover:bg-rose-100">刪除</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // 後台一鍵切換「公開 / 隱藏」模式
-        window.toggleNewsletterMode = async function() {
-            const newHiddenState = !window.appData.newsletterHidden;
-            try {
-                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'config');
-                await setDoc(docRef, { newsletterHidden: newHiddenState }, { merge: true });
-                showToast(newHiddenState ? "已設為【隱藏模式】（一般訪客無法看見選單）" : "已切換為【公開模式】（親職書架全站公開）");
-            } catch (e) {
-                showToast("狀態切換失敗，請重試", true);
-            }
-        };
-
-        // 榮譽榜 CRUD
-        window.saveHonorItem = async function(e) {
-            e.preventDefault();
-            const id = document.getElementById('honor-id').value;
-            const data = {
-                title: document.getElementById('honor-title').value,
-                badge: document.getElementById('honor-badge').value,
-                tag: document.getElementById('honor-tag').value,
-                desc: document.getElementById('honor-desc').value
-            };
-
-            try {
-                if (id) {
-                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'honorRoll', id), data);
-                } else {
-                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'honorRoll'), data);
-                }
-                closeModal('modal-honor-form');
-                showToast("榮譽榜更新成功！");
-            } catch (err) {
-                showToast("儲存失敗", true);
-            }
-        };
-
-        window.deleteHonorItem = async function(id) {
-            try {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'honorRoll', id));
-                showToast("已刪除榮譽事項");
-            } catch (e) {
-                showToast("刪除失敗", true);
-            }
-        };
-
-        window.editHonorItem = function(id) {
-            const item = window.appData.honorList.find(i => i.id === id);
-            if (!item) return;
-            document.getElementById('honor-id').value = item.id;
-            document.getElementById('honor-title').value = item.title || '';
-            document.getElementById('honor-badge').value = item.badge || '';
-            document.getElementById('honor-tag').value = item.tag || '';
-            document.getElementById('honor-desc').value = item.desc || '';
-            document.getElementById('honor-form-title').textContent = "編輯榮譽事項";
-            openModal('modal-honor-form');
-        };
-
-        window.openHonorForm = function() {
-            document.getElementById('honor-id').value = '';
-            document.getElementById('honor-title').value = '';
-            document.getElementById('honor-badge').value = '';
-            document.getElementById('honor-tag').value = '';
-            document.getElementById('honor-desc').value = '';
-            document.getElementById('honor-form-title').textContent = "新增榮譽事項";
-            openModal('modal-honor-form');
-        };
-
-        // 心靈金句 CRUD
-        window.saveQuoteItem = async function(e) {
-            e.preventDefault();
-            const id = document.getElementById('quote-id').value;
-            const content = document.getElementById('quote-content').value;
-
-            try {
-                if (id) {
-                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'quotes', id), { content });
-                } else {
-                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'quotes'), { content });
-                }
-                closeModal('modal-quote-form');
-                showToast("金句庫更新成功！");
-            } catch (err) {
-                showToast("儲存失敗", true);
-            }
-        };
-
-        window.deleteQuoteItem = async function(id) {
-            try {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'quotes', id));
-                showToast("已刪除金句");
-            } catch (e) {
-                showToast("刪除失敗", true);
-            }
-        };
-
-        window.editQuoteItem = function(id) {
-            const item = window.appData.quoteList.find(i => i.id === id);
-            if (!item) return;
-            document.getElementById('quote-id').value = item.id;
-            document.getElementById('quote-content').value = item.content || '';
-            document.getElementById('quote-form-title').textContent = "編輯心靈金句";
-            openModal('modal-quote-form');
-        };
-
-        window.openQuoteForm = function() {
-            document.getElementById('quote-id').value = '';
-            document.getElementById('quote-content').value = '';
-            document.getElementById('quote-form-title').textContent = "新增心靈金句";
-            openModal('modal-quote-form');
-        };
-
-        // 親子橋期刊 CRUD
-        window.saveNewsletterItem = async function(e) {
-            e.preventDefault();
-            const id = document.getElementById('newsletter-id').value;
-            const data = {
-                issue: Number(document.getElementById('newsletter-issue').value),
-                term: document.getElementById('newsletter-term').value,
-                title: document.getElementById('newsletter-title').value,
-                link: document.getElementById('newsletter-link').value
-            };
-
-            try {
-                if (id) {
-                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'newsletters', id), data);
-                } else {
-                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'newsletters'), data);
-                }
-                closeModal('modal-newsletter-form');
-                showToast("期刊上架/更新成功！");
-            } catch (err) {
-                showToast("儲存失敗", true);
-            }
-        };
-
-        window.deleteNewsletterItem = async function(id) {
-            try {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'newsletters', id));
-                showToast("已下架期刊");
-            } catch (e) {
-                showToast("刪除失敗", true);
-            }
-        };
-
-        window.editNewsletterItem = function(id) {
-            const item = window.appData.newsletterList.find(i => i.id === id);
-            if (!item) return;
-            document.getElementById('newsletter-id').value = item.id;
-            document.getElementById('newsletter-issue').value = item.issue || '';
-            document.getElementById('newsletter-term').value = item.term || '';
-            document.getElementById('newsletter-title').value = item.title || '';
-            document.getElementById('newsletter-link').value = item.link || '';
-            document.getElementById('newsletter-form-title').textContent = "編輯期刊內容";
-            openModal('modal-newsletter-form');
-        };
-
-        window.openNewsletterForm = function() {
-            document.getElementById('newsletter-id').value = '';
-            document.getElementById('newsletter-issue').value = '';
-            document.getElementById('newsletter-term').value = '';
-            document.getElementById('newsletter-title').value = '';
-            document.getElementById('newsletter-link').value = '';
-            document.getElementById('newsletter-form-title').textContent = "上架新期刊";
-            openModal('modal-newsletter-form');
-        };
-
-        // 初始化執行
-        initAuth();
-    </script>
-
-    <script>
-        // 常規 UI 管理邏輯 (頁面切換、帳號驗證、Modal 控制)
-
-        function showPage(pageId) {
-            const sections = document.querySelectorAll('.page-section');
-            sections.forEach(sec => sec.classList.add('hidden'));
-
-            document.getElementById('mobile-menu').classList.add('hidden');
-
-            const targetSec = document.getElementById('page-' + pageId);
-            if(targetSec) targetSec.classList.remove('hidden');
-
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobile-menu');
-            menu.classList.toggle('hidden');
-        }
-
-        function openModal(id) {
-            const modal = document.getElementById(id);
-            if(modal) modal.classList.remove('hidden');
-        }
-
-        function closeModal(id) {
-            const modal = document.getElementById(id);
-            if(modal) modal.classList.add('hidden');
-        }
-
-        function openLoginModal() {
-            if (window.appData.userRole) {
-                openModal('modal-admin-panel');
-            } else {
-                document.getElementById('login-error').classList.add('hidden');
-                openModal('modal-login');
-            }
-        }
-
-        // 後台登入處理 (admin / pcdiy4519 與 5303 / 29420451)
-        function handleLogin(e) {
-            e.preventDefault();
-            const user = document.getElementById('login-user').value.trim();
-            const pass = document.getElementById('login-pass').value.trim();
-            const errorEl = document.getElementById('login-error');
-
-            if (user === 'admin' && pass === 'pcdiy4519') {
-                window.appData.userRole = 'admin';
-                onLoginSuccess('系統最高管理員 (admin)');
-            } else if (user === '5303' && pass === '29420451') {
-                window.appData.userRole = 'editor_5303';
-                onLoginSuccess('親師組長 (5303)');
-            } else {
-                errorEl.classList.remove('hidden');
-            }
-        }
-
-        function onLoginSuccess(roleTitle) {
-            closeModal('modal-login');
-            document.getElementById('form-login').reset();
-            document.getElementById('current-user-role-label').textContent = roleTitle;
-            document.getElementById('admin-btn-text').textContent = "管理後台 (" + (window.appData.userRole === 'admin' ? 'admin' : '5303') + ")";
-            document.getElementById('mobile-admin-btn-text').textContent = "管理後台 (" + roleTitle + ")";
-
-            if (window.appData.userRole === 'admin') {
-                document.getElementById('btn-edit-honor').classList.remove('hidden');
-                document.getElementById('btn-edit-quote').classList.remove('hidden');
-                document.getElementById('tab-btn-honor').classList.remove('hidden');
-                document.getElementById('tab-btn-quotes').classList.remove('hidden');
-            } else {
-                document.getElementById('btn-edit-honor').classList.add('hidden');
-                document.getElementById('btn-edit-quote').classList.add('hidden');
-                document.getElementById('tab-btn-honor').classList.add('hidden');
-                document.getElementById('tab-btn-quotes').classList.add('hidden');
-            }
-
-            document.getElementById('btn-manage-bookshelf').classList.remove('hidden');
-
-            if (window.appData.userRole === 'editor_5303') {
-                switchAdminTab('newsletter');
-            } else {
-                switchAdminTab('honor');
-            }
-
-            // 更新親子橋選單顯示 (讓管理員登入後可見)
-            if (window.updateNewsletterVisibility) window.updateNewsletterVisibility();
-
-            openModal('modal-admin-panel');
-            showToast("成功登入： " + roleTitle);
-        }
-
-        function handleLogout() {
-            window.appData.userRole = null;
-            document.getElementById('admin-btn-text').textContent = "管理員登入";
-            document.getElementById('mobile-admin-btn-text').textContent = "管理員登入";
-            document.getElementById('btn-edit-honor').classList.add('hidden');
-            document.getElementById('btn-edit-quote').classList.add('hidden');
-            document.getElementById('btn-manage-bookshelf').classList.add('hidden');
-
-            if (window.updateNewsletterVisibility) window.updateNewsletterVisibility();
-
-            closeModal('modal-admin-panel');
-            showToast("已成功登出系統");
-        }
-
-        function openAdminTab(tabName) {
-            if (!window.appData.userRole) {
-                openLoginModal();
-                return;
-            }
-            switchAdminTab(tabName);
-            openModal('modal-admin-panel');
-        }
-
-        function switchAdminTab(tabName) {
-            const tabs = ['honor', 'quotes', 'newsletter'];
-            tabs.forEach(t => {
-                const btn = document.getElementById('tab-btn-' + t);
-                const content = document.getElementById('admin-tab-' + t);
-                if (t === tabName) {
-                    if (btn) btn.className = "admin-tab-btn border-b-4 border-warm-orange text-warm-orange font-bold px-4 py-2 text-sm flex items-center gap-2";
-                    if (content) content.classList.remove('hidden');
-                } else {
-                    if (btn) btn.className = "admin-tab-btn border-b-4 border-transparent text-gray-500 hover:text-gray-700 font-bold px-4 py-2 text-sm flex items-center gap-2";
-                    if (content) content.classList.add('hidden');
-                }
+                renderBookshelfGrid();
+                renderAdminNewsletterList();
+            }, (error) => {
+                console.log("Newsletter listener warning:", error);
+                renderBookshelfGrid();
             });
         }
 
