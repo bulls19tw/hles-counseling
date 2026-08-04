@@ -134,7 +134,7 @@
 
                     <!-- 後台登入 / 管理狀態按鈕 -->
                     <button onclick="openLoginModal()" id="btn-admin-login" class="bg-amber-100 hover:bg-amber-200 text-amber-900 px-3.5 py-2 rounded-2xl font-bold transition-all flex items-center gap-1.5 ml-2 border border-amber-300">
-                        <i class="fa-solid fa-user-lock"></i> <span id="admin-btn-text">管理員登入</span>
+                        <i id="admin-btn-icon" class="fa-solid fa-user-lock"></i> <span id="admin-btn-text">管理員登入</span>
                     </button>
                 </nav>
 
@@ -165,8 +165,8 @@
             <button onclick="showPage('links')" class="w-full text-left px-4 py-3 rounded-xl hover:bg-orange-50 text-gray-700 font-bold flex items-center gap-3">
                 <i class="fa-solid fa-globe text-warm-orange"></i> 相關網站
             </button>
-            <button onclick="openLoginModal()" class="w-full text-left px-4 py-3 rounded-xl bg-amber-100 text-amber-900 font-bold flex items-center gap-3">
-                <i class="fa-solid fa-user-lock"></i> <span id="mobile-admin-btn-text">管理員登入</span>
+            <button onclick="openLoginModal()" id="mobile-btn-admin-login" class="w-full text-left px-4 py-3 rounded-xl bg-amber-100 text-amber-900 font-bold flex items-center gap-3">
+                <i id="mobile-admin-btn-icon" class="fa-solid fa-user-lock"></i> <span id="mobile-admin-btn-text">管理員登入</span>
             </button>
         </div>
     </header>
@@ -1049,120 +1049,53 @@
     <!-- FIREBASE MODULE & APPLICATION SCRIPTS -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        // 更新管理員按鈕外觀與狀態顏色
+        window.updateAdminButtonUI = function() {
+            const btnDesktop = document.getElementById('btn-admin-login');
+            const btnMobile = document.getElementById('mobile-btn-admin-login');
+            const btnTextDesktop = document.getElementById('admin-btn-text');
+            const btnTextMobile = document.getElementById('mobile-admin-btn-text');
+            const iconDesktop = document.getElementById('admin-btn-icon');
+            const iconMobile = document.getElementById('mobile-admin-btn-icon');
 
-        // 初始化帳號庫 (儲存於 localStorage)
-        const defaultAccounts = {
-            'admin': { pass: 'pcdiy4519', role: 'admin', name: '最高管理員 (admin)' },
-            '5303': { pass: '29420451', role: 'editor_5303', name: '親師組長 (5303)' }
-        };
+            const currentUser = window.appData.currentUser;
 
-        function getSavedAccounts() {
-            try {
-                const stored = localStorage.getItem('hles_user_accounts');
-                if (stored) return JSON.parse(stored);
-            } catch (e) {
-                console.error(e);
-            }
-            return defaultAccounts;
-        }
-
-        function saveAccounts(accs) {
-            localStorage.setItem('hles_user_accounts', JSON.stringify(accs));
-        }
-
-        // 全域資料與狀態儲存
-        window.appData = {
-            currentUser: null, // { username, role, name }
-            accounts: getSavedAccounts(),
-            newsletterHidden: localStorage.getItem('hles_newsletter_hidden') !== 'false', // 預設隱藏
-            honorList: [],
-            quoteList: [],
-            newsletterList: []
-        };
-
-        // 預設榮譽榜清單 (秒開快照)
-        const defaultHonors = [
-            { badge: "家庭教育", title: "114學年度家庭教育檢核榮獲「優良學校」", tag: "校園榮耀", desc: "賀本校榮獲新北市114學年度公私立高級中等以下學校家庭教育檢核工作評選「優良學校」殊榮！" },
-            { badge: "SUPER教師", title: "115年新北市SUPER教師獎", tag: "教師榮耀", desc: "賀本校莊慧娟老師獲得殊榮，並將代表新北市角逐全國SUPER教師獎！" },
-            { badge: "福和盃", title: "第一屆福和盃自由探究榮獲佳績", tag: "學生競賽", desc: "賀資優班應其家同學榮獲「金獎」、邱已家同學榮獲「創新表現獎」！（感謝胡菲茜老師辛勤指導）" },
-            { badge: "圖文創作", title: "2026年第24屆扶輪社電腦圖文創作比賽", tag: "資訊圖文", desc: "恭喜本校榮獲「佳作」殊榮！（感謝陳琬婷老師辛勤指導）" },
-            { badge: "愛在畫中", title: "新北市第28屆「愛在畫中」巡迴畫展暨藝術創作展", tag: "藝術美展", desc: "本校榮獲「績優團體」！優秀作品：孫鞅《昆蟲派對》、許桓睿《我喜愛的飛機》、陳秉緯《打籃球的貓》、陳宥昌《SPRUNKI》、葉俊麟《我要當航海家》、鄭屹辰《跟海豚去游泳》。（感謝黃湘芸、張淑慧、廖英淇、陳琬婷及黃唯寧老師辛勤指導）" }
-        ];
-
-        // 預設金句庫
-        const defaultQuotes = [
-            "「每個孩子都是一顆種子，只是花期不同。有的花一開就是燦爛，有的種子需要時間成長為參天大樹。」",
-            "「陪伴孩子成長的過程，也是重新遇見與療癒自己的溫暖旅程。」",
-            "「教育不是注滿一桶水，而是點燃孩子心中的一把火。」",
-            "「給孩子飛翔的翅膀，同時也給孩子隨時可以停靠與休息的港灣。」",
-            "「傾聽是最好的陪伴，理解是世界上最溫柔的愛。」",
-            "「看見每一個微小的進步，讚美每一次勇敢的嘗試。」",
-            "「用愛包容孩子的不同，讓花朵在自己的季節裡燦爛綻放。」",
-            "「多給孩子一句鼓勵，少給一句比較，自信就會悄悄萌芽。」",
-            "「教養沒有標準答案，只有用心的理解與適時的陪伴。」",
-            "「好的親子關係，是給予孩子探索世界的勇氣與安全感。」"
-        ];
-
-        // 預設《親子橋》刊物庫 (140~148期)
-        const defaultNewsletters = [
-            { issue: 148, term: "114學年度第二期", title: "陪伴孩子建立健康的網路使用習慣", link: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
-            { issue: 147, term: "114學年度第一期", title: "溫柔而堅定的情緒陪伴指南", link: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
-            { issue: 146, term: "113學年度第四期", title: "傾聽孩子的心聲：培養良好的親子溝通", link: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
-            { issue: 145, term: "113學年度第三期", title: "發現孩子的獨特天賦與自信關卡", link: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
-            { issue: 144, term: "113學年度第二期", title: "從挫折中學習：培養孩子的心理韌性", link: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
-            { issue: 143, term: "113學年度第一期", title: "幼小銜接與適應新環境的親職智慧", link: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
-            { issue: 142, term: "112學年度第四期", title: "友善校園與同儕相處的小技巧", link: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
-            { issue: 141, term: "112學年度第三期", title: "點亮希望：生命教育與感恩同行", link: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
-            { issue: 140, term: "112學年度第二期", title: "攜手營造溫暖包容的家庭學習氛圍", link: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" }
-        ];
-
-        window.appData.honorList = defaultHonors;
-        window.appData.quoteList = defaultQuotes.map(content => ({ content }));
-        window.appData.newsletterList = defaultNewsletters;
-
-        // 1. 頁面切換控制
-        window.showPage = function(pageId) {
-            const sections = document.querySelectorAll('.page-section');
-            sections.forEach(sec => sec.classList.add('hidden'));
-
-            const mobileMenu = document.getElementById('mobile-menu');
-            if (mobileMenu) mobileMenu.classList.add('hidden');
-
-            const targetSec = document.getElementById('page-' + pageId);
-            if (targetSec) {
-                targetSec.classList.remove('hidden');
+            if (!currentUser) {
+                // 未登入：預設鵝黃色
+                if (btnDesktop) {
+                    btnDesktop.className = "bg-amber-100 hover:bg-amber-200 text-amber-900 px-3.5 py-2 rounded-2xl font-bold transition-all flex items-center gap-1.5 ml-2 border border-amber-300";
+                }
+                if (btnMobile) {
+                    btnMobile.className = "w-full text-left px-4 py-3 rounded-xl bg-amber-100 text-amber-900 font-bold flex items-center gap-3";
+                }
+                if (btnTextDesktop) btnTextDesktop.textContent = '管理員登入';
+                if (btnTextMobile) btnTextMobile.textContent = '管理員登入';
+                if (iconDesktop) iconDesktop.className = "fa-solid fa-user-lock";
+                if (iconMobile) iconMobile.className = "fa-solid fa-user-lock";
+            } else if (currentUser.role === 'admin') {
+                // 最高管理員：淡藍色 (Sky/Blue)
+                if (btnDesktop) {
+                    btnDesktop.className = "bg-sky-100 hover:bg-sky-200 text-sky-900 px-3.5 py-2 rounded-2xl font-bold transition-all flex items-center gap-1.5 ml-2 border border-sky-300 shadow-sm";
+                }
+                if (btnMobile) {
+                    btnMobile.className = "w-full text-left px-4 py-3 rounded-xl bg-sky-100 text-sky-900 font-bold flex items-center gap-3";
+                }
+                if (btnTextDesktop) btnTextDesktop.textContent = '後台控制中心';
+                if (btnTextMobile) btnTextMobile.textContent = '後台控制中心';
+                if (iconDesktop) iconDesktop.className = "fa-solid fa-sliders";
+                if (iconMobile) iconMobile.className = "fa-solid fa-sliders";
             } else {
-                document.getElementById('page-home').classList.remove('hidden');
-            }
-
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        };
-
-        // 2. 手機版選單切換
-        window.toggleMobileMenu = function() {
-            const menu = document.getElementById('mobile-menu');
-            if (menu) menu.classList.toggle('hidden');
-        };
-
-        // 3. Modal 彈窗控制
-        window.openModal = function(modalId) {
-            const m = document.getElementById(modalId);
-            if (m) m.classList.remove('hidden');
-        };
-
-        window.closeModal = function(modalId) {
-            const m = document.getElementById(modalId);
-            if (m) m.classList.add('hidden');
-        };
-
-        // 4. 登入按鈕邏輯
-        window.openLoginModal = function() {
-            if (window.appData.currentUser) {
-                window.openAdminPanel();
-            } else {
-                window.openModal('modal-login');
+                // 其他協助帳號 (5303 等)：淡粉紅色 (Pink/Rose)
+                if (btnDesktop) {
+                    btnDesktop.className = "bg-pink-100 hover:bg-pink-200 text-pink-900 px-3.5 py-2 rounded-2xl font-bold transition-all flex items-center gap-1.5 ml-2 border border-pink-300 shadow-sm";
+                }
+                if (btnMobile) {
+                    btnMobile.className = "w-full text-left px-4 py-3 rounded-xl bg-pink-100 text-pink-900 font-bold flex items-center gap-3";
+                }
+                if (btnTextDesktop) btnTextDesktop.textContent = '後台控制中心';
+                if (btnTextMobile) btnTextMobile.textContent = '後台控制中心';
+                if (iconDesktop) iconDesktop.className = "fa-solid fa-sliders";
+                if (iconMobile) iconMobile.className = "fa-solid fa-sliders";
             }
         };
 
@@ -1194,8 +1127,8 @@
             const roleLabel = document.getElementById('current-user-role-label');
             if (roleLabel) roleLabel.textContent = `${window.appData.currentUser.name}`;
             
-            document.getElementById('admin-btn-text').textContent = '後台控制中心';
-            document.getElementById('mobile-admin-btn-text').textContent = '後台控制中心';
+            // 更新按鈕外觀顏色
+            window.updateAdminButtonUI();
 
             // 顯示受限編輯按鈕
             if (window.appData.currentUser.role === 'admin') {
@@ -1212,8 +1145,7 @@
         // 6. 登出
         window.handleLogout = function() {
             window.appData.currentUser = null;
-            document.getElementById('admin-btn-text').textContent = '管理員登入';
-            document.getElementById('mobile-admin-btn-text').textContent = '管理員登入';
+            window.updateAdminButtonUI();
             document.querySelectorAll('#btn-edit-honor, #btn-edit-quote, #btn-manage-bookshelf').forEach(b => b.classList.add('hidden'));
 
             window.closeModal('modal-admin-panel');
@@ -1530,6 +1462,7 @@
             window.scheduleMidnightQuoteUpdate(); // 啟用跨日自動切換計時器
             window.renderBookshelfGrid();
             window.updateNewsletterVisibility();
+            window.updateAdminButtonUI();
         });
     </script>
 </body>
