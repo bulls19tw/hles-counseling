@@ -59,61 +59,61 @@
             background: #FFAA8A;
             border-radius: 10px;
         }
-
-        .float-animation {
-            animation: float 3s ease-in-out infinite;
-        }
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-8px); }
-        }
-
-        .book-spine {
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
-        }
-        .book-spine:hover {
-            transform: translateY(-12px) scale(1.03);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
-        }
-    </style>
-</head>
-<body class="min-h-screen flex flex-col text-gray-800 antialiased selection:bg-warm-peach selection:text-white">
-
-    <!-- 頂部導覽列 -->
-    <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b-4 border-warm-orange shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-20">
-                <!-- 標誌區 -->
-                <a href="#" onclick="showPage('home')" class="flex items-center space-x-3 group">
-                    <div class="w-12 h-12 bg-warm-orange rounded-full flex items-center justify-center text-white text-2xl shadow-md group-hover:scale-105 transition-transform">
-                        <i class="fa-solid fa-heart-pulse"></i>
-                    </div>
-                    <div>
-                        <span class="text-2xl font-black font-rounded text-warm-orange tracking-wide block">輔導處</span>
-                        <span class="text-xs font-bold text-gray-500 tracking-wider">COUNSELING OFFICE</span>
-                    </div>
-                </a>
-
-                <!-- 桌長版選單 -->
-                <nav class="hidden md:flex items-center space-x-2 font-bold text-base">
-                    <button onclick="showPage('home')" id="nav-home" class="nav-btn px-3.5 py-2 rounded-2xl text-gray-700 hover:bg-orange-100 hover:text-warm-orange transition-colors flex items-center gap-1.5 active-nav">
-                        <i class="fa-solid fa-house"></i> 首頁
-                    </button>
-                    
-                    <!-- 認識我們 Dropdown/Group (已修復間隙無縫連接) -->
-                    <div class="relative group">
-                        <button onclick="showPage('about-vision')" id="nav-about" class="nav-btn px-3.5 py-2 rounded-2xl text-gray-700 hover:bg-orange-100 hover:text-warm-orange transition-colors flex items-center gap-1.5">
-                            <i class="fa-solid fa-hand-holding-heart"></i> 認識我們 <i class="fa-solid fa-chevron-down text-xs ml-1"></i>
-                        </button>
-                        <div class="absolute left-0 top-full pt-2 w-48 hidden group-hover:block z-50">
-                            <div class="bg-white rounded-2xl shadow-xl border-2 border-orange-100 p-2">
-                                <button onclick="showPage('about-vision')" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-warm-orange rounded-xl font-bold flex items-center gap-2">
-                                    <i class="fa-solid fa-seedling text-mint-green"></i> 願景目標
-                                </button>
-                                <button onclick="showPage('about-duties')" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-warm-orange rounded-xl font-bold flex items-center gap-2">
-                                    <i class="fa-solid fa-clipboard-list text-soft-blue"></i> 工作職掌
-                                </button>
+                    <!-- 榮譽清單容器 (預先渲染，秒開零等待，繽紛多色風格) -->
+                    <div id="honor-roll-container" class="space-y-4">
+                        <div class="p-4 rounded-2xl bg-emerald-50/70 hover:bg-emerald-50 border border-emerald-200 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div class="flex items-start gap-3">
+                                <span class="bg-mint-green text-white text-xs font-bold px-2.5 py-1 rounded-lg shrink-0 mt-0.5">家庭教育</span>
+                                <div>
+                                    <h3 class="font-bold text-gray-800">114學年度家庭教育檢核榮獲「優良學校」</h3>
+                                    <p class="text-xs text-gray-600 mt-1 leading-relaxed">賀本校榮獲新北市114學年度公私立高級中等以下學校家庭教育檢核工作評選「優良學校」殊榮！</p>
+                                </div>
                             </div>
+                            <span class="text-xs font-bold text-emerald-600 bg-emerald-100 px-2.5 py-1 rounded-full self-start sm:self-center shrink-0">校園榮耀</span>
+                        </div>
+
+                        <div class="p-4 rounded-2xl bg-amber-50/70 hover:bg-amber-50 border border-amber-200 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div class="flex items-start gap-3">
+                                <span class="bg-amber-500 text-white text-xs font-bold px-2.5 py-1 rounded-lg shrink-0 mt-0.5">SUPER教師</span>
+                                <div>
+                                    <h3 class="font-bold text-gray-800">115年新北市SUPER教師獎</h3>
+                                    <p class="text-xs text-gray-600 mt-1 leading-relaxed">賀本校莊慧娟老師獲得殊榮，並將代表新北市角逐全國SUPER教師獎！</p>
+                                </div>
+                            </div>
+                            <span class="text-xs font-bold text-amber-600 bg-amber-100 px-2.5 py-1 rounded-full self-start sm:self-center shrink-0">教師榮耀</span>
+                        </div>
+
+                        <div class="p-4 rounded-2xl bg-blue-50/70 hover:bg-blue-50 border border-blue-200 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div class="flex items-start gap-3">
+                                <span class="bg-soft-blue text-white text-xs font-bold px-2.5 py-1 rounded-lg shrink-0 mt-0.5">福和盃</span>
+                                <div>
+                                    <h3 class="font-bold text-gray-800">第一屆福和盃自由探究榮獲佳績</h3>
+                                    <p class="text-xs text-gray-600 mt-1 leading-relaxed">賀資優班應其家同學榮獲「金獎」、邱已家同學榮獲「創新表現獎」！（感謝胡菲茜老師辛勤指導）</p>
+                                </div>
+                            </div>
+                            <span class="text-xs font-bold text-blue-600 bg-blue-100 px-2.5 py-1 rounded-full self-start sm:self-center shrink-0">學生競賽</span>
+                        </div>
+
+                        <div class="p-4 rounded-2xl bg-pink-50/70 hover:bg-pink-50 border border-pink-200 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div class="flex items-start gap-3">
+                                <span class="bg-soft-pink text-white text-xs font-bold px-2.5 py-1 rounded-lg shrink-0 mt-0.5">圖文創作</span>
+                                <div>
+                                    <h3 class="font-bold text-gray-800">2026年第24屆扶輪社電腦圖文創作比賽</h3>
+                                    <p class="text-xs text-gray-600 mt-1 leading-relaxed">恭喜本校榮獲「佳作」殊榮！（感謝陳琬婷老師辛勤指導）</p>
+                                </div>
+                            </div>
+                            <span class="text-xs font-bold text-pink-600 bg-pink-100 px-2.5 py-1 rounded-full self-start sm:self-center shrink-0">資訊圖文</span>
+                        </div>
+
+                        <div class="p-4 rounded-2xl bg-purple-50/70 hover:bg-purple-50 border border-purple-200 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div class="flex items-start gap-3">
+                                <span class="bg-purple-500 text-white text-xs font-bold px-2.5 py-1 rounded-lg shrink-0 mt-0.5">愛在畫中</span>
+                                <div>
+                                    <h3 class="font-bold text-gray-800">新北市第28屆「愛在畫中」巡迴畫展暨藝術創作展</h3>
+                                    <p class="text-xs text-gray-600 mt-1 leading-relaxed">本校榮獲「績優團體」！優秀作品：孫鞅《昆蟲派對》、許桓睿《我喜愛的飛機》、陳秉緯《打籃球的貓》、陳宥昌《SPRUNKI》、葉俊麟《我要當航海家》、鄭屹辰《跟海豚去游泳》。（感謝黃湘芸、張淑慧、廖英淇、陳琬婷及黃唯寧老師辛勤指導）</p>
+                                </div>
+                            </div>
+                            <span class="text-xs font-bold text-purple-600 bg-purple-100 px-2.5 py-1 rounded-full self-start sm:self-center shrink-0">藝術美展</span>
                         </div>
                     </div>
 
@@ -1051,7 +1051,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Firebase 專案設定檔 (請將此處替換為您在 Firebase 取得的真實金鑰)
+        // Firebase 專案設定檔
         const firebaseConfig = {
             apiKey: "YOUR_API_KEY",
             authDomain: "YOUR_PROJECT.firebaseapp.com",
@@ -1093,7 +1093,7 @@
 
         window.appData = {
             currentUser: null,
-            newsletterHidden: localStorage.getItem('hles_newsletter_hidden') !== 'false', // 預設隱藏
+            newsletterHidden: localStorage.getItem('hles_newsletter_hidden') !== 'false',
             accounts: loadAccounts(),
             honorList: [
                 { badge: '家庭教育', title: '114學年度家庭教育檢核榮獲「優良學校」', tag: '校園榮耀', desc: '賀本校榮獲新北市114學年度公私立高級中等以下學校家庭教育檢核工作評選「優良學校」殊榮！' },
@@ -1121,7 +1121,7 @@
             ]
         };
 
-        // 1. 頁面導覽切換 (showPage)
+        // 1. 頁面導覽切換
         window.showPage = function(pageId) {
             document.querySelectorAll('.page-section').forEach(sec => sec.classList.add('hidden'));
             const target = document.getElementById('page-' + pageId);
@@ -1130,12 +1130,10 @@
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
 
-            // 選單按鈕高亮 active 效果
             document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('text-warm-orange', 'bg-orange-100'));
             const activeNav = document.getElementById('nav-' + pageId);
             if (activeNav) activeNav.classList.add('text-warm-orange', 'bg-orange-100');
 
-            // 關閉手機版選單
             const mobileMenu = document.getElementById('mobile-menu');
             if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
                 mobileMenu.classList.add('hidden');
@@ -1165,7 +1163,7 @@
             }
         };
 
-        // 4. 更新管理員按鈕外觀與狀態顏色
+        // 4. 更新管理員按鈕外觀與狀態顏色 (鵝黃/淡藍/淡粉)
         window.updateAdminButtonUI = function() {
             const btnDesktop = document.getElementById('btn-admin-login');
             const btnMobile = document.getElementById('mobile-btn-admin-login');
@@ -1189,7 +1187,7 @@
                 if (iconDesktop) iconDesktop.className = "fa-solid fa-user-lock";
                 if (iconMobile) iconMobile.className = "fa-solid fa-user-lock";
             } else if (currentUser.role === 'admin') {
-                // 最高管理員：淡藍色 (Sky/Blue)
+                // 最高管理員：淡藍色
                 if (btnDesktop) {
                     btnDesktop.className = "bg-sky-100 hover:bg-sky-200 text-sky-900 px-3.5 py-2 rounded-2xl font-bold transition-all flex items-center gap-1.5 ml-2 border border-sky-300 shadow-sm";
                 }
@@ -1201,7 +1199,7 @@
                 if (iconDesktop) iconDesktop.className = "fa-solid fa-sliders";
                 if (iconMobile) iconMobile.className = "fa-solid fa-sliders";
             } else {
-                // 其他協助帳號 (5303 等)：淡粉紅色 (Pink/Rose)
+                // 其他協助帳號 (5303 等)：淡粉紅色
                 if (btnDesktop) {
                     btnDesktop.className = "bg-pink-100 hover:bg-pink-200 text-pink-900 px-3.5 py-2 rounded-2xl font-bold transition-all flex items-center gap-1.5 ml-2 border border-pink-300 shadow-sm";
                 }
@@ -1215,7 +1213,15 @@
             }
         };
 
-        // 5. 畫面渲染與心靈雞湯機制
+        // 5. 繽紛多色榮譽榜渲染機制
+        const colorThemes = [
+            { cardBg: 'bg-emerald-50/70 hover:bg-emerald-50 border-emerald-200', badgeBg: 'bg-mint-green', tagColor: 'text-emerald-600 bg-emerald-100' },
+            { cardBg: 'bg-amber-50/70 hover:bg-amber-50 border-amber-200', badgeBg: 'bg-amber-500', tagColor: 'text-amber-600 bg-amber-100' },
+            { cardBg: 'bg-blue-50/70 hover:bg-blue-50 border-blue-200', badgeBg: 'bg-soft-blue', tagColor: 'text-blue-600 bg-blue-100' },
+            { cardBg: 'bg-pink-50/70 hover:bg-pink-50 border-pink-200', badgeBg: 'bg-soft-pink', tagColor: 'text-pink-600 bg-pink-100' },
+            { cardBg: 'bg-purple-50/70 hover:bg-purple-50 border-purple-200', badgeBg: 'bg-purple-500', tagColor: 'text-purple-600 bg-purple-100' }
+        ];
+
         window.renderHonorRoll = function() {
             const container = document.getElementById('honor-roll-container');
             if (!container) return;
@@ -1224,18 +1230,21 @@
                 container.innerHTML = `<p class="text-sm text-gray-500 text-center py-4">目前尚無榮譽事項紀錄。</p>`;
                 return;
             }
-            container.innerHTML = items.map(item => `
-                <div class="p-4 rounded-2xl bg-amber-50/70 hover:bg-amber-50 border border-amber-200 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div class="flex items-start gap-3">
-                        <span class="bg-amber-500 text-white text-xs font-bold px-2.5 py-1 rounded-lg shrink-0 mt-0.5">${escapeHtml(item.badge)}</span>
-                        <div>
-                            <h3 class="font-bold text-gray-800">${escapeHtml(item.title)}</h3>
-                            <p class="text-xs text-gray-600 mt-1 leading-relaxed">${escapeHtml(item.desc)}</p>
+            container.innerHTML = items.map((item, idx) => {
+                const theme = colorThemes[idx % colorThemes.length];
+                return `
+                    <div class="p-4 rounded-2xl ${theme.cardBg} border transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="flex items-start gap-3">
+                            <span class="${theme.badgeBg} text-white text-xs font-bold px-2.5 py-1 rounded-lg shrink-0 mt-0.5">${escapeHtml(item.badge)}</span>
+                            <div>
+                                <h3 class="font-bold text-gray-800">${escapeHtml(item.title)}</h3>
+                                <p class="text-xs text-gray-600 mt-1 leading-relaxed">${escapeHtml(item.desc)}</p>
+                            </div>
                         </div>
+                        <span class="text-xs font-bold ${theme.tagColor} px-2.5 py-1 rounded-full self-start sm:self-center shrink-0">${escapeHtml(item.tag)}</span>
                     </div>
-                    <span class="text-xs font-bold text-amber-600 bg-amber-100 px-2.5 py-1 rounded-full self-start sm:self-center shrink-0">${escapeHtml(item.tag)}</span>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         };
 
         window.setDailyQuote = function() {
@@ -1288,7 +1297,7 @@
             `).join('');
         };
 
-        // 6. 處理帳號登入 (動態驗證帳號庫)
+        // 6. 處理帳號登入
         window.handleLogin = function(e) {
             e.preventDefault();
             const user = document.getElementById('login-user').value.trim();
@@ -1312,14 +1321,11 @@
             document.getElementById('login-user').value = '';
             document.getElementById('login-pass').value = '';
 
-            // 更新介面身分與按鈕狀態
             const roleLabel = document.getElementById('current-user-role-label');
             if (roleLabel) roleLabel.textContent = `${window.appData.currentUser.name}`;
             
-            // 更新按鈕外觀顏色
             window.updateAdminButtonUI();
 
-            // 顯示受限編輯按鈕
             if (window.appData.currentUser.role === 'admin') {
                 document.querySelectorAll('#btn-edit-honor, #btn-edit-quote, #btn-manage-bookshelf').forEach(b => b.classList.remove('hidden'));
             } else {
@@ -1350,7 +1356,6 @@
 
             const isPageAdmin = currentUser.role === 'admin';
 
-            // 控制分頁按鈕顯示權限
             document.getElementById('tab-btn-honor').classList.toggle('hidden', !isPageAdmin);
             document.getElementById('tab-btn-quotes').classList.toggle('hidden', !isPageAdmin);
             document.getElementById('tab-btn-accounts').classList.toggle('hidden', !isPageAdmin);
@@ -1379,14 +1384,15 @@
                 activeBtn.classList.add('border-warm-orange', 'text-warm-orange');
             }
             if (activeTab) activeTab.classList.remove('hidden');
-        // 10. 親子橋公開/隱藏切換 (同步發布至 Cloud Firestore 與 LocalStorage)
+        };
+
+        // 10. 親子橋公開/隱藏切換
         window.toggleNewsletterMode = function() {
             window.appData.newsletterHidden = !window.appData.newsletterHidden;
             localStorage.setItem('hles_newsletter_hidden', window.appData.newsletterHidden);
             
             window.updateNewsletterVisibility();
 
-            // 若有連接 Firebase 雲端資料庫，即時發布至雲端給全站訪客
             if (db) {
                 try {
                     setDoc(doc(db, "settings", "newsletter"), {
@@ -1401,11 +1407,10 @@
             window.showToast(window.appData.newsletterHidden ? '已切換為【隱藏模式】' : '已切換為【公開上架模式】');
         };
 
-        // 11. 親子橋可見度更新 (嚴格依照公開與登入權限)
+        // 11. 親子橋可見度更新
         window.updateNewsletterVisibility = function() {
             const isHidden = window.appData.newsletterHidden;
             const isLoggedIn = window.appData.currentUser !== null;
-            // 只要設定為公開，或是管理者登入，即可看見連結
             const isVisible = !isHidden || isLoggedIn;
 
             const navNL = document.getElementById('nav-newsletter');
@@ -1432,7 +1437,6 @@
                 }
             }
 
-            // 若目前正停留在《親子橋》頁面，且登出後處於隱藏模式，自動平滑退回首頁
             const nlPage = document.getElementById('page-newsletter');
             if (nlPage && !nlPage.classList.contains('hidden') && !isVisible) {
                 window.showPage('home');
@@ -1648,12 +1652,11 @@
         window.addEventListener('DOMContentLoaded', () => {
             window.renderHonorRoll();
             window.setDailyQuote();
-            window.scheduleMidnightQuoteUpdate(); // 啟用跨日自動切換計時器
+            window.scheduleMidnightQuoteUpdate();
             window.renderBookshelfGrid();
             window.updateNewsletterVisibility();
             window.updateAdminButtonUI();
 
-            // 訂閱 Firestore 雲端設定，實現全瀏覽器（Edge/Chrome/無痕）跨裝置即時公開/隱藏同步
             if (db) {
                 try {
                     onSnapshot(doc(db, "settings", "newsletter"), (snapshot) => {
