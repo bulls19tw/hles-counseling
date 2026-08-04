@@ -1049,6 +1049,27 @@
     <!-- FIREBASE MODULE & APPLICATION SCRIPTS -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Firebase 專案設定檔 (請將此處替換為您在 Firebase 取得的真實金鑰)
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        let db = null;
+        try {
+            if (firebaseConfig.apiKey && !firebaseConfig.apiKey.includes("YOUR_")) {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+            }
+        } catch (e) {
+            console.warn("Firebase 初始化失敗，預設改用本地記憶模式:", e);
+        }
 
         // 全域帳號庫預設值
         const defaultAccounts = {
@@ -1358,24 +1379,25 @@
                 activeBtn.classList.add('border-warm-orange', 'text-warm-orange');
             }
             if (activeTab) activeTab.classList.remove('hidden');
-
-            if (tabName === 'honor') window.renderAdminHonorList();
-            if (tabName === 'quotes') window.renderAdminQuoteList();
-            if (tabName === 'newsletter') window.renderAdminNewsletterList();
-            if (tabName === 'accounts') window.renderAdminAssistantList();
-        };
-
-        window.openAdminTab = function(tabName) {
-            window.openAdminPanel();
-            window.switchAdminTab(tabName);
-        };
-
-        // 10. 親子橋公開/隱藏切換
+        // 10. 親子橋公開/隱藏切換 (同步發布至 Cloud Firestore 與 LocalStorage)
         window.toggleNewsletterMode = function() {
             window.appData.newsletterHidden = !window.appData.newsletterHidden;
             localStorage.setItem('hles_newsletter_hidden', window.appData.newsletterHidden);
             
             window.updateNewsletterVisibility();
+
+            // 若有連接 Firebase 雲端資料庫，即時發布至雲端給全站訪客
+            if (db) {
+                try {
+                    setDoc(doc(db, "settings", "newsletter"), {
+                        hidden: window.appData.newsletterHidden,
+                        updatedAt: new Date().toISOString()
+                    }, { merge: true }).catch(err => console.warn("Firestore 雲端寫入失敗:", err));
+                } catch(e) {
+                    console.warn("Firestore 寫入異常:", e);
+                }
+            }
+
             window.showToast(window.appData.newsletterHidden ? '已切換為【隱藏模式】' : '已切換為【公開上架模式】');
         };
 
@@ -1630,6 +1652,24 @@
             window.renderBookshelfGrid();
             window.updateNewsletterVisibility();
             window.updateAdminButtonUI();
+
+            // 訂閱 Firestore 雲端設定，實現全瀏覽器（Edge/Chrome/無痕）跨裝置即時公開/隱藏同步
+            if (db) {
+                try {
+                    onSnapshot(doc(db, "settings", "newsletter"), (snapshot) => {
+                        if (snapshot.exists()) {
+                            const data = snapshot.data();
+                            if (typeof data.hidden === 'boolean') {
+                                window.appData.newsletterHidden = data.hidden;
+                                localStorage.setItem('hles_newsletter_hidden', data.hidden);
+                                window.updateNewsletterVisibility();
+                            }
+                        }
+                    }, (err) => console.warn("雲端公開狀態讀取失敗:", err));
+                } catch(e) {
+                    console.warn("雲端訂閱失敗:", e);
+                }
+            }
         });
     </script>
 </body>
