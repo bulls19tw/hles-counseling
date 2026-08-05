@@ -822,6 +822,10 @@
                     <p class="text-xs text-amber-700 mt-1">
                         切換【公開 (全站訪客皆可閱讀書架)】，或【隱藏 (選單與連結隱藏，僅管理員登入後可預覽與編輯)】。
                     </p>
+                    <!-- 新增 Firebase 雲端連線狀態提示 -->
+                    <div id="cloud-sync-status" class="mt-2 inline-flex items-center gap-1.5 text-xs font-bold text-amber-800 bg-amber-100/80 px-2.5 py-1 rounded-lg">
+                        <i class="fa-solid fa-circle-dot text-amber-500 animate-pulse"></i> <span>單機模式運作中 (若需跨裝置/跨瀏覽器即時同步，請填入 Firebase 金鑰)</span>
+                    </div>
                 </div>
                 <div class="flex items-center gap-3 bg-white p-2 rounded-xl border border-amber-200 shrink-0">
                     <span id="mode-status-text" class="text-xs font-black text-rose-500 px-2">隱藏中 (未公開)</span>
@@ -1045,15 +1049,23 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Firebase 專案設定檔
-        const firebaseConfig = {
-            apiKey: "AIzaSyAbRD2adKxaNo8TOjMXy1r0MS6K6Up38SM",
-            authDomain: "hles-counseling.firebaseapp.com",
-            projectId: "hles-counseling",
-            storageBucket: "hles-counseling.firebasestorage.app",
-            messagingSenderId: "578492449308",
-            appId: "1:578492449308:web:15b4a4337237de3bec95d9"
+        // SHA-256 密碼壓碼雜湊函式 (確保 Ctrl+U 原始碼中完全不含明文密碼)
+        async function hashPassword(message) {
+            if (!message) return '';
+            const msgBuffer = new TextEncoder().encode(message);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
 
+        // Firebase 專案設定檔 (佈署時請替換為真實金鑰)
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
         };
 
         let db = null;
@@ -1066,10 +1078,10 @@
             console.warn("Firebase 初始化失敗，預設改用本地記憶模式:", e);
         }
 
-        // 全域帳號庫預設值 (admin 密碼: pcdiy4519)
+        // 全域帳號庫預設值 (採用不可逆 SHA-256 雜湊值儲存，防止 Ctrl+U 查看明文)
         const defaultAccounts = {
-            'admin': { pass: 'pcdiy4519', role: 'admin', name: '最高管理員' },
-            '5303': { pass: '29420451', role: 'editor_5303', name: '親師組長' }
+            'admin': { passHash: '683c921319c5b5f35d5528b1e42a98f128c7ef3049cb4a5ee1a3a4115e47854f', role: 'admin', name: '最高管理員' },
+            '5303': { passHash: '6270fa67f13cf0e6d633f8be140d346087796d860d5b59a6bc559f939eb9f8fb', role: 'editor_5303', name: '親師組長' }
         };
 
         function loadAccounts() {
@@ -1086,9 +1098,13 @@
             } catch(e) {}
         }
 
+        // 讀取本地記錄：若無記錄，預設為公開 (false)
+        const savedHiddenSetting = localStorage.getItem('hles_newsletter_hidden');
+        const initialHiddenState = savedHiddenSetting === null ? false : (savedHiddenSetting === 'true');
+
         window.appData = {
             currentUser: null,
-            newsletterHidden: localStorage.getItem('hles_newsletter_hidden') !== 'false',
+            newsletterHidden: initialHiddenState,
             accounts: loadAccounts(),
             honorList: [
                 { badge: '家庭教育', title: '114學年度家庭教育檢核榮獲「優良學校」', tag: '校園榮耀', desc: '賀本校榮獲新北市114學年度公私立高級中等以下學校家庭教育檢核工作評選「優良學校」殊榮！' },
@@ -1283,24 +1299,24 @@
                         </div>
                         <h3 class="text-lg font-bold font-rounded text-gray-800 mb-3 leading-snug">${escapeHtml(item.title)}</h3>
                     </div>
-                    <div class="pt-4 border-t border-gray-100 mt-2">
-                        <a href="${escapeHtml(item.link)}" target="_blank" rel="noopener noreferrer" class="w-full bg-soft-pink hover:bg-pink-600 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 shadow-sm transition-colors">
-                            <i class="fa-solid fa-file-pdf"></i> 線上閱讀期刊 (PDF)
-                        </a>
-                    </div>
-                </div>
-            `).join('');
-        };
-
-        // 6. 處理帳號登入
-        window.handleLogin = function(e) {
+        // 6. 處理帳號登入 (使用 SHA-256 壓碼比對)
+        window.handleLogin = async function(e) {
             e.preventDefault();
             const user = document.getElementById('login-user').value.trim();
             const pass = document.getElementById('login-pass').value.trim();
             const errEl = document.getElementById('login-error');
 
             const accs = window.appData.accounts;
-            if (accs[user] && accs[user].pass === pass) {
+            const inputHash = await hashPassword(pass);
+
+            // 比對帳號與 SHA-256 雜湊碼
+            if (accs[user] && (accs[user].passHash === inputHash || (accs[user].pass && accs[user].pass === pass))) {
+                // 自動轉為 SHA-256 壓碼儲存
+                if (accs[user].pass) {
+                    accs[user].passHash = inputHash;
+                    delete accs[user].pass;
+                    saveAccounts(accs);
+                }
                 window.appData.currentUser = {
                     username: user,
                     role: accs[user].role || 'assistant',
@@ -1384,7 +1400,7 @@
         // 10. 親子橋公開/隱藏切換
         window.toggleNewsletterMode = function() {
             window.appData.newsletterHidden = !window.appData.newsletterHidden;
-            localStorage.setItem('hles_newsletter_hidden', window.appData.newsletterHidden);
+            localStorage.setItem('hles_newsletter_hidden', window.appData.newsletterHidden ? 'true' : 'false');
             
             window.updateNewsletterVisibility();
 
@@ -1393,7 +1409,9 @@
                     setDoc(doc(db, "settings", "newsletter"), {
                         hidden: window.appData.newsletterHidden,
                         updatedAt: new Date().toISOString()
-                    }, { merge: true }).catch(err => console.warn("Firestore 雲端寫入失敗:", err));
+                    }, { merge: true }).then(() => {
+                        console.log("Cloud synced successfully.");
+                    }).catch(err => console.warn("Firestore 雲端寫入失敗:", err));
                 } catch(e) {
                     console.warn("Firestore 寫入異常:", e);
                 }
@@ -1433,36 +1451,35 @@
             }
 
             const nlPage = document.getElementById('page-newsletter');
-            if (nlPage && !nlPage.classList.contains('hidden') && !isVisible) {
-                window.showPage('home');
-            }
-        };
-
-        // 12. 密碼與協助帳號管理功能
-        window.handleAdminChangeSelfPassword = function(e) {
+        // 12. 密碼與協助帳號管理功能 (使用 SHA-256 壓碼儲存)
+        window.handleAdminChangeSelfPassword = async function(e) {
             e.preventDefault();
             const newPass = document.getElementById('admin-new-pass').value.trim();
             if (!newPass) return;
 
-            window.appData.accounts['admin'].pass = newPass;
+            const newHash = await hashPassword(newPass);
+            window.appData.accounts['admin'].passHash = newHash;
+            delete window.appData.accounts['admin'].pass;
             saveAccounts(window.appData.accounts);
             document.getElementById('admin-new-pass').value = '';
-            window.showToast('admin 密碼修改成功！');
+            window.showToast('admin 密碼修改成功 (已完成 SHA-256 安全加密)！');
         };
 
-        window.handleUserChangeSelfPassword = function(e) {
+        window.handleUserChangeSelfPassword = async function(e) {
             e.preventDefault();
             const user = window.appData.currentUser ? window.appData.currentUser.username : null;
             const newPass = document.getElementById('user-new-pass').value.trim();
             if (!user || !newPass) return;
 
-            window.appData.accounts[user].pass = newPass;
+            const newHash = await hashPassword(newPass);
+            window.appData.accounts[user].passHash = newHash;
+            delete window.appData.accounts[user].pass;
             saveAccounts(window.appData.accounts);
             document.getElementById('user-new-pass').value = '';
-            window.showToast('個人密碼修改成功！');
+            window.showToast('個人密碼修改成功 (已完成 SHA-256 安全加密)！');
         };
 
-        window.handleAddAssistantAccount = function(e) {
+        window.handleAddAssistantAccount = async function(e) {
             e.preventDefault();
             const uid = document.getElementById('new-user-id').value.trim();
             const name = document.getElementById('new-user-name').value.trim();
@@ -1475,8 +1492,9 @@
                 return;
             }
 
+            const passHash = await hashPassword(pass);
             window.appData.accounts[uid] = {
-                pass: pass,
+                passHash: passHash,
                 role: 'editor_' + uid,
                 name: name || uid
             };
@@ -1652,20 +1670,32 @@
             window.updateNewsletterVisibility();
             window.updateAdminButtonUI();
 
+            const syncStatusEl = document.getElementById('cloud-sync-status');
+
             if (db) {
+                if (syncStatusEl) {
+                    syncStatusEl.className = "mt-2 inline-flex items-center gap-1.5 text-xs font-bold text-emerald-800 bg-emerald-100 px-2.5 py-1 rounded-lg";
+                    syncStatusEl.innerHTML = `<i class="fa-solid fa-cloud-check text-emerald-600"></i> <span>Firebase 雲端即時同步中 (跨瀏覽器/裝置連動生效)</span>`;
+                }
+
                 try {
                     onSnapshot(doc(db, "settings", "newsletter"), (snapshot) => {
                         if (snapshot.exists()) {
                             const data = snapshot.data();
                             if (typeof data.hidden === 'boolean') {
                                 window.appData.newsletterHidden = data.hidden;
-                                localStorage.setItem('hles_newsletter_hidden', data.hidden);
+                                localStorage.setItem('hles_newsletter_hidden', data.hidden ? 'true' : 'false');
                                 window.updateNewsletterVisibility();
                             }
                         }
                     }, (err) => console.warn("雲端公開狀態讀取失敗:", err));
                 } catch(e) {
                     console.warn("雲端訂閱失敗:", e);
+                }
+            } else {
+                if (syncStatusEl) {
+                    syncStatusEl.className = "mt-2 inline-flex items-center gap-1.5 text-xs font-bold text-amber-800 bg-amber-100/80 px-2.5 py-1 rounded-lg";
+                    syncStatusEl.innerHTML = `<i class="fa-solid fa-circle-info text-amber-600"></i> <span>目前為單機記憶模式（將 Firebase 金鑰填入 index.html 即可啟用跨瀏覽器雲端同步）</span>`;
                 }
             }
         });
