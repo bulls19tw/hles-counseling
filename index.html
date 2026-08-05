@@ -4,11 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>秀朗國小輔導處</title>
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome 圖示庫 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts 圓潤字體 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
@@ -60,7 +57,6 @@
             border-radius: 10px;
         }
 
-        /* 浮動動畫效果 */
         @keyframes float {
             0%, 100% { transform: translateY(0px); }
             50% { transform: translateY(-8px); }
@@ -72,12 +68,10 @@
 </head>
 <body class="min-h-screen flex flex-col custom-scrollbar">
 
-    <!-- 頂部導覽列 Header -->
     <header class="bg-white/95 backdrop-blur-md sticky top-0 z-40 border-b border-orange-100 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-20">
                 
-                <!-- Logo 品牌名稱 -->
                 <button onclick="showPage('home')" class="flex items-center gap-3 group text-left focus:outline-none">
                     <div class="w-12 h-12 bg-gradient-to-br from-warm-orange to-warm-yellow rounded-2xl flex items-center justify-center text-white text-2xl shadow-md group-hover:scale-105 transition-transform">
                         <i class="fa-solid fa-seedling"></i>
@@ -94,13 +88,12 @@
                         <i class="fa-solid fa-house"></i> 首頁
                     </button>
 
-                    <!-- 下拉選單：認識我們 (無縫懸停結構 bridge) -->
+                    <!-- 下拉選單：認識我們 -->
                     <div class="relative group py-2">
                         <button class="nav-btn px-3.5 py-2 rounded-2xl text-gray-700 hover:bg-orange-100 hover:text-warm-orange transition-colors flex items-center gap-1.5">
                             <i class="fa-solid fa-heart"></i> 認識我們 <i class="fa-solid fa-chevron-down text-xs opacity-60"></i>
                         </button>
                         
-                        <!-- 下拉式功能選單容器 -->
                         <div class="absolute left-0 top-full hidden group-hover:block w-48 bg-white border-2 border-orange-100 rounded-2xl shadow-xl p-2 z-50 space-y-1">
                             <button onclick="showPage('about-vision')" class="w-full text-left px-3 py-2 rounded-xl text-gray-700 hover:bg-orange-50 hover:text-warm-orange transition-colors flex items-center gap-2">
                                 <i class="fa-solid fa-seedling text-mint-green"></i> 願景目標
@@ -111,12 +104,12 @@
                         </div>
                     </div>
 
-                    <!-- 親子橋電子報 (根據公開/隱藏與登入狀態動態切換) -->
+                    <!-- 親子橋電子報 -->
                     <button onclick="showPage('newsletter')" id="nav-newsletter" class="nav-btn px-3.5 py-2 rounded-2xl text-gray-700 hover:bg-orange-100 hover:text-warm-orange transition-colors flex items-center gap-1.5 hidden">
                         <i class="fa-solid fa-book-open"></i> 親子橋電子報
                     </button>
 
-                    <!-- 家庭教育專區（外部連結） -->
+                    <!-- 家庭教育專區 -->
                     <a href="https://sites.google.com/hles.ntpc.edu.tw/fdsfamily" target="_blank" rel="noopener noreferrer" class="px-3.5 py-2 rounded-2xl text-gray-700 hover:bg-emerald-100 hover:text-emerald-600 transition-colors flex items-center gap-1.5">
                         <i class="fa-solid fa-house-chimney-user text-mint-green"></i> 家庭教育專區 <i class="fa-solid fa-arrow-up-right-from-square text-xs text-gray-400"></i>
                     </a>
@@ -126,20 +119,19 @@
                         <i class="fa-solid fa-globe"></i> 相關網站
                     </button>
 
-                    <!-- 後台登入 / 管理狀態按鈕 (三色動態變色: 未登入鵝黃 / admin淡藍 / 5303淡粉) -->
+                    <!-- 後台登入 / 管理狀態按鈕 -->
                     <button onclick="openLoginModal()" id="btn-admin-login" class="bg-amber-100 hover:bg-amber-200 text-amber-900 px-3.5 py-2 rounded-2xl font-bold transition-all flex items-center gap-1.5 ml-2 border border-amber-300">
                         <i id="admin-btn-icon" class="fa-solid fa-user-lock"></i> <span id="admin-btn-text">管理員登入</span>
                     </button>
                 </nav>
 
-                <!-- 手機版選單開關按鈕 -->
                 <button onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-xl text-gray-600 hover:bg-orange-100 focus:outline-none">
                     <i class="fa-solid fa-bars text-2xl"></i>
                 </button>
             </div>
         </div>
 
-        <!-- 手機版下拉選單 -->
+        <!-- 手機版選單 -->
         <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-100 px-4 pt-2 pb-4 space-y-2">
             <button onclick="showPage('home')" class="w-full text-left px-4 py-3 rounded-xl hover:bg-orange-50 text-gray-700 font-bold flex items-center gap-3">
                 <i class="fa-solid fa-house text-warm-orange"></i> 首頁
@@ -165,12 +157,10 @@
         </div>
     </header>
 
-    <!-- 主要內容區 -->
     <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
         <!-- ================= PAGE 1: 首頁 ================= -->
         <section id="page-home" class="page-section space-y-10">
-            <!-- 歡迎 Hero Banner -->
             <div class="relative overflow-hidden bg-gradient-to-r from-amber-100 via-orange-100 to-rose-100 rounded-3xl p-8 md:p-12 shadow-lg border-2 border-orange-200">
                 <div class="relative z-10 max-w-2xl">
                     <span class="inline-block bg-warm-orange text-white text-xs font-black px-3 py-1 rounded-full mb-3 shadow-sm">
@@ -192,7 +182,6 @@
                     </div>
                 </div>
 
-                <!-- 浮動裝飾小圖示 -->
                 <div class="absolute right-6 bottom-4 hidden lg:block float-animation opacity-90">
                     <div class="w-64 h-64 bg-white/60 rounded-full p-4 backdrop-blur-sm border-4 border-white shadow-xl flex items-center justify-center text-center">
                         <div>
@@ -237,7 +226,7 @@
 
             <!-- 榮譽榜與心靈雞湯欄位 -->
             <div class="grid md:grid-cols-3 gap-8">
-                <!-- 輔導處榮譽榜 (佔2欄，預先渲染繽紛色彩) -->
+                <!-- 輔導處榮譽榜 -->
                 <div class="md:col-span-2 bg-white rounded-3xl p-6 sm:p-8 border-2 border-orange-100 shadow-sm">
                     <div class="flex items-center justify-between mb-6 border-b-2 border-orange-100 pb-4">
                         <h2 class="text-2xl font-bold font-rounded text-gray-800 flex items-center gap-2">
@@ -253,7 +242,6 @@
                         </div>
                     </div>
 
-                    <!-- 榮譽清單容器 (5 色繽紛標題垂直對齊) -->
                     <div id="honor-roll-container" class="space-y-4">
                         <!-- 動態渲染 -->
                     </div>
@@ -261,7 +249,6 @@
 
                 <!-- 右側：今日心靈雞湯 + 關懷專線 -->
                 <div class="space-y-6">
-                    <!-- 心情小卡 (每日00:00自動更新) -->
                     <div class="bg-gradient-to-br from-warm-yellow to-amber-200 rounded-3xl p-6 shadow-sm border-2 border-yellow-300 relative">
                         <div class="flex items-center justify-between mb-3">
                             <div class="flex items-center gap-2">
@@ -278,7 +265,6 @@
                         <div class="text-right text-xs font-bold text-amber-800">—— 輔導處關心您 ❤️</div>
                     </div>
 
-                    <!-- 求助諮商管道 -->
                     <div class="bg-white rounded-3xl p-6 border-2 border-orange-100 shadow-sm space-y-4">
                         <h3 class="font-bold font-rounded text-gray-800 text-lg flex items-center gap-2 border-b pb-2">
                             <i class="fa-solid fa-phone-volume text-warm-orange"></i> 溫馨求助專線
@@ -311,7 +297,6 @@
             </div>
 
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- 目標 1 -->
                 <div class="bg-white rounded-3xl p-6 border-2 border-orange-100 shadow-sm hover:shadow-md transition-all">
                     <div class="w-12 h-12 bg-orange-100 text-warm-orange rounded-2xl flex items-center justify-center text-2xl mb-4">
                         <i class="fa-solid fa-heart-circle-check"></i>
@@ -322,7 +307,6 @@
                     </p>
                 </div>
 
-                <!-- 目標 2 -->
                 <div class="bg-white rounded-3xl p-6 border-2 border-emerald-100 shadow-sm hover:shadow-md transition-all">
                     <div class="w-12 h-12 bg-emerald-100 text-mint-green rounded-2xl flex items-center justify-center text-2xl mb-4">
                         <i class="fa-solid fa-seedling"></i>
@@ -333,7 +317,6 @@
                     </p>
                 </div>
 
-                <!-- 目標 3 -->
                 <div class="bg-white rounded-3xl p-6 border-2 border-amber-100 shadow-sm hover:shadow-md transition-all">
                     <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center text-2xl mb-4">
                         <i class="fa-solid fa-sun"></i>
@@ -344,7 +327,6 @@
                     </p>
                 </div>
 
-                <!-- 目標 4 -->
                 <div class="bg-white rounded-3xl p-6 border-2 border-pink-100 shadow-sm hover:shadow-md transition-all">
                     <div class="w-12 h-12 bg-pink-100 text-soft-pink rounded-2xl flex items-center justify-center text-2xl mb-4">
                         <i class="fa-solid fa-house-chimney-window"></i>
@@ -355,7 +337,6 @@
                     </p>
                 </div>
 
-                <!-- 目標 5 -->
                 <div class="bg-white rounded-3xl p-6 border-2 border-blue-100 shadow-sm hover:shadow-md transition-all">
                     <div class="w-12 h-12 bg-blue-100 text-soft-blue rounded-2xl flex items-center justify-center text-2xl mb-4">
                         <i class="fa-solid fa-hands-holding-child"></i>
@@ -366,7 +347,6 @@
                     </p>
                 </div>
 
-                <!-- 目標 6 -->
                 <div class="bg-white rounded-3xl p-6 border-2 border-purple-100 shadow-sm hover:shadow-md transition-all">
                     <div class="w-12 h-12 bg-purple-100 text-purple-500 rounded-2xl flex items-center justify-center text-2xl mb-4">
                         <i class="fa-solid fa-people-group"></i>
@@ -388,17 +368,13 @@
             </div>
 
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-
-                <!-- 1. 輔導主任 -->
                 <div class="bg-white rounded-3xl p-6 border-2 border-orange-200 shadow-sm relative overflow-hidden flex flex-col justify-between">
                     <div>
                         <div class="flex items-center justify-between mb-4">
                             <div class="w-12 h-12 bg-orange-100 text-warm-orange rounded-2xl flex items-center justify-center text-2xl shrink-0">
                                 <i class="fa-solid fa-user-tie"></i>
                             </div>
-                            <span class="bg-warm-orange text-white px-3 py-1 rounded-full text-xs font-bold">
-                                分機 5301
-                            </span>
+                            <span class="bg-warm-orange text-white px-3 py-1 rounded-full text-xs font-bold">分機 5301</span>
                         </div>
                         <h3 class="text-xl font-bold font-rounded text-gray-800 mb-3">輔導主任</h3>
                         <ul class="space-y-2 text-sm text-gray-600 list-disc list-inside">
@@ -410,16 +386,13 @@
                     </div>
                 </div>
 
-                <!-- 2. 輔導組長 -->
                 <div class="bg-white rounded-3xl p-6 border-2 border-emerald-200 shadow-sm relative overflow-hidden flex flex-col justify-between">
                     <div>
                         <div class="flex items-center justify-between mb-4">
                             <div class="w-12 h-12 bg-emerald-100 text-mint-green rounded-2xl flex items-center justify-center text-2xl shrink-0">
                                 <i class="fa-solid fa-comments"></i>
                             </div>
-                            <span class="bg-mint-green text-white px-3 py-1 rounded-full text-xs font-bold">
-                                分機 5302
-                            </span>
+                            <span class="bg-mint-green text-white px-3 py-1 rounded-full text-xs font-bold">分機 5302</span>
                         </div>
                         <h3 class="text-xl font-bold font-rounded text-gray-800 mb-3">輔導組長</h3>
                         <ul class="space-y-2 text-sm text-gray-600 list-disc list-inside">
@@ -431,16 +404,13 @@
                     </div>
                 </div>
 
-                <!-- 3. 親師組長 -->
                 <div class="bg-white rounded-3xl p-6 border-2 border-amber-200 shadow-sm relative overflow-hidden flex flex-col justify-between">
                     <div>
                         <div class="flex items-center justify-between mb-4">
                             <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center text-2xl shrink-0">
                                 <i class="fa-solid fa-people-roof"></i>
                             </div>
-                            <span class="bg-amber-500 text-white px-3 py-1 rounded-full text-xs font-bold">
-                                分機 5303
-                            </span>
+                            <span class="bg-amber-500 text-white px-3 py-1 rounded-full text-xs font-bold">分機 5303</span>
                         </div>
                         <h3 class="text-xl font-bold font-rounded text-gray-800 mb-3">親師組長</h3>
                         <ul class="space-y-2 text-sm text-gray-600 list-disc list-inside">
@@ -452,16 +422,13 @@
                     </div>
                 </div>
 
-                <!-- 4. 特教組長 -->
                 <div class="bg-white rounded-3xl p-6 border-2 border-blue-200 shadow-sm relative overflow-hidden flex flex-col justify-between">
                     <div>
                         <div class="flex items-center justify-between mb-4">
                             <div class="w-12 h-12 bg-blue-100 text-soft-blue rounded-2xl flex items-center justify-center text-2xl shrink-0">
                                 <i class="fa-solid fa-hands-holding text-2xl"></i>
                             </div>
-                            <span class="bg-soft-blue text-white px-3 py-1 rounded-full text-xs font-bold">
-                                分機 5304
-                            </span>
+                            <span class="bg-soft-blue text-white px-3 py-1 rounded-full text-xs font-bold">分機 5304</span>
                         </div>
                         <h3 class="text-xl font-bold font-rounded text-gray-800 mb-3">特教組長</h3>
                         <ul class="space-y-2 text-sm text-gray-600 list-disc list-inside">
@@ -473,16 +440,13 @@
                     </div>
                 </div>
 
-                <!-- 5. 專任輔導教師 / 心理師 -->
                 <div class="bg-white rounded-3xl p-6 border-2 border-pink-200 shadow-sm relative overflow-hidden flex flex-col justify-between">
                     <div>
                         <div class="flex items-center justify-between mb-4">
                             <div class="w-12 h-12 bg-pink-100 text-soft-pink rounded-2xl flex items-center justify-center text-2xl shrink-0">
                                 <i class="fa-solid fa-heart-pulse"></i>
                             </div>
-                            <span class="bg-soft-pink text-white px-2.5 py-1 rounded-full text-xs font-bold">
-                                分機 5305、5322 / 5323
-                            </span>
+                            <span class="bg-soft-pink text-white px-2.5 py-1 rounded-full text-xs font-bold">分機 5305、5322 / 5323</span>
                         </div>
                         <h3 class="text-xl font-bold font-rounded text-gray-800 mb-3">專任輔導教師 / 心理師</h3>
                         <ul class="space-y-2 text-sm text-gray-600 list-disc list-inside">
@@ -494,16 +458,13 @@
                     </div>
                 </div>
 
-                <!-- 6. 行政助理 -->
                 <div class="bg-white rounded-3xl p-6 border-2 border-purple-200 shadow-sm relative overflow-hidden flex flex-col justify-between">
                     <div>
                         <div class="flex items-center justify-between mb-4">
                             <div class="w-12 h-12 bg-purple-100 text-purple-500 rounded-2xl flex items-center justify-center text-2xl shrink-0">
                                 <i class="fa-solid fa-clipboard-check"></i>
                             </div>
-                            <span class="bg-purple-500 text-white px-3 py-1 rounded-full text-xs font-bold">
-                                分機 5306
-                            </span>
+                            <span class="bg-purple-500 text-white px-3 py-1 rounded-full text-xs font-bold">分機 5306</span>
                         </div>
                         <h3 class="text-xl font-bold font-rounded text-gray-800 mb-3">行政助理</h3>
                         <ul class="space-y-2 text-sm text-gray-600 list-disc list-inside">
@@ -514,13 +475,11 @@
                         </ul>
                     </div>
                 </div>
-
             </div>
         </section>
 
-        <!-- ================= PAGE 4: 親子橋電子報 (電子書架頁面) ================= -->
+        <!-- ================= PAGE 4: 親子橋電子報 ================= -->
         <section id="page-newsletter" class="page-section hidden space-y-8">
-            <!-- 管理員預覽時顯示的提示 Banner -->
             <div id="admin-hidden-notice" class="bg-amber-100 border-2 border-amber-300 rounded-2xl p-4 flex items-center justify-between text-amber-900 hidden">
                 <div class="flex items-center gap-3">
                     <i class="fa-solid fa-eye-slash text-2xl text-amber-600"></i>
@@ -545,34 +504,12 @@
                 <p class="text-gray-600 text-sm sm:text-base">搭起家長與學校的心靈橋樑，點選各期期刊線上閱讀</p>
             </div>
 
-            <!-- 木質書架容器 -->
             <div id="bookshelf-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 <!-- 動態渲染電子書架 -->
             </div>
         </section>
 
-        <!-- ================= PAGE 5: 家庭教育專區說明 ================= -->
-        <section id="page-family" class="page-section hidden space-y-8">
-            <div class="bg-gradient-to-br from-emerald-50 via-teal-50 to-emerald-100 rounded-3xl p-8 sm:p-12 border-2 border-emerald-200 shadow-md text-center max-w-3xl mx-auto">
-                <div class="w-20 h-20 bg-mint-green text-white rounded-full flex items-center justify-center text-4xl mx-auto mb-6 shadow-md">
-                    <i class="fa-solid fa-house-chimney-user"></i>
-                </div>
-                <h1 class="text-3xl font-black font-rounded text-gray-800 mb-4">家庭教育專區獨立網站</h1>
-                <p class="text-gray-600 text-base mb-8 leading-relaxed">
-                    本校家庭教育專區已有建置專屬網頁，內有更完整的親職教育資源、活動回顧與講座報名資訊。點擊下方按鈕將為您開啓新視窗導向：
-                </p>
-                <div class="bg-white p-4 rounded-2xl border border-emerald-200 font-mono text-sm text-emerald-800 mb-8 inline-block max-w-full overflow-x-auto shadow-inner">
-                    https://sites.google.com/hles.ntpc.edu.tw/fdsfamily
-                </div>
-                <div>
-                    <a href="https://sites.google.com/hles.ntpc.edu.tw/fdsfamily" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-3 bg-mint-green hover:bg-emerald-600 text-white font-black text-lg px-8 py-4 rounded-2xl shadow-lg transition-all hover:scale-105">
-                        <i class="fa-solid fa-arrow-up-right-from-square"></i> 立即前往家庭教育專區
-                    </a>
-                </div>
-            </div>
-        </section>
-
-        <!-- ================= PAGE 6: 相關網站 ================= -->
+        <!-- ================= PAGE 5: 相關網站 ================= -->
         <section id="page-links" class="page-section hidden space-y-8">
             <div class="text-center max-w-2xl mx-auto space-y-3">
                 <span class="bg-orange-100 text-warm-orange px-4 py-1.5 rounded-full text-xs font-black tracking-wider uppercase">Useful Links</span>
@@ -581,8 +518,6 @@
             </div>
 
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-
-                <!-- 類別 1: 新北市官方網站 -->
                 <div class="bg-white rounded-3xl p-6 border-2 border-orange-100 shadow-sm space-y-4">
                     <div class="flex items-center gap-3 border-b border-orange-100 pb-3">
                         <div class="w-10 h-10 bg-orange-100 text-warm-orange rounded-xl flex items-center justify-center font-bold">
@@ -612,7 +547,6 @@
                     </ul>
                 </div>
 
-                <!-- 類別 2: 心理衛生與輔導資源 -->
                 <div class="bg-white rounded-3xl p-6 border-2 border-emerald-100 shadow-sm space-y-4">
                     <div class="flex items-center gap-3 border-b border-emerald-100 pb-3">
                         <div class="w-10 h-10 bg-emerald-100 text-mint-green rounded-xl flex items-center justify-center font-bold">
@@ -642,7 +576,6 @@
                     </ul>
                 </div>
 
-                <!-- 類別 3: 特殊教育資源 -->
                 <div class="bg-white rounded-3xl p-6 border-2 border-blue-100 shadow-sm space-y-4">
                     <div class="flex items-center gap-3 border-b border-blue-100 pb-3">
                         <div class="w-10 h-10 bg-blue-100 text-soft-blue rounded-xl flex items-center justify-center font-bold">
@@ -671,7 +604,6 @@
                         </li>
                     </ul>
                 </div>
-
             </div>
         </section>
 
@@ -691,9 +623,7 @@
         </div>
     </footer>
 
-    <!-- ================= MODALS & OVERLAYS ================= -->
-
-    <!-- 1. 管理員登入 Modal (無資安字數提示) -->
+    <!-- 1. 管理員登入 Modal -->
     <div id="modal-login" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 border-4 border-warm-orange shadow-2xl relative">
             <button onclick="closeModal('modal-login')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
@@ -755,7 +685,7 @@
                 </div>
             </div>
 
-            <!-- 後台管理開關 (親子橋公開/隱藏切換) -->
+            <!-- 後台管理開關 -->
             <div class="bg-amber-50 rounded-2xl p-4 border border-amber-200 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                     <h3 class="font-bold text-amber-900 text-base flex items-center gap-2">
@@ -776,7 +706,7 @@
                 </div>
             </div>
 
-            <!-- 後台分頁標籤 (Tabs) -->
+            <!-- 後台分頁標籤 -->
             <div class="flex border-b border-gray-200 mb-6 gap-2 overflow-x-auto custom-scrollbar">
                 <button id="tab-btn-honor" onclick="switchAdminTab('honor')" class="admin-tab-btn border-b-4 border-warm-orange text-warm-orange font-bold px-4 py-2 text-sm flex items-center gap-2 shrink-0">
                     <i class="fa-solid fa-trophy"></i> 榮譽榜管理
@@ -795,7 +725,6 @@
                 </button>
             </div>
 
-            <!-- TAB 1: 榮譽榜管理 -->
             <div id="admin-tab-honor" class="admin-tab-content space-y-4">
                 <div class="flex justify-between items-center bg-orange-50 p-3 rounded-xl">
                     <span class="text-xs font-bold text-warm-orange">管理首頁榮譽榜事蹟清單</span>
@@ -808,7 +737,6 @@
                 </div>
             </div>
 
-            <!-- TAB 2: 心靈雞湯管理 -->
             <div id="admin-tab-quotes" class="admin-tab-content hidden space-y-4">
                 <div class="flex justify-between items-center bg-amber-50 p-3 rounded-xl">
                     <span class="text-xs font-bold text-amber-800">管理每日輪播的心靈金句庫</span>
@@ -821,7 +749,6 @@
                 </div>
             </div>
 
-            <!-- TAB 3: 親子橋電子報期刊管理 -->
             <div id="admin-tab-newsletter" class="admin-tab-content hidden space-y-4">
                 <div class="flex justify-between items-center bg-pink-50 p-3 rounded-xl">
                     <span class="text-xs font-bold text-soft-pink">管理《親子橋》電子書架刊物內容</span>
@@ -834,9 +761,7 @@
                 </div>
             </div>
 
-            <!-- TAB 4-A: ADMIN 帳號權限管理與密碼修改 -->
             <div id="admin-tab-accounts" class="admin-tab-content hidden space-y-6">
-                <!-- A1. 修改管理員自身密碼 -->
                 <div class="bg-orange-50/60 p-4 rounded-2xl border border-orange-200 space-y-3">
                     <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2">
                         <i class="fa-solid fa-user-lock text-warm-orange"></i> 修改最高管理員 (admin) 登入密碼
@@ -849,7 +774,6 @@
                     </form>
                 </div>
 
-                <!-- A2. 新增協助帳號 -->
                 <div class="bg-blue-50/60 p-4 rounded-2xl border border-blue-200 space-y-3">
                     <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2">
                         <i class="fa-solid fa-user-plus text-soft-blue"></i> 新增協助管理帳號 (如: 其他組長/助理)
@@ -866,7 +790,6 @@
                     </form>
                 </div>
 
-                <!-- A3. 現有協助帳號清單 -->
                 <div class="space-y-2">
                     <h4 class="font-bold text-xs text-gray-600">現有協助帳號清單</h4>
                     <div id="admin-assistant-account-list" class="space-y-2 max-h-48 overflow-y-auto custom-scrollbar p-1">
@@ -875,7 +798,6 @@
                 </div>
             </div>
 
-            <!-- TAB 4-B: 一般協助帳號專用個人密碼修改 -->
             <div id="admin-tab-changepass" class="admin-tab-content hidden space-y-4">
                 <div class="bg-pink-50/60 p-5 rounded-2xl border border-pink-200 space-y-3 max-w-md mx-auto">
                     <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2">
@@ -977,32 +899,55 @@
         </div>
     </div>
 
-    <!-- 6. 訊息提示 Toast / Banner -->
+    <!-- 6. 訊息提示 Toast -->
     <div id="toast-message" class="fixed top-24 right-6 z-50 bg-gray-900 text-white text-xs font-bold px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-2 transform translate-x-72 transition-transform duration-300">
         <i id="toast-icon" class="fa-solid fa-circle-check text-mint-green text-base"></i>
         <span id="toast-text">更新成功！</span>
     </div>
 
-    <!-- FIREBASE MODULE & APPLICATION SCRIPTS -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // SHA-256 單向不可逆壓碼雜湊函式 (確保 Ctrl+U 原始碼中完全不含明文帳號與密碼)
-        async function hashPassword(message) {
-            if (!message) return '';
-            const msgBuffer = new TextEncoder().encode(message);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-        }
+        window.showPage = function(pageId) {
+            document.querySelectorAll('.page-section').forEach(sec => sec.classList.add('hidden'));
+            const target = document.getElementById(`page-${pageId}`);
+            if (target) {
+                target.classList.remove('hidden');
+            }
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+                mobileMenu.classList.add('hidden');
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
 
-        // 本地快取自動儲存與載入函式 (資料持久化保存)
+        window.toggleMobileMenu = function() {
+            const menu = document.getElementById('mobile-menu');
+            if (menu) menu.classList.toggle('hidden');
+        };
+
+        window.openModal = function(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) modal.classList.remove('hidden');
+        };
+
+        window.closeModal = function(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) modal.classList.add('hidden');
+        };
+
         function loadStoredList(key, defaultList) {
             try {
                 const saved = localStorage.getItem(key);
-                if (saved) return JSON.parse(saved);
-            } catch(e) {}
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (Array.isArray(parsed)) return parsed;
+                }
+            } catch(e) {
+                console.warn(`[Safe Storage] Cleaned corrupted storage key: ${key}`, e);
+                localStorage.removeItem(key);
+            }
             return defaultList;
         }
 
@@ -1012,14 +957,23 @@
             } catch(e) {}
         }
 
+        // SHA-256 雙重壓碼防範機制
+        async function hashPassword(message) {
+            if (!message) return '';
+            const msgBuffer = new TextEncoder().encode(message);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
         // Firebase 專案設定檔 (部署時請填入您的金鑰)
         const firebaseConfig = {
-            apiKey: "AIzaSyAbRD2adKxaNo8TOjMXy1r0MS6K6Up38SM",
-            authDomain: "hles-counseling.firebaseapp.com",
-            projectId: "hles-counseling",
-            storageBucket: "hles-counseling.firebasestorage.app",
-            messagingSenderId: "578492449308",
-            appId: "1:578492449308:web:15b4a4337237de3bec95d9"
+          apiKey: "AIzaSyAbRD2adKxaNo8TOjMXy1r0MS6K6Up38SM",
+          authDomain: "hles-counseling.firebaseapp.com",
+          projectId: "hles-counseling",
+          storageBucket: "hles-counseling.firebasestorage.app",
+          messagingSenderId: "578492449308",
+          appId: "1:578492449308:web:15b4a4337237de3bec95d9"
         };
 
         let db = null;
@@ -1032,12 +986,12 @@
             console.warn("Firebase 初始化失敗，採用本地模式運作:", e);
         }
 
-        // 全域預設帳號庫（雜湊碼化對應：'admin' / '5303' / 預設密碼 '29420451'）：
-        const DEFAULT_PASS_HASH = '683c921319c5b5f35d5528b1e42a98f128c7ef3049cb4a5ee1a3a4115e47854f'; // 29420451
+        // 預設雜湊長碼 ('admin' / '5303' / 密碼 '29420451')
+        const DEFAULT_PASS_HASH = '683c921319c5b5f35d5528b1e42a98f128c7ef3049cb4a5ee1a3a4115e47854f';
 
         const defaultAccounts = {
             '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918': { passHash: DEFAULT_PASS_HASH, role: 'admin', name: '最高管理員', userTag: 'admin' },
-            '654f15d2e2499d755ef769c81a206b0d915a7707e324d314f85e51d931398835': { passHash: DEFAULT_PASS_HASH, role: 'editor_5303', name: '親師組長', userTag: '5303' }
+            '654f15d2e2499d755ef769c81a206b0d915a7707e324d314f85e51d931398835': { passHash: DEFAULT_PASS_HASH, role: 'editor_5303', name: '親師组長', userTag: '5303' }
         };
 
         const CURRENT_SCHEMA_VER = 'v5_perfect_final';
@@ -1051,8 +1005,13 @@
                     return { ...defaultAccounts };
                 }
                 const saved = localStorage.getItem('hles_accounts');
-                if (saved) return JSON.parse(saved);
-            } catch(e) {}
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (typeof parsed === 'object' && parsed !== null) return parsed;
+                }
+            } catch(e) {
+                localStorage.removeItem('hles_accounts');
+            }
             return { ...defaultAccounts };
         }
 
@@ -1063,7 +1022,7 @@
             } catch(e) {}
         }
 
-        // 預設《親子橋》公開/隱藏狀態
+        // 預設《親子橋》公開/隱藏狀態 (預設隱藏，僅管理員或已發布顯示)
         const savedHiddenSetting = localStorage.getItem('hles_newsletter_hidden');
         const initialHiddenState = savedHiddenSetting === null ? true : (savedHiddenSetting === 'true');
 
@@ -1097,35 +1056,6 @@
             ])
         };
 
-        // 1. 頁面導覽切換 (A++ 完美版面)
-        window.showPage = function(pageId) {
-            document.querySelectorAll('.page-section').forEach(sec => sec.classList.add('hidden'));
-            const target = document.getElementById(`page-${pageId}`);
-            if (target) {
-                target.classList.remove('hidden');
-            }
-            const mobileMenu = document.getElementById('mobile-menu');
-            if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
-                mobileMenu.classList.add('hidden');
-            }
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        };
-
-        window.toggleMobileMenu = function() {
-            const menu = document.getElementById('mobile-menu');
-            if (menu) menu.classList.toggle('hidden');
-        };
-
-        window.openModal = function(modalId) {
-            const modal = document.getElementById(modalId);
-            if (modal) modal.classList.remove('hidden');
-        };
-
-        window.closeModal = function(modalId) {
-            const modal = document.getElementById(modalId);
-            if (modal) modal.classList.add('hidden');
-        };
-
         window.openLoginModal = function() {
             if (window.appData.currentUser) {
                 window.openAdminPanel();
@@ -1134,7 +1064,7 @@
             }
         };
 
-        // 2. 登入按鈕三色狀態轉換 (未登入鵝黃 / admin天藍 / 協助帳號淡粉)
+        // 登入按鈕三色狀態轉換
         window.updateAdminButtonUI = function() {
             const btn = document.getElementById('btn-admin-login');
             const icon = document.getElementById('admin-btn-icon');
@@ -1178,7 +1108,7 @@
             }
         };
 
-        // 3. 《親子橋》選單動態可見度更新 (公開所有人可看 / 隱藏僅登入者可看)
+        // 《親子橋》動態可見度更新
         window.updateNewsletterVisibility = function() {
             const isHidden = window.appData.newsletterHidden;
             const isLoggedIn = Boolean(window.appData.currentUser);
@@ -1228,7 +1158,7 @@
             window.showToast(newState ? '已切換為【隱藏模式】' : '已切換為【公開模式】');
         };
 
-        // 4. 處理帳號登入 (SHA-256 雙重壓碼防護，100% 成功登入)
+        // 登入處理
         window.handleLogin = async function(e) {
             e.preventDefault();
             const rawUser = document.getElementById('login-user').value.trim();
@@ -1376,7 +1306,7 @@
             window.switchAdminTab(tabName);
         };
 
-        // 5. 渲染與多色卡片機制 (固定標籤寬度確保對齊)
+        // 渲染榮譽榜 (固定標籤寬度與對齊)
         window.renderHonorRoll = function() {
             const container = document.getElementById('honor-roll-container');
             if (!container) return;
@@ -1450,7 +1380,7 @@
             `).join('');
         };
 
-        // 6. 後台帳號與密碼修改
+        // 後台管理密碼
         window.handleAdminChangeSelfPassword = async function(e) {
             e.preventDefault();
             const newPass = document.getElementById('admin-new-pass').value.trim();
@@ -1598,7 +1528,6 @@
             `).join('');
         };
 
-        // CRUD 觸發與資料處置 (同步儲存至 localStorage)
         window.openHonorForm = function() { window.openModal('modal-honor-form'); };
         window.saveHonorItem = function(e) {
             e.preventDefault();
@@ -1674,7 +1603,6 @@
             window.showToast('已刪除該期刊');
         };
 
-        // Toast 訊息提示
         window.showToast = function(msg, isError = false) {
             const toast = document.getElementById('toast-message');
             const toastText = document.getElementById('toast-text');
@@ -1696,14 +1624,18 @@
             });
         }
 
-        // DOMContentLoaded 初始化載入
+        // 頁面初始化防護載入
         window.addEventListener('DOMContentLoaded', () => {
-            window.renderHonorRoll();
-            window.setDailyQuote();
-            window.scheduleMidnightQuoteUpdate();
-            window.renderBookshelfGrid();
-            window.updateNewsletterVisibility();
-            window.updateAdminButtonUI();
+            try {
+                window.renderHonorRoll();
+                window.setDailyQuote();
+                window.scheduleMidnightQuoteUpdate();
+                window.renderBookshelfGrid();
+                window.updateNewsletterVisibility();
+                window.updateAdminButtonUI();
+            } catch(e) {
+                console.warn("[Init Safeguard] Exception handled during render:", e);
+            }
 
             const syncStatusEl = document.getElementById('cloud-sync-status');
 
