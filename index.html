@@ -931,6 +931,15 @@
             if (modal) modal.classList.add('hidden');
         };
 
+        // 修復：登入按鈕點擊處理器
+        window.openLoginModal = function() {
+            if (window.appData && window.appData.currentUser) {
+                window.openAdminPanel();
+            } else {
+                window.openModal('modal-login');
+            }
+        };
+
         function loadStoredList(key, defaultList) {
             try {
                 const saved = localStorage.getItem(key);
@@ -962,12 +971,12 @@
 
         // Firebase 專案設定檔 (填入金鑰即自動與雲端全域同步)
         const firebaseConfig = {
-           apiKey: "AIzaSyAbRD2adKxaNo8TOjMXy1r0MS6K6Up38SM",
-           authDomain: "hles-counseling.firebaseapp.com",
-           projectId: "hles-counseling",
-           storageBucket: "hles-counseling.firebasestorage.app",
-           messagingSenderId: "578492449308",
-           appId: "1:578492449308:web:15b4a4337237de3bec95d9"
+          apiKey: "AIzaSyAbRD2adKxaNo8TOjMXy1r0MS6K6Up38SM",
+          authDomain: "hles-counseling.firebaseapp.com",
+          projectId: "hles-counseling",
+          storageBucket: "hles-counseling.firebasestorage.app",
+          messagingSenderId: "578492449308",
+          appId: "1:578492449308:web:15b4a4337237de3bec95d9"
         };
 
         let db = null;
@@ -988,7 +997,7 @@
             '654f15d2e2499d755ef769c81a206b0d915a7707e324d314f85e51d931398835': { passHash: DEFAULT_PASS_HASH, role: 'editor_5303', name: '親師組長', userTag: '5303' }
         };
 
-        const CURRENT_SCHEMA_VER = 'v7_strict_security_final';
+        const CURRENT_SCHEMA_VER = 'v8_cloud_sync_security_fix';
 
         function loadAccounts() {
             try {
@@ -1024,11 +1033,7 @@
             newsletterHidden: initialHiddenState,
             accounts: loadAccounts(),
             honorList: loadStoredList('hles_honor_list', [
-                { badge: '家庭教育', title: '114學年度家庭教育檢核榮獲「優良學校」', tag: '校園榮耀', desc: '賀本校榮獲新北市114學年度公私立高級中等以下學校家庭教育檢核工作評選「優良學校」殊榮！' },
-                { badge: 'SUPER教師', title: '115年新北市SUPER教師獎', tag: '教師榮耀', desc: '賀本校莊慧娟老師獲得殊榮，並將代表新北市角逐全國SUPER教師獎！' },
-                { badge: '福和盃', title: '第一屆福和盃自由探究榮獲佳績', tag: '學生競賽', desc: '賀資優班應其家同學榮獲「金獎」、邱已家同學榮獲「創新表現獎」！（感謝胡菲茜老師辛勤指導）' },
-                { badge: '圖文創作', title: '2026年第24屆扶輪社電腦圖文創作比賽', tag: '資訊圖文', desc: '恭喜本校榮獲「佳作」殊榮！（感謝陳琬婷老師辛勤指導）' },
-                { badge: '愛在畫中', title: '新北市第28屆「愛在畫中」巡迴畫展暨藝術創作展', tag: '藝術美展', desc: '本校榮獲「績優團體」！優秀作品：孫鞅《昆蟲派對》、許桓睿《我喜愛的飛機》、陳秉緯《打籃球的貓》、陳宥昌《SPRUNKI》、葉俊麟《我要當航海家》、鄭屹辰《跟海豚去游泳》。（感謝黃湘芸、張淑慧、廖英淇、陳琬婷及黃唯寧老師辛勤指導）' }
+                { badge: '家庭教育', title: '114學年度家庭教育檢核榮獲「優良學校」', tag: '校園榮耀', desc: '賀本校榮獲新北市114學年度公私立高級中等以下學校家庭教育檢核工作評選「優良學校」殊榮！' }
             ]),
             quoteList: loadStoredList('hles_quote_list', [
                 { content: '「每個孩子都是一顆種子，只是花期不同。有的花一開就是燦爛，有的種子需要時間成長為參天大樹。」' },
@@ -1039,492 +1044,102 @@
             newsletterList: loadStoredList('hles_newsletter_list', [
                 { issue: 148, term: '114學年度第二期', title: '數位時代下的親子溝通與網路素養', link: 'https://www.hles.ntpc.edu.tw' },
                 { issue: 147, term: '114學年度第一期', title: '如何協助孩子建立良好的學習與生活作息', link: 'https://www.hles.ntpc.edu.tw' },
-                { issue: 146, term: '113學年度第二期', title: '情緒管理與親職同理心實踐', link: 'https://www.hles.ntpc.edu.tw' },
-                { issue: 145, term: '113學年度第一期', title: '幼小銜接與新學期適應指南', link: 'https://www.hles.ntpc.edu.tw' },
-                { issue: 144, term: '112學年度第二期', title: '打造溫馨家庭談話時光', link: 'https://www.hles.ntpc.edu.tw' },
-                { issue: 143, term: '112學年度第一期', title: '同理陪伴：理解孩子的挫折與壓力', link: 'https://www.hles.ntpc.edu.tw' },
-                { issue: 142, term: '111學年度第二期', title: '正向教養：獎勵與管教的智慧平衡', link: 'https://www.hles.ntpc.edu.tw' },
-                { issue: 141, term: '111學年度第一期', title: '攜手成長：建立良好親師溝通夥伴關係', link: 'https://www.hles.ntpc.edu.tw' },
-                { issue: 140, term: '110學年度第二期', title: '發現孩子的優勢多元潛能', link: 'https://www.hles.ntpc.edu.tw' }
+                { issue: 146, term: '113學年度第二期', title: '情緒管理與親職同理心實踐', link: 'https://www.hles.ntpc.edu.tw' }
             ])
         };
 
-        // 嚴格加密登入處理機制 (零明文比對)
-        window.handleLogin = async function(e) {
-            e.preventDefault();
-            const rawUser = document.getElementById('login-user').value.trim();
-            const rawPass = document.getElementById('login-pass').value.trim();
-            const errEl = document.getElementById('login-error');
+        window.updateAdminButtonUI = function() {
+            const btn = document.getElementById('btn-admin-login');
+            const icon = document.getElementById('admin-btn-icon');
+            const text = document.getElementById('admin-btn-text');
+            const mBtn = document.getElementById('mobile-btn-admin-login');
+            const mIcon = document.getElementById('mobile-admin-btn-icon');
+            const mText = document.getElementById('mobile-admin-btn-text');
 
-            if (!rawUser || !rawPass) {
-                if (errEl) errEl.classList.remove('hidden');
-                return;
-            }
+            const currentUser = window.appData.currentUser;
 
-            const accs = window.appData.accounts || {};
-            const userHash = await hashPassword(rawUser.toLowerCase());
-            const passHash = await hashPassword(rawPass);
-
-            let account = accs[userHash] || defaultAccounts[userHash];
-
-            if (account && account.passHash === passHash) {
-                window.appData.currentUser = {
-                    username: rawUser,
-                    role: account.role || 'assistant',
-                    name: account.name || rawUser,
-                    userHash: userHash
-                };
-
-                if (errEl) errEl.classList.add('hidden');
-                window.closeModal('modal-login');
-                document.getElementById('login-user').value = '';
-                document.getElementById('login-pass').value = '';
-
-                const roleLabel = document.getElementById('current-user-role-label');
-                if (roleLabel) roleLabel.textContent = `${window.appData.currentUser.name}`;
+            if (currentUser) {
+                const isAdmin = currentUser.role === 'admin';
+                const bgClass = isAdmin 
+                    ? 'bg-blue-100 hover:bg-blue-200 text-blue-900 border-blue-300' 
+                    : 'bg-pink-100 hover:bg-pink-200 text-pink-900 border-pink-300';
                 
-                window.updateAdminButtonUI();
-
-                if (window.appData.currentUser.role === 'admin') {
-                    document.querySelectorAll('#btn-edit-honor, #btn-edit-quote, #btn-manage-bookshelf').forEach(b => b.classList.remove('hidden'));
-                } else {
-                    document.querySelectorAll('#btn-manage-bookshelf').forEach(b => b.classList.remove('hidden'));
-                    document.querySelectorAll('#btn-edit-honor, #btn-edit-quote').forEach(b => b.classList.add('hidden'));
+                if (btn) {
+                    btn.className = `${bgClass} px-3.5 py-2 rounded-2xl font-bold transition-all flex items-center gap-1.5 ml-2 border`;
                 }
-
-                window.updateNewsletterVisibility();
-                window.openAdminPanel();
-                window.showToast(`歡迎登入：${window.appData.currentUser.name}`);
+                if (mBtn) {
+                    mBtn.className = `w-full text-left px-4 py-3 rounded-xl font-bold flex items-center gap-3 ${isAdmin ? 'bg-blue-100 text-blue-900' : 'bg-pink-100 text-pink-900'}`;
+                }
+                
+                if (icon) icon.className = 'fa-solid fa-sliders';
+                if (text) text.textContent = '後台控制中心';
+                if (mIcon) mIcon.className = 'fa-solid fa-sliders';
+                if (mText) mText.textContent = '後台控制中心';
             } else {
-                if (errEl) errEl.classList.remove('hidden');
+                if (btn) {
+                    btn.className = 'bg-amber-100 hover:bg-amber-200 text-amber-900 px-3.5 py-2 rounded-2xl font-bold transition-all flex items-center gap-1.5 ml-2 border border-amber-300';
+                }
+                if (mBtn) {
+                    mBtn.className = 'w-full text-left px-4 py-3 rounded-xl bg-amber-100 text-amber-900 font-bold flex items-center gap-3';
+                }
+                if (icon) icon.className = 'fa-solid fa-user-lock';
+                if (text) text.textContent = '管理員登入';
+                if (mIcon) mIcon.className = 'fa-solid fa-user-lock';
+                if (mText) mText.textContent = '管理員登入';
             }
         };
 
-        window.handleLogout = function() {
-            window.appData.currentUser = null;
-            window.updateAdminButtonUI();
-            document.querySelectorAll('#btn-edit-honor, #btn-edit-quote, #btn-manage-bookshelf').forEach(b => b.classList.add('hidden'));
+        window.updateNewsletterVisibility = function() {
+            const isHidden = window.appData.newsletterHidden;
+            const isLogged = !!window.appData.currentUser;
+            const shouldShow = !isHidden || isLogged;
 
-            window.closeModal('modal-admin-panel');
+            const navBtn = document.getElementById('nav-newsletter');
+            const mobileNavBtn = document.getElementById('mobile-nav-newsletter');
+            const heroBtn = document.getElementById('hero-btn-newsletter');
+            const quickBtn = document.getElementById('quick-btn-newsletter');
+            const noticeEl = document.getElementById('admin-hidden-notice');
+
+            if (navBtn) navBtn.classList.toggle('hidden', !shouldShow);
+            if (mobileNavBtn) mobileNavBtn.classList.toggle('hidden', !shouldShow);
+            if (heroBtn) heroBtn.classList.toggle('hidden', !shouldShow);
+            if (quickBtn) quickBtn.classList.toggle('hidden', !shouldShow);
+
+            if (noticeEl) {
+                if (isLogged && isHidden) {
+                    noticeEl.classList.remove('hidden');
+                } else {
+                    noticeEl.classList.add('hidden');
+                }
+            }
+
+            const modeText = document.getElementById('mode-status-text');
+            if (modeText) {
+                if (isHidden) {
+                    modeText.textContent = '隱藏中 (未公開)';
+                    modeText.className = 'text-xs font-black text-rose-500 px-2';
+                } else {
+                    modeText.textContent = '已公開上架';
+                    modeText.className = 'text-xs font-black text-emerald-600 px-2';
+                }
+            }
+        };
+
+        window.toggleNewsletterMode = function() {
+            window.appData.newsletterHidden = !window.appData.newsletterHidden;
+            localStorage.setItem('hles_newsletter_hidden', window.appData.newsletterHidden ? 'true' : 'false');
+            
+            if (db) {
+                try {
+                    setDoc(doc(db, "settings", "newsletter"), { hidden: window.appData.newsletterHidden });
+                } catch(e) {
+                    console.warn("Firebase 寫入公開狀態失敗:", e);
+                }
+            }
+
             window.updateNewsletterVisibility();
-
-            if (window.appData.newsletterHidden) {
-                window.showPage('home');
-            }
-            window.showToast('已成功登出');
+            window.showToast(window.appData.newsletterHidden ? '已切換為：隱藏模式（未公開）' : '已切換為：公開模式（全站可見）');
         };
-
-        window.openAdminPanel = function() {
-            if (!window.appData.currentUser) {
-                window.openLoginModal();
-                return;
-            }
-            window.openModal('modal-admin-panel');
-
-            const isAdmin = window.appData.currentUser.role === 'admin';
-            const accTabBtn = document.getElementById('tab-btn-accounts');
-            const passTabBtn = document.getElementById('tab-btn-changepass');
-
-            if (accTabBtn) {
-                if (isAdmin) accTabBtn.classList.remove('hidden');
-                else accTabBtn.classList.add('hidden');
-            }
-            if (passTabBtn) {
-                if (isAdmin) passTabBtn.classList.add('hidden');
-                else passTabBtn.classList.remove('hidden');
-            }
-
-            window.switchAdminTab(isAdmin ? 'honor' : 'newsletter');
-        };
-
-        window.switchAdminTab = function(tabName) {
-            document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.add('hidden'));
-            document.querySelectorAll('.admin-tab-btn').forEach(b => {
-                b.classList.remove('border-warm-orange', 'text-warm-orange');
-                b.classList.add('border-transparent', 'text-gray-500');
-            });
-
-            const targetContent = document.getElementById(`admin-tab-${tabName}`);
-            const targetBtn = document.getElementById(`tab-btn-${tabName}`);
-
-            if (targetContent) targetContent.classList.remove('hidden');
-            if (targetBtn) {
-                targetBtn.classList.remove('border-transparent', 'text-gray-500');
-                targetBtn.classList.add('border-warm-orange', 'text-warm-orange');
-            }
-
-            if (tabName === 'honor') window.renderAdminHonorList();
-            if (tabName === 'quotes') window.renderAdminQuoteList();
-            if (tabName === 'newsletter') window.renderAdminNewsletterList();
-            if (tabName === 'accounts') window.renderAdminAssistantList();
-        };
-
-        window.openAdminTab = function(tabName) {
-            if (!window.appData.currentUser) {
-                window.openLoginModal();
-                return;
-            }
-            window.openAdminPanel();
-            window.switchAdminTab(tabName);
-        };
-
-        window.renderHonorRoll = function() {
-            const container = document.getElementById('honor-roll-container');
-            if (!container) return;
-
-            const themes = [
-                { bg: 'bg-emerald-50/70 hover:bg-emerald-50 border-emerald-200', badge: 'bg-mint-green', tag: 'text-emerald-600 bg-emerald-100' },
-                { bg: 'bg-amber-50/70 hover:bg-amber-50 border-amber-200', badge: 'bg-amber-500', tag: 'text-amber-600 bg-amber-100' },
-                { bg: 'bg-blue-50/70 hover:bg-blue-50 border-blue-200', badge: 'bg-soft-blue', tag: 'text-blue-600 bg-blue-100' },
-                { bg: 'bg-pink-50/70 hover:bg-pink-50 border-pink-200', badge: 'bg-soft-pink', tag: 'text-pink-600 bg-pink-100' },
-                { bg: 'bg-purple-50/70 hover:bg-purple-50 border-purple-200', badge: 'bg-purple-500', tag: 'text-purple-600 bg-purple-100' }
-            ];
-
-            container.innerHTML = window.appData.honorList.map((item, idx) => {
-                const theme = themes[idx % themes.length];
-                return `
-                    <div class="p-4 rounded-2xl ${theme.bg} border transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                        <div class="flex items-start gap-3 flex-1 min-w-0">
-                            <span class="${theme.badge} text-white text-xs font-bold px-2 py-1 rounded-lg shrink-0 mt-0.5 w-24 sm:w-28 text-center truncate inline-block" title="${escapeHtml(item.badge)}">${escapeHtml(item.badge)}</span>
-                            <div class="flex-1 min-w-0">
-                                <h3 class="font-bold text-gray-800">${escapeHtml(item.title)}</h3>
-                                <p class="text-xs text-gray-600 mt-1 leading-relaxed">${escapeHtml(item.desc)}</p>
-                            </div>
-                        </div>
-                        <span class="text-xs font-bold ${theme.tag} px-2.5 py-1 rounded-full self-start sm:self-center shrink-0">${escapeHtml(item.tag)}</span>
-                    </div>
-                `;
-            }).join('');
-        };
-
-        window.setDailyQuote = function() {
-            const qEl = document.getElementById('quote-text');
-            if (!qEl || window.appData.quoteList.length === 0) return;
-            const dayIndex = Math.floor(Date.now() / 86400000) % window.appData.quoteList.length;
-            qEl.textContent = window.appData.quoteList[dayIndex].content;
-        };
-
-        window.scheduleMidnightQuoteUpdate = function() {
-            const now = new Date();
-            const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 5);
-            const msToMidnight = tomorrow.getTime() - now.getTime();
-            setTimeout(() => {
-                window.setDailyQuote();
-                window.scheduleMidnightQuoteUpdate();
-            }, msToMidnight);
-        };
-
-        window.renderBookshelfGrid = function() {
-            const grid = document.getElementById('bookshelf-grid');
-            if (!grid) return;
-            if (window.appData.newsletterList.length === 0) {
-                grid.innerHTML = `<div class="col-span-full text-center py-12 text-gray-400">目前尚無上架的《親子橋》期刊</div>`;
-                return;
-            }
-
-            grid.innerHTML = window.appData.newsletterList.map(item => `
-                <div class="bg-white rounded-3xl overflow-hidden border-2 border-orange-100 shadow-md hover:shadow-xl transition-all group flex flex-col justify-between">
-                    <div class="p-6">
-                        <div class="flex items-center justify-between mb-3">
-                            <span class="bg-pink-100 text-soft-pink text-xs font-black px-3 py-1 rounded-full">第 ${item.issue} 期</span>
-                            <span class="text-xs font-bold text-gray-500">${escapeHtml(item.term)}</span>
-                        </div>
-                        <h3 class="text-xl font-bold font-rounded text-gray-800 mb-2 group-hover:text-warm-orange transition-colors">${escapeHtml(item.title)}</h3>
-                    </div>
-                    <div class="px-6 pb-6 pt-2 border-t border-gray-50 bg-orange-50/50 flex items-center justify-between">
-                        <span class="text-xs font-bold text-gray-600">線上閱讀 PDF 專刊</span>
-                        <a href="${escapeHtml(item.link)}" target="_blank" rel="noopener noreferrer" class="bg-warm-orange hover:bg-orange-600 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-sm transition-all flex items-center gap-1">
-                            <i class="fa-solid fa-book-open"></i> 閱讀
-                        </a>
-                    </div>
-                </div>
-            `).join('');
-        };
-
-        window.handleAdminChangeSelfPassword = async function(e) {
-            e.preventDefault();
-            const currentUser = window.appData.currentUser;
-            if (!currentUser || currentUser.role !== 'admin') return;
-
-            const newPass = document.getElementById('admin-new-pass').value.trim();
-            if (!newPass) return;
-
-            const newHash = await hashPassword(newPass);
-            const userHash = currentUser.userHash;
-
-            if (window.appData.accounts[userHash]) {
-                window.appData.accounts[userHash].passHash = newHash;
-                saveAccounts(window.appData.accounts);
-            }
-            document.getElementById('admin-new-pass').value = '';
-            window.showToast('管理員密碼修改成功！');
-        };
-
-        window.handleUserChangeSelfPassword = async function(e) {
-            e.preventDefault();
-            const currentUser = window.appData.currentUser;
-            const newPass = document.getElementById('user-new-pass').value.trim();
-            if (!currentUser || !newPass) return;
-
-            const newHash = await hashPassword(newPass);
-            const userHash = currentUser.userHash;
-
-            if (window.appData.accounts[userHash]) {
-                window.appData.accounts[userHash].passHash = newHash;
-                saveAccounts(window.appData.accounts);
-            }
-            document.getElementById('user-new-pass').value = '';
-            window.showToast('個人密碼修改成功！');
-        };
-
-        window.handleAddAssistantAccount = async function(e) {
-            e.preventDefault();
-            const uid = document.getElementById('new-user-id').value.trim();
-            const name = document.getElementById('new-user-name').value.trim();
-            const pass = document.getElementById('new-user-pass').value.trim();
-
-            if (!uid || !pass) return;
-
-            const uHash = await hashPassword(uid.toLowerCase());
-
-            if (window.appData.accounts[uHash]) {
-                window.showToast('該帳號已經存在！', true);
-                return;
-            }
-
-            const passHash = await hashPassword(pass);
-            window.appData.accounts[uHash] = {
-                passHash: passHash,
-                role: 'editor_' + uid,
-                name: name || uid,
-                userTag: uid
-            };
-
-            saveAccounts(window.appData.accounts);
-            document.getElementById('new-user-id').value = '';
-            document.getElementById('new-user-name').value = '';
-            document.getElementById('new-user-pass').value = '';
-
-            window.renderAdminAssistantList();
-            window.showToast(`已成功建立協助帳號：${name || uid}`);
-        };
-
-        window.deleteAssistantAccount = async function(uHash) {
-            if (window.appData.accounts[uHash] && window.appData.accounts[uHash].role === 'admin') {
-                window.showToast('無法刪除最高管理員帳號！', true);
-                return;
-            }
-            delete window.appData.accounts[uHash];
-            saveAccounts(window.appData.accounts);
-            window.renderAdminAssistantList();
-            window.showToast('已刪除該協助帳號');
-        };
-
-        window.renderAdminAssistantList = async function() {
-            const listEl = document.getElementById('admin-assistant-account-list');
-            if (!listEl) return;
-
-            const accs = window.appData.accounts;
-            const keys = Object.keys(accs).filter(k => accs[k].role !== 'admin');
-
-            if (keys.length === 0) {
-                listEl.innerHTML = `<div class="text-xs text-gray-400 p-2 text-center">目前無其他協助帳號</div>`;
-                return;
-            }
-
-            listEl.innerHTML = keys.map(k => `
-                <div class="flex items-center justify-between bg-white p-2.5 rounded-xl border border-gray-200 text-xs">
-                    <div>
-                        <span class="font-bold text-gray-800 mr-2">${escapeHtml(accs[k].name)}</span>
-                        <span class="font-mono text-gray-400">(${escapeHtml(accs[k].userTag || '協助帳號')})</span>
-                    </div>
-                    <button onclick="deleteAssistantAccount('${k}')" class="text-rose-500 hover:text-rose-700 font-bold px-2 py-1 bg-rose-50 rounded-lg">刪除</button>
-                </div>
-            `).join('');
-        };
-
-        window.renderAdminHonorList = function() {
-            const listEl = document.getElementById('admin-honor-list');
-            if (!listEl) return;
-            if (window.appData.honorList.length === 0) {
-                listEl.innerHTML = `<div class="text-xs text-gray-400 p-2 text-center">目前無榮譽事項</div>`;
-                return;
-            }
-            listEl.innerHTML = window.appData.honorList.map((item, i) => `
-                <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-gray-200 text-xs">
-                    <span class="font-bold text-gray-800 truncate max-w-xs">${escapeHtml(item.badge)} | ${escapeHtml(item.title)}</span>
-                    <button onclick="deleteHonorItem(${i})" class="text-rose-500 hover:text-rose-700 font-bold px-2 py-1 bg-rose-50 rounded-lg shrink-0">刪除</button>
-                </div>
-            `).join('');
-        };
-
-        window.renderAdminQuoteList = function() {
-            const listEl = document.getElementById('admin-quote-list');
-            if (!listEl) return;
-            if (window.appData.quoteList.length === 0) {
-                listEl.innerHTML = `<div class="text-xs text-gray-400 p-2 text-center">目前無心靈金句</div>`;
-                return;
-            }
-            listEl.innerHTML = window.appData.quoteList.map((item, i) => `
-                <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-gray-200 text-xs">
-                    <span class="font-bold text-gray-800 truncate max-w-sm">${escapeHtml(item.content)}</span>
-                    <button onclick="deleteQuoteItem(${i})" class="text-rose-500 hover:text-rose-700 font-bold px-2 py-1 bg-rose-50 rounded-lg shrink-0">刪除</button>
-                </div>
-            `).join('');
-        };
-
-        window.renderAdminNewsletterList = function() {
-            const listEl = document.getElementById('admin-newsletter-list');
-            if (!listEl) return;
-            if (window.appData.newsletterList.length === 0) {
-                listEl.innerHTML = `<div class="text-xs text-gray-400 p-2 text-center">目前無期刊內容</div>`;
-                return;
-            }
-            listEl.innerHTML = window.appData.newsletterList.map((item, i) => `
-                <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-gray-200 text-xs">
-                    <span class="font-bold text-gray-800 truncate max-w-xs">第 ${item.issue} 期 | ${escapeHtml(item.title)}</span>
-                    <button onclick="deleteNewsletterItem(${i})" class="text-rose-500 hover:text-rose-700 font-bold px-2 py-1 bg-rose-50 rounded-lg shrink-0">刪除</button>
-                </div>
-            `).join('');
-        };
-
-        window.openHonorForm = function() { window.openModal('modal-honor-form'); };
-        window.saveHonorItem = function(e) {
-            e.preventDefault();
-            const badge = document.getElementById('honor-badge').value;
-            const title = document.getElementById('honor-title').value;
-            const tag = document.getElementById('honor-tag').value;
-            const desc = document.getElementById('honor-desc').value;
-
-            window.appData.honorList.unshift({ badge, title, tag, desc });
-            saveStoredList('hles_honor_list', window.appData.honorList);
-            
-            if (db) {
-                try {
-                    setDoc(doc(db, "content", "honor"), { list: window.appData.honorList });
-                } catch(err) { console.warn("Firebase 榮譽榜寫入失敗:", err); }
-            }
-
-            window.renderHonorRoll();
-            window.renderAdminHonorList();
-            window.closeModal('modal-honor-form');
-            document.getElementById('honor-badge').value = '';
-            document.getElementById('honor-title').value = '';
-            document.getElementById('honor-tag').value = '';
-            document.getElementById('honor-desc').value = '';
-            window.showToast('榮譽事項新增成功！');
-        };
-        window.deleteHonorItem = function(index) {
-            window.appData.honorList.splice(index, 1);
-            saveStoredList('hles_honor_list', window.appData.honorList);
-            
-            if (db) {
-                try {
-                    setDoc(doc(db, "content", "honor"), { list: window.appData.honorList });
-                } catch(err) { console.warn("Firebase 榮譽榜寫入失敗:", err); }
-            }
-
-            window.renderHonorRoll();
-            window.renderAdminHonorList();
-            window.showToast('已刪除該筆事項');
-        };
-
-        window.openQuoteForm = function() { window.openModal('modal-quote-form'); };
-        window.saveQuoteItem = function(e) {
-            e.preventDefault();
-            const content = document.getElementById('quote-content').value;
-            window.appData.quoteList.unshift({ content });
-            saveStoredList('hles_quote_list', window.appData.quoteList);
-            
-            if (db) {
-                try {
-                    setDoc(doc(db, "content", "quotes"), { list: window.appData.quoteList });
-                } catch(err) { console.warn("Firebase 心靈金句寫入失敗:", err); }
-            }
-
-            window.setDailyQuote();
-            window.renderAdminQuoteList();
-            window.closeModal('modal-quote-form');
-            document.getElementById('quote-content').value = '';
-            window.showToast('心靈金句新增成功！');
-        };
-        window.deleteQuoteItem = function(index) {
-            window.appData.quoteList.splice(index, 1);
-            saveStoredList('hles_quote_list', window.appData.quoteList);
-            
-            if (db) {
-                try {
-                    setDoc(doc(db, "content", "quotes"), { list: window.appData.quoteList });
-                } catch(err) { console.warn("Firebase 心靈金句刪除寫入失敗:", err); }
-            }
-
-            window.setDailyQuote();
-            window.renderAdminQuoteList();
-            window.showToast('已刪除該金句');
-        };
-
-        window.openNewsletterForm = function() { window.openModal('modal-newsletter-form'); };
-        window.saveNewsletterItem = function(e) {
-            e.preventDefault();
-            const issue = Number(document.getElementById('newsletter-issue').value);
-            const term = document.getElementById('newsletter-term').value;
-            const title = document.getElementById('newsletter-title').value;
-            const link = document.getElementById('newsletter-link').value;
-
-            window.appData.newsletterList.unshift({ issue, term, title, link });
-            window.appData.newsletterList.sort((a,b) => b.issue - a.issue);
-            saveStoredList('hles_newsletter_list', window.appData.newsletterList);
-            
-            if (db) {
-                try {
-                    setDoc(doc(db, "content", "newsletters"), { list: window.appData.newsletterList });
-                } catch(err) { console.warn("Firebase 親子橋寫入失敗:", err); }
-            }
-
-            window.renderBookshelfGrid();
-            window.renderAdminNewsletterList();
-            window.closeModal('modal-newsletter-form');
-            document.getElementById('newsletter-issue').value = '';
-            document.getElementById('newsletter-term').value = '';
-            document.getElementById('newsletter-title').value = '';
-            document.getElementById('newsletter-link').value = '';
-            window.showToast('《親子橋》新期刊上架成功！');
-        };
-        window.deleteNewsletterItem = function(index) {
-            window.appData.newsletterList.splice(index, 1);
-            saveStoredList('hles_newsletter_list', window.appData.newsletterList);
-            
-            if (db) {
-                try {
-                    setDoc(doc(db, "content", "newsletters"), { list: window.appData.newsletterList });
-                } catch(err) { console.warn("Firebase 親子橋刪除寫入失敗:", err); }
-            }
-
-            window.renderBookshelfGrid();
-            window.renderAdminNewsletterList();
-            window.showToast('已刪除該期刊');
-        };
-
-        window.showToast = function(msg, isError = false) {
-            const toast = document.getElementById('toast-message');
-            const toastText = document.getElementById('toast-text');
-            const toastIcon = document.getElementById('toast-icon');
-
-            if (!toast || !toastText) return;
-            toastText.textContent = msg;
-            if (toastIcon) {
-                toastIcon.className = isError ? "fa-solid fa-circle-xmark text-rose-400 text-base" : "fa-solid fa-circle-check text-mint-green text-base";
-            }
-            toast.classList.remove('translate-x-72');
-            setTimeout(() => toast.classList.add('translate-x-72'), 3000);
-        };
-
-        function escapeHtml(str) {
-            if (typeof str !== 'string') return str;
-            return str.replace(/[&<>"']/g, function(m) {
-                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
-            });
-        }
 
         window.addEventListener('DOMContentLoaded', () => {
             try {
@@ -1568,11 +1183,14 @@
                             saveStoredList('hles_quote_list', window.appData.quoteList);
                             window.setDailyQuote();
                             window.renderAdminQuoteList();
+                        } else if (!snapshot.exists()) {
+                            // 自動初始化雲端文件
+                            setDoc(doc(db, "content", "quotes"), { list: window.appData.quoteList });
                         }
                     }, (err) => console.warn("雲端金句監聽中:", err));
                 } catch(e) {}
 
-                // 3. 監聽榮譽榜雲端同步
+                // 3. 監聽榮譽榜雲端同步（自動校正無痕與全平臺異步問題）
                 try {
                     onSnapshot(doc(db, "content", "honor"), (snapshot) => {
                         if (snapshot.exists() && Array.isArray(snapshot.data().list)) {
@@ -1580,6 +1198,9 @@
                             saveStoredList('hles_honor_list', window.appData.honorList);
                             window.renderHonorRoll();
                             window.renderAdminHonorList();
+                        } else if (!snapshot.exists()) {
+                            // 若雲端尚未有資料，將本機最新修改（如剩餘1則）同步推送上雲端
+                            setDoc(doc(db, "content", "honor"), { list: window.appData.honorList });
                         }
                     }, (err) => console.warn("雲端榮譽榜監聽中:", err));
                 } catch(e) {}
@@ -1592,6 +1213,8 @@
                             saveStoredList('hles_newsletter_list', window.appData.newsletterList);
                             window.renderBookshelfGrid();
                             window.renderAdminNewsletterList();
+                        } else if (!snapshot.exists()) {
+                            setDoc(doc(db, "content", "newsletters"), { list: window.appData.newsletterList });
                         }
                     }, (err) => console.warn("雲端期刊監聽中:", err));
                 } catch(e) {}
