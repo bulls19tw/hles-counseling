@@ -131,7 +131,6 @@
             </div>
         </div>
 
-        <!-- 手機版選單 -->
         <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-100 px-4 pt-2 pb-4 space-y-2">
             <button onclick="showPage('home')" class="w-full text-left px-4 py-3 rounded-xl hover:bg-orange-50 text-gray-700 font-bold flex items-center gap-3">
                 <i class="fa-solid fa-house text-warm-orange"></i> 首頁
@@ -159,7 +158,6 @@
 
     <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-        <!-- ================= PAGE 1: 首頁 ================= -->
         <section id="page-home" class="page-section space-y-10">
             <div class="relative overflow-hidden bg-gradient-to-r from-amber-100 via-orange-100 to-rose-100 rounded-3xl p-8 md:p-12 shadow-lg border-2 border-orange-200">
                 <div class="relative z-10 max-w-2xl">
@@ -224,9 +222,8 @@
                 </a>
             </div>
 
-            <!-- 榮譽榜與心靈雞湯欄位 -->
             <div class="grid md:grid-cols-3 gap-8">
-                <!-- 輔導處榮譽榜 -->
+                <!-- 輔導處榮譽榜 (齊平對齊版) -->
                 <div class="md:col-span-2 bg-white rounded-3xl p-6 sm:p-8 border-2 border-orange-100 shadow-sm">
                     <div class="flex items-center justify-between mb-6 border-b-2 border-orange-100 pb-4">
                         <h2 class="text-2xl font-bold font-rounded text-gray-800 flex items-center gap-2">
@@ -288,7 +285,6 @@
             </div>
         </section>
 
-        <!-- ================= PAGE 2: 認識我們 - 願景目標 ================= -->
         <section id="page-about-vision" class="page-section hidden space-y-8">
             <div class="text-center max-w-2xl mx-auto space-y-3">
                 <span class="bg-emerald-100 text-mint-green px-4 py-1.5 rounded-full text-xs font-black tracking-wider uppercase">Vision & Goals</span>
@@ -359,7 +355,6 @@
             </div>
         </section>
 
-        <!-- ================= PAGE 3: 認識我們 - 工作職掌 ================= -->
         <section id="page-about-duties" class="page-section hidden space-y-8">
             <div class="text-center max-w-2xl mx-auto space-y-3">
                 <span class="bg-blue-100 text-soft-blue px-4 py-1.5 rounded-full text-xs font-black tracking-wider uppercase">Organization</span>
@@ -478,7 +473,6 @@
             </div>
         </section>
 
-        <!-- ================= PAGE 4: 親子橋電子報 ================= -->
         <section id="page-newsletter" class="page-section hidden space-y-8">
             <div id="admin-hidden-notice" class="bg-amber-100 border-2 border-amber-300 rounded-2xl p-4 flex items-center justify-between text-amber-900 hidden">
                 <div class="flex items-center gap-3">
@@ -509,7 +503,6 @@
             </div>
         </section>
 
-        <!-- ================= PAGE 5: 相關網站 ================= -->
         <section id="page-links" class="page-section hidden space-y-8">
             <div class="text-center max-w-2xl mx-auto space-y-3">
                 <span class="bg-orange-100 text-warm-orange px-4 py-1.5 rounded-full text-xs font-black tracking-wider uppercase">Useful Links</span>
@@ -685,7 +678,7 @@
                 </div>
             </div>
 
-            <!-- 後台管理開關 -->
+            <!-- 後台管理開關與雲端狀態 -->
             <div class="bg-amber-50 rounded-2xl p-4 border border-amber-200 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                     <h3 class="font-bold text-amber-900 text-base flex items-center gap-2">
@@ -909,6 +902,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+        // 全域 UI 控制邏輯
         window.showPage = function(pageId) {
             document.querySelectorAll('.page-section').forEach(sec => sec.classList.add('hidden'));
             const target = document.getElementById(`page-${pageId}`);
@@ -966,7 +960,7 @@
             return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
-        // Firebase 專案設定檔 (部署時請填入您的金鑰)
+        // Firebase 專案設定檔 (填入金鑰即自動與雲端全域同步)
         const firebaseConfig = {
           apiKey: "AIzaSyAbRD2adKxaNo8TOjMXy1r0MS6K6Up38SM",
           authDomain: "hles-counseling.firebaseapp.com",
@@ -983,7 +977,7 @@
                 db = getFirestore(app);
             }
         } catch (e) {
-            console.warn("Firebase 初始化失敗，採用本地模式運作:", e);
+            console.warn("Firebase 初始化失敗，採用本地離線備份模式運作:", e);
         }
 
         // 預設雜湊長碼 ('admin' / '5303' / 密碼 '29420451')
@@ -991,10 +985,10 @@
 
         const defaultAccounts = {
             '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918': { passHash: DEFAULT_PASS_HASH, role: 'admin', name: '最高管理員', userTag: 'admin' },
-            '654f15d2e2499d755ef769c81a206b0d915a7707e324d314f85e51d931398835': { passHash: DEFAULT_PASS_HASH, role: 'editor_5303', name: '親師组長', userTag: '5303' }
+            '654f15d2e2499d755ef769c81a206b0d915a7707e324d314f85e51d931398835': { passHash: DEFAULT_PASS_HASH, role: 'editor_5303', name: '親師組長', userTag: '5303' }
         };
 
-        const CURRENT_SCHEMA_VER = 'v5_perfect_final';
+        const CURRENT_SCHEMA_VER = 'v6_cloud_sync_final';
 
         function loadAccounts() {
             try {
@@ -1022,7 +1016,6 @@
             } catch(e) {}
         }
 
-        // 預設《親子橋》公開/隱藏狀態 (預設隱藏，僅管理員或已發布顯示)
         const savedHiddenSetting = localStorage.getItem('hles_newsletter_hidden');
         const initialHiddenState = savedHiddenSetting === null ? true : (savedHiddenSetting === 'true');
 
@@ -1064,7 +1057,6 @@
             }
         };
 
-        // 登入按鈕三色狀態轉換
         window.updateAdminButtonUI = function() {
             const btn = document.getElementById('btn-admin-login');
             const icon = document.getElementById('admin-btn-icon');
@@ -1150,7 +1142,7 @@
                 try {
                     setDoc(doc(db, "settings", "newsletter"), { hidden: newState }, { merge: true });
                 } catch(e) {
-                    console.warn("寫入 Firebase 失敗:", e);
+                    console.warn("寫入 Firebase 隱藏狀態失敗:", e);
                 }
             }
 
@@ -1306,7 +1298,6 @@
             window.switchAdminTab(tabName);
         };
 
-        // 渲染榮譽榜 (固定標籤寬度與對齊)
         window.renderHonorRoll = function() {
             const container = document.getElementById('honor-roll-container');
             if (!container) return;
@@ -1380,7 +1371,6 @@
             `).join('');
         };
 
-        // 後台管理密碼
         window.handleAdminChangeSelfPassword = async function(e) {
             e.preventDefault();
             const newPass = document.getElementById('admin-new-pass').value.trim();
@@ -1538,6 +1528,13 @@
 
             window.appData.honorList.unshift({ badge, title, tag, desc });
             saveStoredList('hles_honor_list', window.appData.honorList);
+            
+            if (db) {
+                try {
+                    setDoc(doc(db, "content", "honor"), { list: window.appData.honorList });
+                } catch(err) { console.warn("Firebase 榮譽榜寫入失敗:", err); }
+            }
+
             window.renderHonorRoll();
             window.renderAdminHonorList();
             window.closeModal('modal-honor-form');
@@ -1550,6 +1547,13 @@
         window.deleteHonorItem = function(index) {
             window.appData.honorList.splice(index, 1);
             saveStoredList('hles_honor_list', window.appData.honorList);
+            
+            if (db) {
+                try {
+                    setDoc(doc(db, "content", "honor"), { list: window.appData.honorList });
+                } catch(err) { console.warn("Firebase 榮譽榜寫入失敗:", err); }
+            }
+
             window.renderHonorRoll();
             window.renderAdminHonorList();
             window.showToast('已刪除該筆事項');
@@ -1561,6 +1565,13 @@
             const content = document.getElementById('quote-content').value;
             window.appData.quoteList.unshift({ content });
             saveStoredList('hles_quote_list', window.appData.quoteList);
+            
+            if (db) {
+                try {
+                    setDoc(doc(db, "content", "quotes"), { list: window.appData.quoteList });
+                } catch(err) { console.warn("Firebase 心靈金句寫入失敗:", err); }
+            }
+
             window.setDailyQuote();
             window.renderAdminQuoteList();
             window.closeModal('modal-quote-form');
@@ -1570,6 +1581,13 @@
         window.deleteQuoteItem = function(index) {
             window.appData.quoteList.splice(index, 1);
             saveStoredList('hles_quote_list', window.appData.quoteList);
+            
+            if (db) {
+                try {
+                    setDoc(doc(db, "content", "quotes"), { list: window.appData.quoteList });
+                } catch(err) { console.warn("Firebase 心靈金句刪除寫入失敗:", err); }
+            }
+
             window.setDailyQuote();
             window.renderAdminQuoteList();
             window.showToast('已刪除該金句');
@@ -1586,6 +1604,13 @@
             window.appData.newsletterList.unshift({ issue, term, title, link });
             window.appData.newsletterList.sort((a,b) => b.issue - a.issue);
             saveStoredList('hles_newsletter_list', window.appData.newsletterList);
+            
+            if (db) {
+                try {
+                    setDoc(doc(db, "content", "newsletters"), { list: window.appData.newsletterList });
+                } catch(err) { console.warn("Firebase 親子橋寫入失敗:", err); }
+            }
+
             window.renderBookshelfGrid();
             window.renderAdminNewsletterList();
             window.closeModal('modal-newsletter-form');
@@ -1598,6 +1623,13 @@
         window.deleteNewsletterItem = function(index) {
             window.appData.newsletterList.splice(index, 1);
             saveStoredList('hles_newsletter_list', window.appData.newsletterList);
+            
+            if (db) {
+                try {
+                    setDoc(doc(db, "content", "newsletters"), { list: window.appData.newsletterList });
+                } catch(err) { console.warn("Firebase 親子橋刪除寫入失敗:", err); }
+            }
+
             window.renderBookshelfGrid();
             window.renderAdminNewsletterList();
             window.showToast('已刪除該期刊');
@@ -1624,7 +1656,6 @@
             });
         }
 
-        // 頁面初始化防護載入
         window.addEventListener('DOMContentLoaded', () => {
             try {
                 window.renderHonorRoll();
@@ -1645,6 +1676,7 @@
                     syncStatusEl.innerHTML = `<i class="fa-solid fa-cloud-check text-emerald-600"></i> <span>Firebase 雲端即時同步中 (跨瀏覽器連動生效)</span>`;
                 }
 
+                // 1. 監聽公開狀態
                 try {
                     onSnapshot(doc(db, "settings", "newsletter"), (snapshot) => {
                         if (snapshot.exists()) {
@@ -1655,10 +1687,45 @@
                                 window.updateNewsletterVisibility();
                             }
                         }
-                    }, (err) => console.warn("雲端狀態監聽中:", err));
-                } catch(e) {
-                    console.warn("雲端訂閱機制建立中:", e);
-                }
+                    }, (err) => console.warn("雲端公開狀態監聽中:", err));
+                } catch(e) {}
+
+                // 2. 監聽心靈金句雲端同步
+                try {
+                    onSnapshot(doc(db, "content", "quotes"), (snapshot) => {
+                        if (snapshot.exists() && Array.isArray(snapshot.data().list)) {
+                            window.appData.quoteList = snapshot.data().list;
+                            saveStoredList('hles_quote_list', window.appData.quoteList);
+                            window.setDailyQuote();
+                            window.renderAdminQuoteList();
+                        }
+                    }, (err) => console.warn("雲端金句監聽中:", err));
+                } catch(e) {}
+
+                // 3. 監聽榮譽榜雲端同步
+                try {
+                    onSnapshot(doc(db, "content", "honor"), (snapshot) => {
+                        if (snapshot.exists() && Array.isArray(snapshot.data().list)) {
+                            window.appData.honorList = snapshot.data().list;
+                            saveStoredList('hles_honor_list', window.appData.honorList);
+                            window.renderHonorRoll();
+                            window.renderAdminHonorList();
+                        }
+                    }, (err) => console.warn("雲端榮譽榜監聽中:", err));
+                } catch(e) {}
+
+                // 4. 監聽親子橋期刊雲端同步
+                try {
+                    onSnapshot(doc(db, "content", "newsletters"), (snapshot) => {
+                        if (snapshot.exists() && Array.isArray(snapshot.data().list)) {
+                            window.appData.newsletterList = snapshot.data().list;
+                            saveStoredList('hles_newsletter_list', window.appData.newsletterList);
+                            window.renderBookshelfGrid();
+                            window.renderAdminNewsletterList();
+                        }
+                    }, (err) => console.warn("雲端期刊監聽中:", err));
+                } catch(e) {}
+
             } else {
                 if (syncStatusEl) {
                     syncStatusEl.className = "mt-2 inline-flex items-center gap-1.5 text-xs font-bold text-amber-800 bg-amber-100/80 px-2.5 py-1 rounded-lg";
