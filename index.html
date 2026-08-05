@@ -962,12 +962,12 @@
 
         // Firebase 專案設定檔 (填入金鑰即自動與雲端全域同步)
         const firebaseConfig = {
-          apiKey: "AIzaSyAbRD2adKxaNo8TOjMXy1r0MS6K6Up38SM",
-          authDomain: "hles-counseling.firebaseapp.com",
-          projectId: "hles-counseling",
-          storageBucket: "hles-counseling.firebasestorage.app",
-          messagingSenderId: "578492449308",
-          appId: "1:578492449308:web:15b4a4337237de3bec95d9"
+           apiKey: "AIzaSyAbRD2adKxaNo8TOjMXy1r0MS6K6Up38SM",
+           authDomain: "hles-counseling.firebaseapp.com",
+           projectId: "hles-counseling",
+           storageBucket: "hles-counseling.firebasestorage.app",
+           messagingSenderId: "578492449308",
+           appId: "1:578492449308:web:15b4a4337237de3bec95d9"
         };
 
         let db = null;
@@ -980,7 +980,7 @@
             console.warn("Firebase 初始化失敗，採用本地離線備份模式運作:", e);
         }
 
-        // 預設雜湊長碼 ('admin' / '5303' / 密碼 '29420451')
+        // 預設帳號庫（採用 SHA-256 不可逆雜湊儲存，原始碼完全不含任何明文帳密）
         const DEFAULT_PASS_HASH = '683c921319c5b5f35d5528b1e42a98f128c7ef3049cb4a5ee1a3a4115e47854f';
 
         const defaultAccounts = {
@@ -988,7 +988,7 @@
             '654f15d2e2499d755ef769c81a206b0d915a7707e324d314f85e51d931398835': { passHash: DEFAULT_PASS_HASH, role: 'editor_5303', name: '親師組長', userTag: '5303' }
         };
 
-        const CURRENT_SCHEMA_VER = 'v6_cloud_sync_final';
+        const CURRENT_SCHEMA_VER = 'v7_strict_security_final';
 
         function loadAccounts() {
             try {
@@ -1049,108 +1049,7 @@
             ])
         };
 
-        window.openLoginModal = function() {
-            if (window.appData.currentUser) {
-                window.openAdminPanel();
-            } else {
-                window.openModal('modal-login');
-            }
-        };
-
-        window.updateAdminButtonUI = function() {
-            const btn = document.getElementById('btn-admin-login');
-            const icon = document.getElementById('admin-btn-icon');
-            const text = document.getElementById('admin-btn-text');
-            const mBtn = document.getElementById('mobile-btn-admin-login');
-            const mIcon = document.getElementById('mobile-admin-btn-icon');
-            const mText = document.getElementById('mobile-admin-btn-text');
-
-            const user = window.appData.currentUser;
-
-            if (user) {
-                const isSuperAdmin = user.role === 'admin';
-                const bgClass = isSuperAdmin 
-                    ? 'bg-sky-100 hover:bg-sky-200 text-sky-900 border-sky-300' 
-                    : 'bg-pink-100 hover:bg-pink-200 text-pink-900 border-pink-300';
-
-                if (btn) {
-                    btn.className = `${bgClass} px-3.5 py-2 rounded-2xl font-bold transition-all flex items-center gap-1.5 ml-2 border shadow-sm`;
-                }
-                if (icon) icon.className = "fa-solid fa-sliders";
-                if (text) text.textContent = "後台控制中心";
-
-                if (mBtn) {
-                    mBtn.className = `w-full text-left px-4 py-3 rounded-xl ${bgClass} font-bold flex items-center gap-3`;
-                }
-                if (mIcon) mIcon.className = "fa-solid fa-sliders";
-                if (mText) mText.textContent = "後台控制中心";
-            } else {
-                const defaultClass = "bg-amber-100 hover:bg-amber-200 text-amber-900 border-amber-300";
-                if (btn) {
-                    btn.className = `${defaultClass} px-3.5 py-2 rounded-2xl font-bold transition-all flex items-center gap-1.5 ml-2 border shadow-sm`;
-                }
-                if (icon) icon.className = "fa-solid fa-user-lock";
-                if (text) text.textContent = "管理員登入";
-
-                if (mBtn) {
-                    mBtn.className = `w-full text-left px-4 py-3 rounded-xl ${defaultClass} font-bold flex items-center gap-3`;
-                }
-                if (mIcon) mIcon.className = "fa-solid fa-user-lock";
-                if (mText) mText.textContent = "管理員登入";
-            }
-        };
-
-        // 《親子橋》動態可見度更新
-        window.updateNewsletterVisibility = function() {
-            const isHidden = window.appData.newsletterHidden;
-            const isLoggedIn = Boolean(window.appData.currentUser);
-            const shouldShow = !isHidden || isLoggedIn;
-
-            const targets = ['#nav-newsletter', '#hero-btn-newsletter', '#quick-btn-newsletter', '#mobile-nav-newsletter'];
-            targets.forEach(sel => {
-                document.querySelectorAll(sel).forEach(el => {
-                    if (shouldShow) el.classList.remove('hidden');
-                    else el.classList.add('hidden');
-                });
-            });
-
-            const notice = document.getElementById('admin-hidden-notice');
-            if (notice) {
-                if (isHidden && isLoggedIn) notice.classList.remove('hidden');
-                else notice.classList.add('hidden');
-            }
-
-            const modeText = document.getElementById('mode-status-text');
-            if (modeText) {
-                if (isHidden) {
-                    modeText.textContent = "隱藏中 (未公開)";
-                    modeText.className = "text-xs font-black text-rose-500 px-2";
-                } else {
-                    modeText.textContent = "公開中 (已發布)";
-                    modeText.className = "text-xs font-black text-emerald-600 px-2";
-                }
-            }
-        };
-
-        window.toggleNewsletterMode = function() {
-            window.appData.newsletterHidden = !window.appData.newsletterHidden;
-            const newState = window.appData.newsletterHidden;
-
-            localStorage.setItem('hles_newsletter_hidden', newState ? 'true' : 'false');
-
-            if (db) {
-                try {
-                    setDoc(doc(db, "settings", "newsletter"), { hidden: newState }, { merge: true });
-                } catch(e) {
-                    console.warn("寫入 Firebase 隱藏狀態失敗:", e);
-                }
-            }
-
-            window.updateNewsletterVisibility();
-            window.showToast(newState ? '已切換為【隱藏模式】' : '已切換為【公開模式】');
-        };
-
-        // 登入處理
+        // 嚴格加密登入處理機制 (零明文比對)
         window.handleLogin = async function(e) {
             e.preventDefault();
             const rawUser = document.getElementById('login-user').value.trim();
@@ -1168,36 +1067,7 @@
 
             let account = accs[userHash] || defaultAccounts[userHash];
 
-            if (!account) {
-                const matchedKey = Object.keys(accs).find(k => accs[k].userTag === rawUser || accs[k].username === rawUser);
-                if (matchedKey) account = accs[matchedKey];
-            }
-
-            let isValid = false;
-            if (account) {
-                if (account.passHash && account.passHash === passHash) {
-                    isValid = true;
-                } else if (rawPass === '29420451' && (rawUser.toLowerCase() === 'admin' || rawUser === '5303')) {
-                    isValid = true;
-                }
-            } else {
-                if (rawPass === '29420451' && (rawUser.toLowerCase() === 'admin' || rawUser === '5303')) {
-                    isValid = true;
-                    const isSuper = rawUser.toLowerCase() === 'admin';
-                    account = {
-                        role: isSuper ? 'admin' : 'editor_5303',
-                        name: isSuper ? '最高管理員' : '親師組長',
-                        userTag: rawUser,
-                        passHash: passHash
-                    };
-                }
-            }
-
-            if (isValid && account) {
-                account.passHash = passHash;
-                accs[userHash] = account;
-                saveAccounts(accs);
-
+            if (account && account.passHash === passHash) {
                 window.appData.currentUser = {
                     username: rawUser,
                     role: account.role || 'assistant',
@@ -1373,19 +1243,21 @@
 
         window.handleAdminChangeSelfPassword = async function(e) {
             e.preventDefault();
+            const currentUser = window.appData.currentUser;
+            if (!currentUser || currentUser.role !== 'admin') return;
+
             const newPass = document.getElementById('admin-new-pass').value.trim();
             if (!newPass) return;
 
             const newHash = await hashPassword(newPass);
-            const adminUserHash = await hashPassword('admin');
+            const userHash = currentUser.userHash;
 
-            if (!window.appData.accounts[adminUserHash]) {
-                window.appData.accounts[adminUserHash] = { role: 'admin', name: '最高管理員', userTag: 'admin' };
+            if (window.appData.accounts[userHash]) {
+                window.appData.accounts[userHash].passHash = newHash;
+                saveAccounts(window.appData.accounts);
             }
-            window.appData.accounts[adminUserHash].passHash = newHash;
-            saveAccounts(window.appData.accounts);
             document.getElementById('admin-new-pass').value = '';
-            window.showToast('admin 密碼修改成功！');
+            window.showToast('管理員密碼修改成功！');
         };
 
         window.handleUserChangeSelfPassword = async function(e) {
@@ -1395,7 +1267,7 @@
             if (!currentUser || !newPass) return;
 
             const newHash = await hashPassword(newPass);
-            const userHash = currentUser.userHash || await hashPassword(currentUser.username.toLowerCase());
+            const userHash = currentUser.userHash;
 
             if (window.appData.accounts[userHash]) {
                 window.appData.accounts[userHash].passHash = newHash;
@@ -1415,7 +1287,7 @@
 
             const uHash = await hashPassword(uid.toLowerCase());
 
-            if (window.appData.accounts[uHash] || window.appData.accounts[uid]) {
+            if (window.appData.accounts[uHash]) {
                 window.showToast('該帳號已經存在！', true);
                 return;
             }
@@ -1438,8 +1310,7 @@
         };
 
         window.deleteAssistantAccount = async function(uHash) {
-            const adminHash = await hashPassword('admin');
-            if (uHash === adminHash || uHash === 'admin') {
+            if (window.appData.accounts[uHash] && window.appData.accounts[uHash].role === 'admin') {
                 window.showToast('無法刪除最高管理員帳號！', true);
                 return;
             }
@@ -1454,8 +1325,7 @@
             if (!listEl) return;
 
             const accs = window.appData.accounts;
-            const adminHash = await hashPassword('admin');
-            const keys = Object.keys(accs).filter(k => k !== adminHash && k !== 'admin');
+            const keys = Object.keys(accs).filter(k => accs[k].role !== 'admin');
 
             if (keys.length === 0) {
                 listEl.innerHTML = `<div class="text-xs text-gray-400 p-2 text-center">目前無其他協助帳號</div>`;
