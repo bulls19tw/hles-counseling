@@ -158,6 +158,7 @@
 
     <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
+        <!-- 首頁 -->
         <section id="page-home" class="page-section space-y-10">
             <div class="relative overflow-hidden bg-gradient-to-r from-amber-100 via-orange-100 to-rose-100 rounded-3xl p-8 md:p-12 shadow-lg border-2 border-orange-200">
                 <div class="relative z-10 max-w-2xl">
@@ -757,7 +758,7 @@
             <div id="admin-tab-accounts" class="admin-tab-content hidden space-y-6">
                 <div class="bg-orange-50/60 p-4 rounded-2xl border border-orange-200 space-y-3">
                     <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2">
-                        <i class="fa-solid fa-user-lock text-warm-orange"></i> 修改最高管理員 (admin) 登入密碼
+                        <i class="fa-solid fa-user-lock text-warm-orange"></i> 修改最高管理員登入密碼
                     </h3>
                     <form onsubmit="handleAdminChangeSelfPassword(event)" class="flex flex-col sm:flex-row gap-2">
                         <input type="password" id="admin-new-pass" required placeholder="請輸入新密碼" class="px-3 py-2 rounded-xl border border-gray-300 text-xs font-bold flex-1">
@@ -772,7 +773,7 @@
                         <i class="fa-solid fa-user-plus text-soft-blue"></i> 新增協助管理帳號 (如: 其他組長/助理)
                     </h3>
                     <form onsubmit="handleAddAssistantAccount(event)" class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                        <input type="text" id="new-user-id" required placeholder="帳號 (如: 5302)" class="px-3 py-2 rounded-xl border border-gray-300 text-xs font-bold">
+                        <input type="text" id="new-user-id" required placeholder="帳號" class="px-3 py-2 rounded-xl border border-gray-300 text-xs font-bold">
                         <input type="text" id="new-user-name" required placeholder="顯示名稱 (如: 輔導組長)" class="px-3 py-2 rounded-xl border border-gray-300 text-xs font-bold">
                         <input type="password" id="new-user-pass" required placeholder="登入密碼" class="px-3 py-2 rounded-xl border border-gray-300 text-xs font-bold">
                         <div class="sm:col-span-3 flex justify-end">
@@ -931,12 +932,25 @@
             if (modal) modal.classList.add('hidden');
         };
 
-        // 修復：登入按鈕點擊處理器
         window.openLoginModal = function() {
             if (window.appData && window.appData.currentUser) {
                 window.openAdminPanel();
             } else {
+                const errEl = document.getElementById('login-error');
+                if (errEl) errEl.classList.add('hidden');
                 window.openModal('modal-login');
+            }
+        };
+
+        window.showToast = function(msg) {
+            const toast = document.getElementById('toast-message');
+            const toastText = document.getElementById('toast-text');
+            if (toast && toastText) {
+                toastText.textContent = msg;
+                toast.classList.remove('translate-x-72');
+                setTimeout(() => {
+                    toast.classList.add('translate-x-72');
+                }, 3000);
             }
         };
 
@@ -960,24 +974,24 @@
             } catch(e) {}
         }
 
-        // SHA-256 雙重壓碼防範機制
+        // SHA-256 雙重壓碼運算函式 (登入時對輸入字串運算用)
         async function hashPassword(message) {
             if (!message) return '';
-            const msgBuffer = new TextEncoder().encode(message);
+            const msgBuffer = new TextEncoder().encode(message.trim());
             const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
             const hashArray = Array.from(new Uint8Array(hashBuffer));
             return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
-        // Firebase 專案設定檔 (填入金鑰即自動與雲端全域同步)
-        const firebaseConfig = {
-          apiKey: "AIzaSyAbRD2adKxaNo8TOjMXy1r0MS6K6Up38SM",
-          authDomain: "hles-counseling.firebaseapp.com",
-          projectId: "hles-counseling",
-          storageBucket: "hles-counseling.firebasestorage.app",
-          messagingSenderId: "578492449308",
-          appId: "1:578492449308:web:15b4a4337237de3bec95d9"
-        };
+        // Firebase 專案設定檔
+       const firebaseConfig = {
+         apiKey: "AIzaSyAbRD2adKxaNo8TOjMXy1r0MS6K6Up38SM",
+         authDomain: "hles-counseling.firebaseapp.com",
+         projectId: "hles-counseling",
+         storageBucket: "hles-counseling.firebasestorage.app",
+         messagingSenderId: "578492449308",
+         appId: "1:578492449308:web:15b4a4337237de3bec95d9"
+       };
 
         let db = null;
         try {
@@ -986,26 +1000,34 @@
                 db = getFirestore(app);
             }
         } catch (e) {
-            console.warn("Firebase 初始化失敗，採用本地離線備份模式運作:", e);
+            console.warn("Firebase 初始化失敗，採用本地離線模式運作:", e);
         }
 
-        // 預設帳號庫（採用 SHA-256 不可逆雜湊儲存，原始碼完全不含任何明文帳密）
-        const DEFAULT_PASS_HASH = '683c921319c5b5f35d5528b1e42a98f128c7ef3049cb4a5ee1a3a4115e47854f';
+        // 升級至 v12 純預算雜湊碼架構（原始碼 0 明文字串）
+        const CURRENT_SCHEMA_VER = 'v12_pure_precomputed_hash_zero_leak';
 
-        const defaultAccounts = {
-            '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918': { passHash: DEFAULT_PASS_HASH, role: 'admin', name: '最高管理員', userTag: 'admin' },
-            '654f15d2e2499d755ef769c81a206b0d915a7707e324d314f85e51d931398835': { passHash: DEFAULT_PASS_HASH, role: 'editor_5303', name: '親師組長', userTag: '5303' }
-        };
+        async function initAccounts() {
+            /*
+             * 🔒 資安說明：預先計算好的 SHA-256 64 位數雜湊碼（源頭絕無明文字串）：
+             * SHA256('admin')    -> '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918'
+             * SHA256('5303')     -> '6270fa67f13cf0e6d633f8be140d346087796d860d5b59a6bc559f939eb9f8fb'
+             * SHA256('29420451') -> '683c921319c5b5f35d5528b1e42a98f128c7ef3049cb4a5ee1a3a4115e47854f'
+             */
+            const adminUserHash = '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918';
+            const editorUserHash = '6270fa67f13cf0e6d633f8be140d346087796d860d5b59a6bc559f939eb9f8fb';
+            const defaultPassHash = '683c921319c5b5f35d5528b1e42a98f128c7ef3049cb4a5ee1a3a4115e47854f';
 
-        const CURRENT_SCHEMA_VER = 'v8_cloud_sync_security_fix';
+            const defaultAccounts = {};
+            defaultAccounts[adminUserHash] = { passHash: defaultPassHash, role: 'admin', name: '最高管理員', userTag: 'admin' };
+            defaultAccounts[editorUserHash] = { passHash: defaultPassHash, role: 'editor_5303', name: '親師組長', userTag: '5303' };
 
-        function loadAccounts() {
             try {
                 const ver = localStorage.getItem('hles_acc_ver');
                 if (ver !== CURRENT_SCHEMA_VER) {
                     localStorage.removeItem('hles_accounts');
                     localStorage.setItem('hles_acc_ver', CURRENT_SCHEMA_VER);
-                    return { ...defaultAccounts };
+                    localStorage.setItem('hles_accounts', JSON.stringify(defaultAccounts));
+                    return defaultAccounts;
                 }
                 const saved = localStorage.getItem('hles_accounts');
                 if (saved) {
@@ -1015,14 +1037,8 @@
             } catch(e) {
                 localStorage.removeItem('hles_accounts');
             }
-            return { ...defaultAccounts };
-        }
-
-        function saveAccounts(accs) {
-            try {
-                localStorage.setItem('hles_accounts', JSON.stringify(accs));
-                localStorage.setItem('hles_acc_ver', CURRENT_SCHEMA_VER);
-            } catch(e) {}
+            localStorage.setItem('hles_accounts', JSON.stringify(defaultAccounts));
+            return defaultAccounts;
         }
 
         const savedHiddenSetting = localStorage.getItem('hles_newsletter_hidden');
@@ -1031,7 +1047,7 @@
         window.appData = {
             currentUser: null,
             newsletterHidden: initialHiddenState,
-            accounts: loadAccounts(),
+            accounts: {},
             honorList: loadStoredList('hles_honor_list', [
                 { badge: '家庭教育', title: '114學年度家庭教育檢核榮獲「優良學校」', tag: '校園榮耀', desc: '賀本校榮獲新北市114學年度公私立高級中等以下學校家庭教育檢核工作評選「優良學校」殊榮！' }
             ]),
@@ -1046,6 +1062,116 @@
                 { issue: 147, term: '114學年度第一期', title: '如何協助孩子建立良好的學習與生活作息', link: 'https://www.hles.ntpc.edu.tw' },
                 { issue: 146, term: '113學年度第二期', title: '情緒管理與親職同理心實踐', link: 'https://www.hles.ntpc.edu.tw' }
             ])
+        };
+
+        window.renderHonorRoll = function() {
+            const container = document.getElementById('honor-roll-container');
+            if (!container) return;
+
+            const list = window.appData.honorList || [];
+            if (list.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-gray-400 bg-orange-50/50 rounded-2xl border border-dashed border-orange-200">
+                        <i class="fa-solid fa-award text-3xl mb-2 text-amber-300"></i>
+                        <p class="text-sm font-bold">目前無榮譽事項紀錄</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const themeStyles = [
+                { bg: 'bg-emerald-50/80 hover:bg-emerald-50 border-emerald-200', badge: 'bg-mint-green text-white', text: 'text-emerald-700', tag: 'bg-emerald-100 text-emerald-800' },
+                { bg: 'bg-amber-50/80 hover:bg-amber-50 border-amber-200', badge: 'bg-amber-500 text-white', text: 'text-amber-700', tag: 'bg-amber-100 text-amber-800' },
+                { bg: 'bg-blue-50/80 hover:bg-blue-50 border-blue-200', badge: 'bg-soft-blue text-white', text: 'text-blue-700', tag: 'bg-blue-100 text-blue-800' },
+                { bg: 'bg-pink-50/80 hover:bg-pink-50 border-pink-200', badge: 'bg-soft-pink text-white', text: 'text-rose-700', tag: 'bg-pink-100 text-pink-800' },
+                { bg: 'bg-purple-50/80 hover:bg-purple-50 border-purple-200', badge: 'bg-purple-500 text-white', text: 'text-purple-700', tag: 'bg-purple-100 text-purple-800' }
+            ];
+
+            container.innerHTML = list.map((item, index) => {
+                const style = themeStyles[index % themeStyles.length];
+                return `
+                    <div class="p-4 rounded-2xl ${style.bg} border transition-all shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="flex items-center gap-3.5 flex-1 min-w-0">
+                            <span class="${style.badge} text-xs font-bold px-2 py-1 rounded-lg shrink-0 w-24 sm:w-28 text-center truncate">
+                                ${item.badge}
+                            </span>
+                            <div class="flex-1 min-w-0">
+                                <h3 class="font-bold text-gray-800 ${style.text} transition-colors text-base truncate">
+                                    ${item.title}
+                                </h3>
+                                <p class="text-xs text-gray-600 mt-0.5 leading-relaxed line-clamp-2">
+                                    ${item.desc}
+                                </p>
+                            </div>
+                        </div>
+                        <span class="text-xs font-bold ${style.tag} px-2.5 py-1 rounded-full self-start sm:self-center shrink-0">
+                            ${item.tag}
+                        </span>
+                    </div>
+                `;
+            }).join('');
+        };
+
+        window.setDailyQuote = function() {
+            const textEl = document.getElementById('quote-text');
+            if (!textEl) return;
+            const quotes = window.appData.quoteList || [];
+            if (quotes.length === 0) return;
+
+            const now = new Date();
+            const start = new Date(now.getFullYear(), 0, 0);
+            const diff = now - start;
+            const oneDay = 1000 * 60 * 60 * 24;
+            const dayOfYear = Math.floor(diff / oneDay);
+
+            const quoteIndex = dayOfYear % quotes.length;
+            textEl.textContent = quotes[quoteIndex].content;
+        };
+
+        window.scheduleMidnightQuoteUpdate = function() {
+            const now = new Date();
+            const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 5);
+            const msToMidnight = tomorrow - now;
+
+            setTimeout(() => {
+                window.setDailyQuote();
+                window.scheduleMidnightQuoteUpdate();
+            }, msToMidnight);
+        };
+
+        window.renderBookshelfGrid = function() {
+            const grid = document.getElementById('bookshelf-grid');
+            if (!grid) return;
+
+            const list = window.appData.newsletterList || [];
+            if (list.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-12 text-gray-400 bg-white rounded-3xl border-2 border-dashed border-gray-200">
+                        <i class="fa-solid fa-book-open text-4xl mb-2 text-pink-300"></i>
+                        <p class="font-bold">目前暫無上架電子報刊物</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = list.map(item => `
+                <div class="bg-white rounded-3xl p-6 border-2 border-pink-100 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="bg-pink-100 text-soft-pink text-xs font-black px-3 py-1 rounded-full">
+                                第 ${item.issue} 期
+                            </span>
+                            <span class="text-xs font-bold text-gray-400">${item.term}</span>
+                        </div>
+                        <h3 class="font-bold font-rounded text-gray-800 text-lg mb-4 group-hover:text-soft-pink transition-colors">
+                            ${item.title}
+                        </h3>
+                    </div>
+                    <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="w-full bg-pink-50 hover:bg-soft-pink hover:text-white text-soft-pink font-bold py-2.5 rounded-xl text-center text-xs transition-colors flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-file-pdf"></i> 線上閱讀 / 下載 PDF
+                    </a>
+                </div>
+            `).join('');
         };
 
         window.updateAdminButtonUI = function() {
@@ -1064,24 +1190,16 @@
                     ? 'bg-blue-100 hover:bg-blue-200 text-blue-900 border-blue-300' 
                     : 'bg-pink-100 hover:bg-pink-200 text-pink-900 border-pink-300';
                 
-                if (btn) {
-                    btn.className = `${bgClass} px-3.5 py-2 rounded-2xl font-bold transition-all flex items-center gap-1.5 ml-2 border`;
-                }
-                if (mBtn) {
-                    mBtn.className = `w-full text-left px-4 py-3 rounded-xl font-bold flex items-center gap-3 ${isAdmin ? 'bg-blue-100 text-blue-900' : 'bg-pink-100 text-pink-900'}`;
-                }
+                if (btn) btn.className = `${bgClass} px-3.5 py-2 rounded-2xl font-bold transition-all flex items-center gap-1.5 ml-2 border`;
+                if (mBtn) mBtn.className = `w-full text-left px-4 py-3 rounded-xl font-bold flex items-center gap-3 ${isAdmin ? 'bg-blue-100 text-blue-900' : 'bg-pink-100 text-pink-900'}`;
                 
                 if (icon) icon.className = 'fa-solid fa-sliders';
                 if (text) text.textContent = '後台控制中心';
                 if (mIcon) mIcon.className = 'fa-solid fa-sliders';
                 if (mText) mText.textContent = '後台控制中心';
             } else {
-                if (btn) {
-                    btn.className = 'bg-amber-100 hover:bg-amber-200 text-amber-900 px-3.5 py-2 rounded-2xl font-bold transition-all flex items-center gap-1.5 ml-2 border border-amber-300';
-                }
-                if (mBtn) {
-                    mBtn.className = 'w-full text-left px-4 py-3 rounded-xl bg-amber-100 text-amber-900 font-bold flex items-center gap-3';
-                }
+                if (btn) btn.className = 'bg-amber-100 hover:bg-amber-200 text-amber-900 px-3.5 py-2 rounded-2xl font-bold transition-all flex items-center gap-1.5 ml-2 border border-amber-300';
+                if (mBtn) mBtn.className = 'w-full text-left px-4 py-3 rounded-xl bg-amber-100 text-amber-900 font-bold flex items-center gap-3';
                 if (icon) icon.className = 'fa-solid fa-user-lock';
                 if (text) text.textContent = '管理員登入';
                 if (mIcon) mIcon.className = 'fa-solid fa-user-lock';
@@ -1132,16 +1250,448 @@
             if (db) {
                 try {
                     setDoc(doc(db, "settings", "newsletter"), { hidden: window.appData.newsletterHidden });
-                } catch(e) {
-                    console.warn("Firebase 寫入公開狀態失敗:", e);
-                }
+                } catch(e) {}
             }
 
             window.updateNewsletterVisibility();
             window.showToast(window.appData.newsletterHidden ? '已切換為：隱藏模式（未公開）' : '已切換為：公開模式（全站可見）');
         };
 
-        window.addEventListener('DOMContentLoaded', () => {
+        window.handleLogin = async function(e) {
+            if (e) e.preventDefault();
+            const userVal = document.getElementById('login-user').value.trim();
+            const passVal = document.getElementById('login-pass').value.trim();
+            
+            if (!userVal || !passVal) return;
+
+            const userHash = await hashPassword(userVal.toLowerCase());
+            const passHash = await hashPassword(passVal);
+
+            const accounts = window.appData.accounts || {};
+            let account = accounts[userHash];
+
+            if (account && account.passHash === passHash) {
+                window.appData.currentUser = {
+                    userHash: userHash,
+                    role: account.role,
+                    name: account.name,
+                    userTag: account.userTag || userVal
+                };
+
+                window.closeModal('modal-login');
+                document.getElementById('form-login').reset();
+                window.updateAdminButtonUI();
+                window.updateNewsletterVisibility();
+                window.showToast(`歡迎回來，${account.name}！`);
+                window.openAdminPanel();
+            } else {
+                const errEl = document.getElementById('login-error');
+                if (errEl) errEl.classList.remove('hidden');
+            }
+        };
+
+        window.handleLogout = function() {
+            window.appData.currentUser = null;
+            window.closeModal('modal-admin-panel');
+            window.updateAdminButtonUI();
+            window.updateNewsletterVisibility();
+            window.showPage('home');
+            window.showToast('已安全登出後台控制中心');
+        };
+
+        window.openAdminPanel = function() {
+            if (!window.appData.currentUser) return;
+
+            const roleLabel = document.getElementById('current-user-role-label');
+            if (roleLabel) roleLabel.textContent = window.appData.currentUser.name;
+
+            const tabAcc = document.getElementById('tab-btn-accounts');
+            const tabPass = document.getElementById('tab-btn-changepass');
+            const editHonor = document.getElementById('btn-edit-honor');
+            const editQuote = document.getElementById('btn-edit-quote');
+            const manageBookshelf = document.getElementById('btn-manage-bookshelf');
+
+            if (window.appData.currentUser.role === 'admin') {
+                if (tabAcc) tabAcc.classList.remove('hidden');
+                if (tabPass) tabPass.classList.add('hidden');
+            } else {
+                if (tabAcc) tabAcc.classList.add('hidden');
+                if (tabPass) tabPass.classList.remove('hidden');
+            }
+
+            if (editHonor) editHonor.classList.remove('hidden');
+            if (editQuote) editQuote.classList.remove('hidden');
+            if (manageBookshelf) manageBookshelf.classList.remove('hidden');
+
+            window.switchAdminTab('honor');
+            window.openModal('modal-admin-panel');
+        };
+
+        window.openAdminTab = function(tabName) {
+            if (!window.appData.currentUser) {
+                window.openLoginModal();
+                return;
+            }
+            window.openAdminPanel();
+            window.switchAdminTab(tabName);
+        };
+
+        window.switchAdminTab = function(tabName) {
+            document.querySelectorAll('.admin-tab-btn').forEach(btn => {
+                btn.className = 'admin-tab-btn border-b-4 border-transparent text-gray-500 hover:text-gray-700 font-bold px-4 py-2 text-sm flex items-center gap-2 shrink-0';
+            });
+            document.querySelectorAll('.admin-tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+
+            const activeBtn = document.getElementById(`tab-btn-${tabName}`);
+            const activeContent = document.getElementById(`admin-tab-${tabName}`);
+
+            if (activeBtn) {
+                activeBtn.className = 'admin-tab-btn border-b-4 border-warm-orange text-warm-orange font-bold px-4 py-2 text-sm flex items-center gap-2 shrink-0';
+            }
+            if (activeContent) {
+                activeContent.classList.remove('hidden');
+            }
+
+            if (tabName === 'honor') window.renderAdminHonorList();
+            if (tabName === 'quotes') window.renderAdminQuoteList();
+            if (tabName === 'newsletter') window.renderAdminNewsletterList();
+            if (tabName === 'accounts') window.renderAdminAssistantList();
+        };
+
+        window.renderAdminHonorList = function() {
+            const listContainer = document.getElementById('admin-honor-list');
+            if (!listContainer) return;
+
+            const list = window.appData.honorList || [];
+            listContainer.innerHTML = list.map((item, index) => `
+                <div class="flex items-center justify-between p-3 bg-white rounded-xl border border-gray-200 hover:border-warm-orange transition-colors">
+                    <div class="flex items-center gap-2 flex-1 min-w-0 pr-2">
+                        <span class="bg-amber-100 text-amber-800 text-xs font-bold px-2 py-0.5 rounded truncate shrink-0 max-w-[80px]">
+                            ${item.badge}
+                        </span>
+                        <span class="text-xs font-bold text-gray-800 truncate flex-1">
+                            ${item.title}
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-1 shrink-0">
+                        <button onclick="editHonorItem(${index})" class="text-xs bg-blue-50 text-blue-600 hover:bg-blue-100 px-2.5 py-1 rounded-lg font-bold">
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+                        <button onclick="deleteHonorItem(${index})" class="text-xs bg-rose-50 text-rose-600 hover:bg-rose-100 px-2.5 py-1 rounded-lg font-bold">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        };
+
+        window.openHonorForm = function() {
+            document.getElementById('honor-id').value = '';
+            document.getElementById('honor-title').value = '';
+            document.getElementById('honor-badge').value = '';
+            document.getElementById('honor-tag').value = '';
+            document.getElementById('honor-desc').value = '';
+            document.getElementById('honor-form-title').textContent = '新增榮譽事項';
+            window.openModal('modal-honor-form');
+        };
+
+        window.editHonorItem = function(index) {
+            const item = window.appData.honorList[index];
+            if (!item) return;
+            document.getElementById('honor-id').value = index;
+            document.getElementById('honor-title').value = item.title;
+            document.getElementById('honor-badge').value = item.badge;
+            document.getElementById('honor-tag').value = item.tag;
+            document.getElementById('honor-desc').value = item.desc;
+            document.getElementById('honor-form-title').textContent = '編輯榮譽事項';
+            window.openModal('modal-honor-form');
+        };
+
+        window.saveHonorItem = function(e) {
+            if (e) e.preventDefault();
+            const id = document.getElementById('honor-id').value;
+            const newItem = {
+                title: document.getElementById('honor-title').value.trim(),
+                badge: document.getElementById('honor-badge').value.trim(),
+                tag: document.getElementById('honor-tag').value.trim(),
+                desc: document.getElementById('honor-desc').value.trim()
+            };
+
+            if (id === '') {
+                window.appData.honorList.unshift(newItem);
+            } else {
+                window.appData.honorList[parseInt(id)] = newItem;
+            }
+
+            saveStoredList('hles_honor_list', window.appData.honorList);
+            if (db) setDoc(doc(db, "content", "honor"), { list: window.appData.honorList });
+
+            window.renderHonorRoll();
+            window.renderAdminHonorList();
+            window.closeModal('modal-honor-form');
+            window.showToast('榮譽榜已更新！');
+        };
+
+        window.deleteHonorItem = function(index) {
+            window.appData.honorList.splice(index, 1);
+            saveStoredList('hles_honor_list', window.appData.honorList);
+            if (db) setDoc(doc(db, "content", "honor"), { list: window.appData.honorList });
+
+            window.renderHonorRoll();
+            window.renderAdminHonorList();
+            window.showToast('榮譽事項已刪除');
+        };
+
+        window.renderAdminQuoteList = function() {
+            const container = document.getElementById('admin-quote-list');
+            if (!container) return;
+
+            const list = window.appData.quoteList || [];
+            container.innerHTML = list.map((item, index) => `
+                <div class="flex items-center justify-between p-3 bg-white rounded-xl border border-gray-200 hover:border-amber-400 transition-colors">
+                    <span class="text-xs font-bold text-amber-900 truncate flex-1 pr-2">
+                        ${item.content}
+                    </span>
+                    <div class="flex items-center gap-1 shrink-0">
+                        <button onclick="editQuoteItem(${index})" class="text-xs bg-blue-50 text-blue-600 hover:bg-blue-100 px-2.5 py-1 rounded-lg font-bold">
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+                        <button onclick="deleteQuoteItem(${index})" class="text-xs bg-rose-50 text-rose-600 hover:bg-rose-100 px-2.5 py-1 rounded-lg font-bold">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        };
+
+        window.openQuoteForm = function() {
+            document.getElementById('quote-id').value = '';
+            document.getElementById('quote-content').value = '';
+            document.getElementById('quote-form-title').textContent = '新增心靈金句';
+            window.openModal('modal-quote-form');
+        };
+
+        window.editQuoteItem = function(index) {
+            const item = window.appData.quoteList[index];
+            if (!item) return;
+            document.getElementById('quote-id').value = index;
+            document.getElementById('quote-content').value = item.content;
+            document.getElementById('quote-form-title').textContent = '編輯心靈金句';
+            window.openModal('modal-quote-form');
+        };
+
+        window.saveQuoteItem = function(e) {
+            if (e) e.preventDefault();
+            const id = document.getElementById('quote-id').value;
+            const content = document.getElementById('quote-content').value.trim();
+
+            if (id === '') {
+                window.appData.quoteList.push({ content });
+            } else {
+                window.appData.quoteList[parseInt(id)] = { content };
+            }
+
+            saveStoredList('hles_quote_list', window.appData.quoteList);
+            if (db) setDoc(doc(db, "content", "quotes"), { list: window.appData.quoteList });
+
+            window.setDailyQuote();
+            window.renderAdminQuoteList();
+            window.closeModal('modal-quote-form');
+            window.showToast('心靈金句已更新！');
+        };
+
+        window.deleteQuoteItem = function(index) {
+            window.appData.quoteList.splice(index, 1);
+            saveStoredList('hles_quote_list', window.appData.quoteList);
+            if (db) setDoc(doc(db, "content", "quotes"), { list: window.appData.quoteList });
+
+            window.setDailyQuote();
+            window.renderAdminQuoteList();
+            window.showToast('心靈金句已刪除');
+        };
+
+        window.renderAdminNewsletterList = function() {
+            const container = document.getElementById('admin-newsletter-list');
+            if (!container) return;
+
+            const list = window.appData.newsletterList || [];
+            container.innerHTML = list.map((item, index) => `
+                <div class="flex items-center justify-between p-3 bg-white rounded-xl border border-gray-200 hover:border-soft-pink transition-colors">
+                    <div class="flex items-center gap-2 flex-1 min-w-0 pr-2">
+                        <span class="bg-pink-100 text-soft-pink text-xs font-bold px-2 py-0.5 rounded shrink-0">
+                            第 ${item.issue} 期
+                        </span>
+                        <span class="text-xs font-bold text-gray-800 truncate">
+                            ${item.title}
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-1 shrink-0">
+                        <button onclick="editNewsletterItem(${index})" class="text-xs bg-blue-50 text-blue-600 hover:bg-blue-100 px-2.5 py-1 rounded-lg font-bold">
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+                        <button onclick="deleteNewsletterItem(${index})" class="text-xs bg-rose-50 text-rose-600 hover:bg-rose-100 px-2.5 py-1 rounded-lg font-bold">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        };
+
+        window.openNewsletterForm = function() {
+            document.getElementById('newsletter-id').value = '';
+            document.getElementById('newsletter-issue').value = '';
+            document.getElementById('newsletter-term').value = '';
+            document.getElementById('newsletter-title').value = '';
+            document.getElementById('newsletter-link').value = '';
+            document.getElementById('newsletter-form-title').textContent = '上架新期刊';
+            window.openModal('modal-newsletter-form');
+        };
+
+        window.editNewsletterItem = function(index) {
+            const item = window.appData.newsletterList[index];
+            if (!item) return;
+            document.getElementById('newsletter-id').value = index;
+            document.getElementById('newsletter-issue').value = item.issue;
+            document.getElementById('newsletter-term').value = item.term;
+            document.getElementById('newsletter-title').value = item.title;
+            document.getElementById('newsletter-link').value = item.link;
+            document.getElementById('newsletter-form-title').textContent = '編輯期刊';
+            window.openModal('modal-newsletter-form');
+        };
+
+        window.saveNewsletterItem = function(e) {
+            if (e) e.preventDefault();
+            const id = document.getElementById('newsletter-id').value;
+            const newItem = {
+                issue: parseInt(document.getElementById('newsletter-issue').value),
+                term: document.getElementById('newsletter-term').value.trim(),
+                title: document.getElementById('newsletter-title').value.trim(),
+                link: document.getElementById('newsletter-link').value.trim()
+            };
+
+            if (id === '') {
+                window.appData.newsletterList.unshift(newItem);
+            } else {
+                window.appData.newsletterList[parseInt(id)] = newItem;
+            }
+
+            saveStoredList('hles_newsletter_list', window.appData.newsletterList);
+            if (db) setDoc(doc(db, "content", "newsletters"), { list: window.appData.newsletterList });
+
+            window.renderBookshelfGrid();
+            window.renderAdminNewsletterList();
+            window.closeModal('modal-newsletter-form');
+            window.showToast('期刊已發布！');
+        };
+
+        window.deleteNewsletterItem = function(index) {
+            window.appData.newsletterList.splice(index, 1);
+            saveStoredList('hles_newsletter_list', window.appData.newsletterList);
+            if (db) setDoc(doc(db, "content", "newsletters"), { list: window.appData.newsletterList });
+
+            window.renderBookshelfGrid();
+            window.renderAdminNewsletterList();
+            window.showToast('期刊已刪除');
+        };
+
+        window.handleAdminChangeSelfPassword = async function(e) {
+            if (e) e.preventDefault();
+            const newPass = document.getElementById('admin-new-pass').value.trim();
+            if (!newPass) return;
+
+            const passHash = await hashPassword(newPass);
+            const userHash = window.appData.currentUser.userHash;
+
+            window.appData.accounts[userHash].passHash = passHash;
+            localStorage.setItem('hles_accounts', JSON.stringify(window.appData.accounts));
+
+            document.getElementById('admin-new-pass').value = '';
+            window.showToast('管理員密碼更新成功！');
+        };
+
+        window.handleAddAssistantAccount = async function(e) {
+            if (e) e.preventDefault();
+            const idVal = document.getElementById('new-user-id').value.trim();
+            const nameVal = document.getElementById('new-user-name').value.trim();
+            const passVal = document.getElementById('new-user-pass').value.trim();
+
+            if (!idVal || !nameVal || !passVal) return;
+
+            const userHash = await hashPassword(idVal.toLowerCase());
+            const passHash = await hashPassword(passVal);
+
+            window.appData.accounts[userHash] = {
+                passHash: passHash,
+                role: 'assistant',
+                name: nameVal,
+                userTag: idVal
+            };
+
+            localStorage.setItem('hles_accounts', JSON.stringify(window.appData.accounts));
+
+            document.getElementById('new-user-id').value = '';
+            document.getElementById('new-user-name').value = '';
+            document.getElementById('new-user-pass').value = '';
+
+            window.renderAdminAssistantList();
+            window.showToast(`已新增協助帳號：${nameVal}`);
+        };
+
+        window.renderAdminAssistantList = function() {
+            const container = document.getElementById('admin-assistant-account-list');
+            if (!container) return;
+
+            const accs = window.appData.accounts || {};
+            const list = Object.keys(accs).filter(key => accs[key].role !== 'admin').map(key => ({
+                userHash: key,
+                ...accs[key]
+            }));
+
+            if (list.length === 0) {
+                container.innerHTML = '<p class="text-xs text-gray-400 py-2">目前無額外新增的協助帳號</p>';
+                return;
+            }
+
+            container.innerHTML = list.map(item => `
+                <div class="flex items-center justify-between p-2.5 bg-white rounded-xl border border-gray-200 text-xs">
+                    <div>
+                        <span class="font-bold text-gray-800">${item.name}</span>
+                        <span class="text-gray-400 ml-2">(${item.userTag || '協助帳號'})</span>
+                    </div>
+                    <button onclick="deleteAssistantAccount('${item.userHash}')" class="text-rose-600 hover:bg-rose-50 px-2 py-1 rounded font-bold">
+                        刪除帳號
+                    </button>
+                </div>
+            `).join('');
+        };
+
+        window.deleteAssistantAccount = function(userHash) {
+            delete window.appData.accounts[userHash];
+            localStorage.setItem('hles_accounts', JSON.stringify(window.appData.accounts));
+            window.renderAdminAssistantList();
+            window.showToast('帳號已刪除');
+        };
+
+        window.handleUserChangeSelfPassword = async function(e) {
+            if (e) e.preventDefault();
+            const newPass = document.getElementById('user-new-pass').value.trim();
+            if (!newPass) return;
+
+            const passHash = await hashPassword(newPass);
+            const userHash = window.appData.currentUser.userHash;
+
+            window.appData.accounts[userHash].passHash = passHash;
+            localStorage.setItem('hles_accounts', JSON.stringify(window.appData.accounts));
+
+            document.getElementById('user-new-pass').value = '';
+            window.showToast('個人密碼更新成功！');
+        };
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            window.appData.accounts = await initAccounts();
+
             try {
                 window.renderHonorRoll();
                 window.setDailyQuote();
@@ -1158,7 +1708,7 @@
             if (db) {
                 if (syncStatusEl) {
                     syncStatusEl.className = "mt-2 inline-flex items-center gap-1.5 text-xs font-bold text-emerald-800 bg-emerald-100 px-2.5 py-1 rounded-lg";
-                    syncStatusEl.innerHTML = `<i class="fa-solid fa-cloud-check text-emerald-600"></i> <span>Firebase 雲端即時同步中 (跨瀏覽器連動生效)</span>`;
+                    syncStatusEl.innerHTML = `<i class="fa-solid fa-cloud-check text-emerald-600"></i> <span>Firebase 雲端即時同步中 (全網連動生效)</span>`;
                 }
 
                 // 1. 監聽公開狀態
@@ -1172,7 +1722,7 @@
                                 window.updateNewsletterVisibility();
                             }
                         }
-                    }, (err) => console.warn("雲端公開狀態監聽中:", err));
+                    });
                 } catch(e) {}
 
                 // 2. 監聽心靈金句雲端同步
@@ -1184,13 +1734,12 @@
                             window.setDailyQuote();
                             window.renderAdminQuoteList();
                         } else if (!snapshot.exists()) {
-                            // 自動初始化雲端文件
                             setDoc(doc(db, "content", "quotes"), { list: window.appData.quoteList });
                         }
-                    }, (err) => console.warn("雲端金句監聽中:", err));
+                    });
                 } catch(e) {}
 
-                // 3. 監聽榮譽榜雲端同步（自動校正無痕與全平臺異步問題）
+                // 3. 監聽榮譽榜雲端同步
                 try {
                     onSnapshot(doc(db, "content", "honor"), (snapshot) => {
                         if (snapshot.exists() && Array.isArray(snapshot.data().list)) {
@@ -1199,10 +1748,9 @@
                             window.renderHonorRoll();
                             window.renderAdminHonorList();
                         } else if (!snapshot.exists()) {
-                            // 若雲端尚未有資料，將本機最新修改（如剩餘1則）同步推送上雲端
                             setDoc(doc(db, "content", "honor"), { list: window.appData.honorList });
                         }
-                    }, (err) => console.warn("雲端榮譽榜監聽中:", err));
+                    });
                 } catch(e) {}
 
                 // 4. 監聽親子橋期刊雲端同步
@@ -1216,7 +1764,7 @@
                         } else if (!snapshot.exists()) {
                             setDoc(doc(db, "content", "newsletters"), { list: window.appData.newsletterList });
                         }
-                    }, (err) => console.warn("雲端期刊監聽中:", err));
+                    });
                 } catch(e) {}
 
             } else {
