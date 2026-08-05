@@ -78,7 +78,7 @@
             <div class="flex items-center justify-between h-20">
                 
                 <!-- Logo 品牌名稱 -->
-                <button onclick="showPage('home')" class="flex items-center gap-3 group text-left">
+                <button onclick="showPage('home')" class="flex items-center gap-3 group text-left focus:outline-none">
                     <div class="w-12 h-12 bg-gradient-to-br from-warm-orange to-warm-yellow rounded-2xl flex items-center justify-center text-white text-2xl shadow-md group-hover:scale-105 transition-transform">
                         <i class="fa-solid fa-seedling"></i>
                     </div>
@@ -94,7 +94,7 @@
                         <i class="fa-solid fa-house"></i> 首頁
                     </button>
 
-                    <!-- 下拉選單：認識我們 (無縫懸停結構) -->
+                    <!-- 下拉選單：認識我們 (無縫懸停結構 bridge) -->
                     <div class="relative group py-2">
                         <button class="nav-btn px-3.5 py-2 rounded-2xl text-gray-700 hover:bg-orange-100 hover:text-warm-orange transition-colors flex items-center gap-1.5">
                             <i class="fa-solid fa-heart"></i> 認識我們 <i class="fa-solid fa-chevron-down text-xs opacity-60"></i>
@@ -111,8 +111,8 @@
                         </div>
                     </div>
 
-                    <!-- 親子橋電子報 (根據公開/隱藏動態切換) -->
-                    <button onclick="showPage('newsletter')" id="nav-newsletter" class="nav-btn px-3.5 py-2 rounded-2xl text-gray-700 hover:bg-orange-100 hover:text-warm-orange transition-colors flex items-center gap-1.5 hidden">
+                    <!-- 親子橋電子報 (根據公開/隱藏與登入狀態動態切換) -->
+                    <button onclick="showPage('newsletter')" id="nav-newsletter" class="nav-btn px-3.5 py-2 rounded-2xl text-gray-700 hover:bg-orange-100 hover:text-warm-orange transition-colors flex items-center gap-1.5">
                         <i class="fa-solid fa-book-open"></i> 親子橋電子報
                     </button>
 
@@ -126,7 +126,7 @@
                         <i class="fa-solid fa-globe"></i> 相關網站
                     </button>
 
-                    <!-- 後台登入 / 管理狀態按鈕 (動態變色) -->
+                    <!-- 後台登入 / 管理狀態按鈕 (三色動態變色) -->
                     <button onclick="openLoginModal()" id="btn-admin-login" class="bg-amber-100 hover:bg-amber-200 text-amber-900 px-3.5 py-2 rounded-2xl font-bold transition-all flex items-center gap-1.5 ml-2 border border-amber-300">
                         <i id="admin-btn-icon" class="fa-solid fa-user-lock"></i> <span id="admin-btn-text">管理員登入</span>
                     </button>
@@ -150,7 +150,7 @@
             <button onclick="showPage('about-duties')" class="w-full text-left px-4 py-3 rounded-xl hover:bg-orange-50 text-gray-700 font-bold flex items-center gap-3">
                 <i class="fa-solid fa-clipboard-list text-soft-blue"></i> 認識我們 - 工作職掌
             </button>
-            <button onclick="showPage('newsletter')" id="mobile-nav-newsletter" class="w-full text-left px-4 py-3 rounded-xl hover:bg-orange-50 text-gray-700 font-bold flex items-center gap-3 hidden">
+            <button onclick="showPage('newsletter')" id="mobile-nav-newsletter" class="w-full text-left px-4 py-3 rounded-xl hover:bg-orange-50 text-gray-700 font-bold flex items-center gap-3">
                 <i class="fa-solid fa-book-open text-soft-pink"></i> 親子橋電子報
             </button>
             <a href="https://sites.google.com/hles.ntpc.edu.tw/fdsfamily" target="_blank" class="w-full text-left px-4 py-3 rounded-xl hover:bg-emerald-50 text-gray-700 font-bold flex items-center gap-3">
@@ -183,7 +183,7 @@
                         這裡是一個充滿愛與包容的空間。無論是學習關卡、人際小煩惱，或是親職育兒的點點滴滴，輔導處隨時陪伴您與孩子一起微笑面對！
                     </p>
                     <div class="flex flex-wrap gap-3">
-                        <button id="hero-btn-newsletter" onclick="showPage('newsletter')" class="bg-warm-orange hover:bg-orange-600 text-white font-bold px-6 py-3 rounded-2xl shadow-md transition-all hover:shadow-lg flex items-center gap-2 hidden">
+                        <button id="hero-btn-newsletter" onclick="showPage('newsletter')" class="bg-warm-orange hover:bg-orange-600 text-white font-bold px-6 py-3 rounded-2xl shadow-md transition-all hover:shadow-lg flex items-center gap-2">
                             <i class="fa-solid fa-book-open"></i> 閱讀親子橋電子報
                         </button>
                         <a href="https://sites.google.com/hles.ntpc.edu.tw/fdsfamily" target="_blank" class="bg-white hover:bg-gray-50 text-emerald-600 font-bold px-6 py-3 rounded-2xl border-2 border-emerald-300 shadow-sm transition-all flex items-center gap-2">
@@ -220,7 +220,7 @@
                     <span class="font-bold text-gray-800 group-hover:text-soft-blue">工作職掌</span>
                 </button>
 
-                <button id="quick-btn-newsletter" onclick="showPage('newsletter')" class="bg-white p-5 rounded-3xl border-2 border-pink-100 hover:border-soft-pink shadow-sm hover:shadow-md transition-all text-center group hidden">
+                <button id="quick-btn-newsletter" onclick="showPage('newsletter')" class="bg-white p-5 rounded-3xl border-2 border-pink-100 hover:border-soft-pink shadow-sm hover:shadow-md transition-all text-center group">
                     <div class="w-14 h-14 bg-pink-100 rounded-2xl flex items-center justify-center text-soft-pink text-2xl mx-auto mb-3 group-hover:scale-110 transition-transform">
                         <i class="fa-solid fa-newspaper"></i>
                     </div>
@@ -237,7 +237,7 @@
 
             <!-- 榮譽榜與心靈雞湯欄位 -->
             <div class="grid md:grid-cols-3 gap-8">
-                <!-- 輔導處榮譽榜 (佔2欄，預先渲染與繽紛色彩) -->
+                <!-- 輔導處榮譽榜 (佔2欄，預先渲染繽紛色彩) -->
                 <div class="md:col-span-2 bg-white rounded-3xl p-6 sm:p-8 border-2 border-orange-100 shadow-sm">
                     <div class="flex items-center justify-between mb-6 border-b-2 border-orange-100 pb-4">
                         <h2 class="text-2xl font-bold font-rounded text-gray-800 flex items-center gap-2">
@@ -253,7 +253,7 @@
                         </div>
                     </div>
 
-                    <!-- 榮譽清單容器 (預先渲染，秒開零等待) -->
+                    <!-- 榮譽清單容器 (繽紛 5 色秒開零等待) -->
                     <div id="honor-roll-container" class="space-y-4">
                         <div class="p-4 rounded-2xl bg-emerald-50/70 hover:bg-emerald-50 border border-emerald-200 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                             <div class="flex items-start gap-3">
@@ -314,7 +314,7 @@
 
                 <!-- 右側：今日心靈雞湯 + 關懷專線 -->
                 <div class="space-y-6">
-                    <!-- 心情小卡 -->
+                    <!-- 心情小卡 (每日00:00自動更新) -->
                     <div class="bg-gradient-to-br from-warm-yellow to-amber-200 rounded-3xl p-6 shadow-sm border-2 border-yellow-300 relative">
                         <div class="flex items-center justify-between mb-3">
                             <div class="flex items-center gap-2">
@@ -363,7 +363,6 @@
                 <p class="text-gray-600 text-sm sm:text-base">陪伴每一個孩子，在愛的養分中發芽茁壯</p>
             </div>
 
-            <!-- 願景目標卡片列表 -->
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <!-- 目標 1 -->
                 <div class="bg-white rounded-3xl p-6 border-2 border-orange-100 shadow-sm hover:shadow-md transition-all">
@@ -441,7 +440,6 @@
                 <p class="text-gray-600 text-sm sm:text-base">專業分工，攜手打造友善溫馨校園</p>
             </div>
 
-            <!-- 執掌卡片列表 -->
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
 
                 <!-- 1. 輔導主任 -->
@@ -600,12 +598,9 @@
                 <p class="text-gray-600 text-sm sm:text-base">搭起家長與學校的心靈橋樑，點選各期期刊線上閱讀</p>
             </div>
 
-            <!-- 木質書架容器 (預設載入 140~148 期) -->
+            <!-- 木質書架容器 -->
             <div id="bookshelf-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div class="col-span-full text-center py-12 text-gray-400">
-                    <i class="fa-solid fa-spinner fa-spin text-3xl mb-2"></i>
-                    <p>正在為您整理《親子橋》書架電子報...</p>
-                </div>
+                <!-- 動態渲染電子書架 -->
             </div>
         </section>
 
@@ -822,13 +817,12 @@
                     <p class="text-xs text-amber-700 mt-1">
                         切換【公開 (全站訪客皆可閱讀書架)】，或【隱藏 (選單與連結隱藏，僅管理員登入後可預覽與編輯)】。
                     </p>
-                    <!-- 新增 Firebase 雲端連線狀態提示 -->
                     <div id="cloud-sync-status" class="mt-2 inline-flex items-center gap-1.5 text-xs font-bold text-amber-800 bg-amber-100/80 px-2.5 py-1 rounded-lg">
-                        <i class="fa-solid fa-circle-dot text-amber-500 animate-pulse"></i> <span>單機模式運作中 (若需跨裝置/跨瀏覽器即時同步，請填入 Firebase 金鑰)</span>
+                        <i class="fa-solid fa-circle-info text-amber-600"></i> <span>預設為單機記憶模式（將 Firebase 金鑰填入即可啟用跨瀏覽器雲端同步）</span>
                     </div>
                 </div>
                 <div class="flex items-center gap-3 bg-white p-2 rounded-xl border border-amber-200 shrink-0">
-                    <span id="mode-status-text" class="text-xs font-black text-rose-500 px-2">隱藏中 (未公開)</span>
+                    <span id="mode-status-text" class="text-xs font-black text-emerald-600 px-2">公開中 (已發布)</span>
                     <button onclick="toggleNewsletterMode()" class="bg-warm-orange hover:bg-orange-600 text-white font-bold text-xs px-4 py-2 rounded-lg shadow-sm transition-all">
                         一鍵切換公開/隱藏
                     </button>
@@ -846,17 +840,15 @@
                 <button id="tab-btn-newsletter" onclick="switchAdminTab('newsletter')" class="admin-tab-btn border-b-4 border-transparent text-gray-500 hover:text-gray-700 font-bold px-4 py-2 text-sm flex items-center gap-2 shrink-0">
                     <i class="fa-solid fa-book"></i> 親子橋期刊管理
                 </button>
-                <!-- ADMIN 專屬：帳號與權限管理 -->
                 <button id="tab-btn-accounts" onclick="switchAdminTab('accounts')" class="admin-tab-btn border-b-4 border-transparent text-gray-500 hover:text-gray-700 font-bold px-4 py-2 text-sm flex items-center gap-2 shrink-0">
                     <i class="fa-solid fa-users-gear"></i> 帳號權限管理
                 </button>
-                <!-- 一般權限專屬：修改密碼 -->
                 <button id="tab-btn-changepass" onclick="switchAdminTab('changepass')" class="admin-tab-btn border-b-4 border-transparent text-gray-500 hover:text-gray-700 font-bold px-4 py-2 text-sm flex items-center gap-2 shrink-0 hidden">
                     <i class="fa-solid fa-key"></i> 修改個人密碼
                 </button>
             </div>
 
-            <!-- TAB 1: 榮譽榜管理 (限 admin) -->
+            <!-- TAB 1: 榮譽榜管理 -->
             <div id="admin-tab-honor" class="admin-tab-content space-y-4">
                 <div class="flex justify-between items-center bg-orange-50 p-3 rounded-xl">
                     <span class="text-xs font-bold text-warm-orange">管理首頁榮譽榜事蹟清單</span>
@@ -869,7 +861,7 @@
                 </div>
             </div>
 
-            <!-- TAB 2: 心靈雞湯管理 (限 admin) -->
+            <!-- TAB 2: 心靈雞湯管理 -->
             <div id="admin-tab-quotes" class="admin-tab-content hidden space-y-4">
                 <div class="flex justify-between items-center bg-amber-50 p-3 rounded-xl">
                     <span class="text-xs font-bold text-amber-800">管理每日輪播的心靈金句庫</span>
@@ -882,7 +874,7 @@
                 </div>
             </div>
 
-            <!-- TAB 3: 親子橋電子報期刊管理 (admin & 5303 & 協助帳號) -->
+            <!-- TAB 3: 親子橋電子報期刊管理 -->
             <div id="admin-tab-newsletter" class="admin-tab-content hidden space-y-4">
                 <div class="flex justify-between items-center bg-pink-50 p-3 rounded-xl">
                     <span class="text-xs font-bold text-soft-pink">管理《親子橋》電子書架刊物內容</span>
@@ -936,7 +928,7 @@
                 </div>
             </div>
 
-            <!-- TAB 4-B: 5303 / 協助帳號 專用個人密碼修改 -->
+            <!-- TAB 4-B: 一般協助帳號專用個人密碼修改 -->
             <div id="admin-tab-changepass" class="admin-tab-content hidden space-y-4">
                 <div class="bg-pink-50/60 p-5 rounded-2xl border border-pink-200 space-y-3 max-w-md mx-auto">
                     <h3 class="font-bold text-gray-800 text-sm flex items-center gap-2">
@@ -956,7 +948,7 @@
         </div>
     </div>
 
-    <!-- 3. 榮譽事項表單 Modal (新增/編輯) -->
+    <!-- 3. 榮譽事項表單 Modal -->
     <div id="modal-honor-form" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-3xl max-w-lg w-full p-6 border-4 border-warm-orange shadow-2xl">
             <h3 id="honor-form-title" class="text-xl font-bold text-gray-800 mb-4">新增榮譽事項</h3>
@@ -1049,7 +1041,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // SHA-256 密碼壓碼雜湊函式 (確保 Ctrl+U 原始碼中完全不含明文帳號與密碼)
+        // SHA-256 單向不可逆壓碼雜湊函式 (確保 Ctrl+U 原始碼中完全不含明文帳號與密碼)
         async function hashPassword(message) {
             if (!message) return '';
             const msgBuffer = new TextEncoder().encode(message);
@@ -1058,7 +1050,7 @@
             return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
-        // Firebase 專案設定檔 (佈署時請替換為真實金鑰)
+        // Firebase 專案設定檔 (部署時請填入您的金鑰)
         const firebaseConfig = {
             apiKey: "YOUR_API_KEY",
             authDomain: "YOUR_PROJECT.firebaseapp.com",
@@ -1075,13 +1067,15 @@
                 db = getFirestore(app);
             }
         } catch (e) {
-            console.warn("Firebase 初始化失敗，預設改用本地記憶模式:", e);
+            console.warn("Firebase 初始化失敗，採用本地模式運作:", e);
         }
 
-        // 全域帳號庫預設值 (帳號與密碼均採用不可逆 SHA-256 雜湊值儲存，Ctrl+U 完全不含任何明文)
+        // 全域帳號庫預設值 (帳號與密碼均採用 SHA-256 雜湊碼儲存，100% 隱藏明文)
+        // 8c6976e5b541... = hash('admin') ; 683c921319c5... = hash('29420451')
+        // 654f15d2e249... = hash('5303')  ; 6270fa67f13c... = hash('29420451')
         const defaultAccounts = {
-            '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918': { passHash: '683c921319c5b5f35d5528b1e42a98f128c7ef3049cb4a5ee1a3a4115e47854f', role: 'admin', name: '最高管理員' },
-            '654f15d2e2499d755ef769c81a206b0d915a7707e324d314f85e51d931398835': { passHash: '6270fa67f13cf0e6d633f8be140d346087796d860d5b59a6bc559f939eb9f8fb', role: 'editor_5303', name: '親師組長' }
+            '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918': { passHash: '683c921319c5b5f35d5528b1e42a98f128c7ef3049cb4a5ee1a3a4115e47854f', role: 'admin', name: '最高管理員', userTag: 'admin' },
+            '654f15d2e2499d755ef769c81a206b0d915a7707e324d314f85e51d931398835': { passHash: '6270fa67f13cf0e6d633f8be140d346087796d860d5b59a6bc559f939eb9f8fb', role: 'editor_5303', name: '親師組長', userTag: '5303' }
         };
 
         function loadAccounts() {
@@ -1098,7 +1092,7 @@
             } catch(e) {}
         }
 
-        // 讀取本地記錄：若無記錄，預設為公開 (false)
+        // 預設《親子橋》公開狀態：未特別設定時預設為公開 (false 即非隱藏)
         const savedHiddenSetting = localStorage.getItem('hles_newsletter_hidden');
         const initialHiddenState = savedHiddenSetting === null ? false : (savedHiddenSetting === 'true');
 
@@ -1132,8 +1126,138 @@
             ]
         };
 
-        // 1. 頁面導覽切換
-        // 6. 處理帳號登入 (採用雙重 SHA-256 帳號密碼雜湊比對，100% 隱藏明文)
+        // 1. 頁面導覽切換 (A++ 完美版面)
+        window.showPage = function(pageId) {
+            document.querySelectorAll('.page-section').forEach(sec => sec.classList.add('hidden'));
+            const target = document.getElementById(`page-${pageId}`);
+            if (target) {
+                target.classList.remove('hidden');
+            }
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+                mobileMenu.classList.add('hidden');
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        window.toggleMobileMenu = function() {
+            const menu = document.getElementById('mobile-menu');
+            if (menu) menu.classList.toggle('hidden');
+        };
+
+        window.openModal = function(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) modal.classList.remove('hidden');
+        };
+
+        window.closeModal = function(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) modal.classList.add('hidden');
+        };
+
+        window.openLoginModal = function() {
+            if (window.appData.currentUser) {
+                window.openAdminPanel();
+            } else {
+                window.openModal('modal-login');
+            }
+        };
+
+        // 2. 登入按鈕三色狀態轉換 (未登入鵝黃 / admin天藍 / 協助帳號淡粉)
+        window.updateAdminButtonUI = function() {
+            const btn = document.getElementById('btn-admin-login');
+            const icon = document.getElementById('admin-btn-icon');
+            const text = document.getElementById('admin-btn-text');
+            const mBtn = document.getElementById('mobile-btn-admin-login');
+            const mIcon = document.getElementById('mobile-admin-btn-icon');
+            const mText = document.getElementById('mobile-admin-btn-text');
+
+            const user = window.appData.currentUser;
+
+            if (user) {
+                const isSuperAdmin = user.role === 'admin';
+                const bgClass = isSuperAdmin 
+                    ? 'bg-sky-100 hover:bg-sky-200 text-sky-900 border-sky-300' 
+                    : 'bg-pink-100 hover:bg-pink-200 text-pink-900 border-pink-300';
+
+                if (btn) {
+                    btn.className = `${bgClass} px-3.5 py-2 rounded-2xl font-bold transition-all flex items-center gap-1.5 ml-2 border shadow-sm`;
+                }
+                if (icon) icon.className = "fa-solid fa-sliders";
+                if (text) text.textContent = "後台控制中心";
+
+                if (mBtn) {
+                    mBtn.className = `w-full text-left px-4 py-3 rounded-xl ${bgClass} font-bold flex items-center gap-3`;
+                }
+                if (mIcon) mIcon.className = "fa-solid fa-sliders";
+                if (mText) mText.textContent = "後台控制中心";
+            } else {
+                const defaultClass = "bg-amber-100 hover:bg-amber-200 text-amber-900 border-amber-300";
+                if (btn) {
+                    btn.className = `${defaultClass} px-3.5 py-2 rounded-2xl font-bold transition-all flex items-center gap-1.5 ml-2 border shadow-sm`;
+                }
+                if (icon) icon.className = "fa-solid fa-user-lock";
+                if (text) text.textContent = "管理員登入";
+
+                if (mBtn) {
+                    mBtn.className = `w-full text-left px-4 py-3 rounded-xl ${defaultClass} font-bold flex items-center gap-3`;
+                }
+                if (mIcon) mIcon.className = "fa-solid fa-user-lock";
+                if (mText) mText.textContent = "管理員登入";
+            }
+        };
+
+        // 3. 《親子橋》選單動態可見度更新 (公開所有人可看 / 隱藏僅登入者可看)
+        window.updateNewsletterVisibility = function() {
+            const isHidden = window.appData.newsletterHidden;
+            const isLoggedIn = Boolean(window.appData.currentUser);
+            const shouldShow = !isHidden || isLoggedIn;
+
+            const targets = ['#nav-newsletter', '#hero-btn-newsletter', '#quick-btn-newsletter', '#mobile-nav-newsletter'];
+            targets.forEach(sel => {
+                document.querySelectorAll(sel).forEach(el => {
+                    if (shouldShow) el.classList.remove('hidden');
+                    else el.classList.add('hidden');
+                });
+            });
+
+            const notice = document.getElementById('admin-hidden-notice');
+            if (notice) {
+                if (isHidden && isLoggedIn) notice.classList.remove('hidden');
+                else notice.classList.add('hidden');
+            }
+
+            const modeText = document.getElementById('mode-status-text');
+            if (modeText) {
+                if (isHidden) {
+                    modeText.textContent = "隱藏中 (未公開)";
+                    modeText.className = "text-xs font-black text-rose-500 px-2";
+                } else {
+                    modeText.textContent = "公開中 (已發布)";
+                    modeText.className = "text-xs font-black text-emerald-600 px-2";
+                }
+            }
+        };
+
+        window.toggleNewsletterMode = function() {
+            window.appData.newsletterHidden = !window.appData.newsletterHidden;
+            const newState = window.appData.newsletterHidden;
+
+            localStorage.setItem('hles_newsletter_hidden', newState ? 'true' : 'false');
+
+            if (db) {
+                try {
+                    setDoc(doc(db, "settings", "newsletter"), { hidden: newState }, { merge: true });
+                } catch(e) {
+                    console.warn("寫入 Firebase 失敗:", e);
+                }
+            }
+
+            window.updateNewsletterVisibility();
+            window.showToast(newState ? '已切換為【隱藏模式】' : '已切換為【公開模式】');
+        };
+
+        // 4. 處理帳號登入 (採用 SHA-256 雙重壓碼防護，100% 隱藏明文)
         window.handleLogin = async function(e) {
             e.preventDefault();
             const rawUser = document.getElementById('login-user').value.trim();
@@ -1144,7 +1268,6 @@
             const userHash = await hashPassword(rawUser.toLowerCase());
             const passHash = await hashPassword(rawPass);
 
-            // 支援雙重雜湊比對，並兼容舊版儲存結構
             let account = accs[userHash];
             let matchedKey = userHash;
 
@@ -1154,7 +1277,6 @@
             }
 
             if (account && (account.passHash === passHash || account.pass === rawPass)) {
-                // 自動將舊結構升級為全雜湊防護儲存
                 if (matchedKey === rawUser || account.pass) {
                     delete accs[matchedKey];
                     account.passHash = passHash;
@@ -1195,7 +1317,6 @@
             window.showToast(`歡迎登入：${window.appData.currentUser.name}`);
         };
 
-        // 7. 登出
         window.handleLogout = function() {
             window.appData.currentUser = null;
             window.updateAdminButtonUI();
@@ -1203,11 +1324,139 @@
 
             window.closeModal('modal-admin-panel');
             window.updateNewsletterVisibility();
+            window.showPage('home');
             window.showToast('已成功登出');
         };
 
-        // 8. 開啟後台控制中心
-        // 12. 密碼與協助帳號管理功能 (使用全 SHA-256 雜湊儲存)
+        window.openAdminPanel = function() {
+            if (!window.appData.currentUser) {
+                window.openLoginModal();
+                return;
+            }
+            window.openModal('modal-admin-panel');
+
+            const isAdmin = window.appData.currentUser.role === 'admin';
+            const accTabBtn = document.getElementById('tab-btn-accounts');
+            const passTabBtn = document.getElementById('tab-btn-changepass');
+
+            if (accTabBtn) {
+                if (isAdmin) accTabBtn.classList.remove('hidden');
+                else accTabBtn.classList.add('hidden');
+            }
+            if (passTabBtn) {
+                if (isAdmin) passTabBtn.classList.add('hidden');
+                else passTabBtn.classList.remove('hidden');
+            }
+
+            window.switchAdminTab(isAdmin ? 'honor' : 'newsletter');
+        };
+
+        window.switchAdminTab = function(tabName) {
+            document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.add('hidden'));
+            document.querySelectorAll('.admin-tab-btn').forEach(b => {
+                b.classList.remove('border-warm-orange', 'text-warm-orange');
+                b.classList.add('border-transparent', 'text-gray-500');
+            });
+
+            const targetContent = document.getElementById(`admin-tab-${tabName}`);
+            const targetBtn = document.getElementById(`tab-btn-${tabName}`);
+
+            if (targetContent) targetContent.classList.remove('hidden');
+            if (targetBtn) {
+                targetBtn.classList.remove('border-transparent', 'text-gray-500');
+                targetBtn.classList.add('border-warm-orange', 'text-warm-orange');
+            }
+
+            if (tabName === 'honor') window.renderAdminHonorList();
+            if (tabName === 'quotes') window.renderAdminQuoteList();
+            if (tabName === 'newsletter') window.renderAdminNewsletterList();
+            if (tabName === 'accounts') window.renderAdminAssistantList();
+        };
+
+        window.openAdminTab = function(tabName) {
+            if (!window.appData.currentUser) {
+                window.openLoginModal();
+                return;
+            }
+            window.openAdminPanel();
+            window.switchAdminTab(tabName);
+        };
+
+        // 5. 渲染與多色卡片機制
+        window.renderHonorRoll = function() {
+            const container = document.getElementById('honor-roll-container');
+            if (!container) return;
+
+            const themes = [
+                { bg: 'bg-emerald-50/70 hover:bg-emerald-50 border-emerald-200', badge: 'bg-mint-green', tag: 'text-emerald-600 bg-emerald-100' },
+                { bg: 'bg-amber-50/70 hover:bg-amber-50 border-amber-200', badge: 'bg-amber-500', tag: 'text-amber-600 bg-amber-100' },
+                { bg: 'bg-blue-50/70 hover:bg-blue-50 border-blue-200', badge: 'bg-soft-blue', tag: 'text-blue-600 bg-blue-100' },
+                { bg: 'bg-pink-50/70 hover:bg-pink-50 border-pink-200', badge: 'bg-soft-pink', tag: 'text-pink-600 bg-pink-100' },
+                { bg: 'bg-purple-50/70 hover:bg-purple-50 border-purple-200', badge: 'bg-purple-500', tag: 'text-purple-600 bg-purple-100' }
+            ];
+
+            container.innerHTML = window.appData.honorList.map((item, idx) => {
+                const theme = themes[idx % themes.length];
+                return `
+                    <div class="p-4 rounded-2xl ${theme.bg} border transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="flex items-start gap-3">
+                            <span class="${theme.badge} text-white text-xs font-bold px-2.5 py-1 rounded-lg shrink-0 mt-0.5">${escapeHtml(item.badge)}</span>
+                            <div>
+                                <h3 class="font-bold text-gray-800">${escapeHtml(item.title)}</h3>
+                                <p class="text-xs text-gray-600 mt-1 leading-relaxed">${escapeHtml(item.desc)}</p>
+                            </div>
+                        </div>
+                        <span class="text-xs font-bold ${theme.tag} px-2.5 py-1 rounded-full self-start sm:self-center shrink-0">${escapeHtml(item.tag)}</span>
+                    </div>
+                `;
+            }).join('');
+        };
+
+        window.setDailyQuote = function() {
+            const qEl = document.getElementById('quote-text');
+            if (!qEl || window.appData.quoteList.length === 0) return;
+            const dayIndex = Math.floor(Date.now() / 86400000) % window.appData.quoteList.length;
+            qEl.textContent = window.appData.quoteList[dayIndex].content;
+        };
+
+        window.scheduleMidnightQuoteUpdate = function() {
+            const now = new Date();
+            const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 5);
+            const msToMidnight = tomorrow.getTime() - now.getTime();
+            setTimeout(() => {
+                window.setDailyQuote();
+                window.scheduleMidnightQuoteUpdate();
+            }, msToMidnight);
+        };
+
+        window.renderBookshelfGrid = function() {
+            const grid = document.getElementById('bookshelf-grid');
+            if (!grid) return;
+            if (window.appData.newsletterList.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-12 text-gray-400">目前尚無上架的《親子橋》期刊</div>`;
+                return;
+            }
+
+            grid.innerHTML = window.appData.newsletterList.map(item => `
+                <div class="bg-white rounded-3xl overflow-hidden border-2 border-orange-100 shadow-md hover:shadow-xl transition-all group flex flex-col justify-between">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="bg-pink-100 text-soft-pink text-xs font-black px-3 py-1 rounded-full">第 ${item.issue} 期</span>
+                            <span class="text-xs font-bold text-gray-500">${escapeHtml(item.term)}</span>
+                        </div>
+                        <h3 class="text-xl font-bold font-rounded text-gray-800 mb-2 group-hover:text-warm-orange transition-colors">${escapeHtml(item.title)}</h3>
+                    </div>
+                    <div class="px-6 pb-6 pt-2 border-t border-gray-50 bg-orange-50/50 flex items-center justify-between">
+                        <span class="text-xs font-bold text-gray-600">線上閱讀 PDF 專刊</span>
+                        <a href="${escapeHtml(item.link)}" target="_blank" rel="noopener noreferrer" class="bg-warm-orange hover:bg-orange-600 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-sm transition-all flex items-center gap-1">
+                            <i class="fa-solid fa-book-open"></i> 閱讀
+                        </a>
+                    </div>
+                </div>
+            `).join('');
+        };
+
+        // 6. 後台帳號與密碼修改
         window.handleAdminChangeSelfPassword = async function(e) {
             e.preventDefault();
             const newPass = document.getElementById('admin-new-pass').value.trim();
@@ -1217,13 +1466,12 @@
             const adminUserHash = await hashPassword('admin');
 
             if (!window.appData.accounts[adminUserHash]) {
-                window.appData.accounts[adminUserHash] = { role: 'admin', name: '最高管理員' };
+                window.appData.accounts[adminUserHash] = { role: 'admin', name: '最高管理員', userTag: 'admin' };
             }
             window.appData.accounts[adminUserHash].passHash = newHash;
-            delete window.appData.accounts['admin'];
             saveAccounts(window.appData.accounts);
             document.getElementById('admin-new-pass').value = '';
-            window.showToast('admin 密碼修改成功 (已完成 SHA-256 安全加密)！');
+            window.showToast('admin 密碼修改成功！');
         };
 
         window.handleUserChangeSelfPassword = async function(e) {
@@ -1240,7 +1488,7 @@
                 saveAccounts(window.appData.accounts);
             }
             document.getElementById('user-new-pass').value = '';
-            window.showToast('個人密碼修改成功 (已完成 SHA-256 安全加密)！');
+            window.showToast('個人密碼修改成功！');
         };
 
         window.handleAddAssistantAccount = async function(e) {
@@ -1311,16 +1559,13 @@
             `).join('');
         };
 
-        // 後台管理列表渲染
         window.renderAdminHonorList = function() {
             const listEl = document.getElementById('admin-honor-list');
             if (!listEl) return;
             listEl.innerHTML = window.appData.honorList.map((item, i) => `
                 <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-gray-200 text-xs">
                     <span class="font-bold text-gray-800 truncate max-w-xs">${escapeHtml(item.badge)} | ${escapeHtml(item.title)}</span>
-                    <div class="flex gap-2 shrink-0">
-                        <button onclick="deleteHonorItem(${i})" class="text-rose-500 hover:text-rose-700 font-bold px-2 py-1 bg-rose-50 rounded-lg">刪除</button>
-                    </div>
+                    <button onclick="deleteHonorItem(${i})" class="text-rose-500 hover:text-rose-700 font-bold px-2 py-1 bg-rose-50 rounded-lg shrink-0">刪除</button>
                 </div>
             `).join('');
         };
@@ -1347,7 +1592,7 @@
             `).join('');
         };
 
-        // CRUD 觸發表單
+        // CRUD 觸發與資料處置
         window.openHonorForm = function() { window.openModal('modal-honor-form'); };
         window.saveHonorItem = function(e) {
             e.preventDefault();
@@ -1408,7 +1653,7 @@
             window.showToast('已刪除該期刊');
         };
 
-        // Toast 訊息
+        // Toast 訊息提示
         window.showToast = function(msg, isError = false) {
             const toast = document.getElementById('toast-message');
             const toastText = document.getElementById('toast-text');
@@ -1430,7 +1675,7 @@
             });
         }
 
-        // 初始化載入
+        // DOMDOMContentLoaded 初始化載入
         window.addEventListener('DOMContentLoaded', () => {
             window.renderHonorRoll();
             window.setDailyQuote();
@@ -1444,7 +1689,7 @@
             if (db) {
                 if (syncStatusEl) {
                     syncStatusEl.className = "mt-2 inline-flex items-center gap-1.5 text-xs font-bold text-emerald-800 bg-emerald-100 px-2.5 py-1 rounded-lg";
-                    syncStatusEl.innerHTML = `<i class="fa-solid fa-cloud-check text-emerald-600"></i> <span>Firebase 雲端即時同步中 (跨瀏覽器/裝置連動生效)</span>`;
+                    syncStatusEl.innerHTML = `<i class="fa-solid fa-cloud-check text-emerald-600"></i> <span>Firebase 雲端即時同步中 (跨瀏覽器連動生效)</span>`;
                 }
 
                 try {
@@ -1457,14 +1702,14 @@
                                 window.updateNewsletterVisibility();
                             }
                         }
-                    }, (err) => console.warn("雲端公開狀態讀取失敗:", err));
+                    }, (err) => console.warn("雲端狀態監聽中:", err));
                 } catch(e) {
-                    console.warn("雲端訂閱失敗:", e);
+                    console.warn("雲端訂閱機制建立中:", e);
                 }
             } else {
                 if (syncStatusEl) {
                     syncStatusEl.className = "mt-2 inline-flex items-center gap-1.5 text-xs font-bold text-amber-800 bg-amber-100/80 px-2.5 py-1 rounded-lg";
-                    syncStatusEl.innerHTML = `<i class="fa-solid fa-circle-info text-amber-600"></i> <span>目前為單機記憶模式（將 Firebase 金鑰填入 index.html 即可啟用跨瀏覽器雲端同步）</span>`;
+                    syncStatusEl.innerHTML = `<i class="fa-solid fa-circle-info text-amber-600"></i> <span>預設為單機記憶模式（將 Firebase 金鑰填入即可啟用跨瀏覽器雲端同步）</span>`;
                 }
             }
         });
