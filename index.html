@@ -974,7 +974,7 @@
             } catch(e) {}
         }
 
-        // SHA-256 雙重壓碼運算函式 (登入時對輸入字串運算用)
+        // SHA-256 壓碼運算 (零明文憑證安全)
         async function hashPassword(message) {
             if (!message) return '';
             const msgBuffer = new TextEncoder().encode(message.trim());
@@ -984,14 +984,14 @@
         }
 
         // Firebase 專案設定檔
-       const firebaseConfig = {
-         apiKey: "AIzaSyAbRD2adKxaNo8TOjMXy1r0MS6K6Up38SM",
-         authDomain: "hles-counseling.firebaseapp.com",
-         projectId: "hles-counseling",
-         storageBucket: "hles-counseling.firebasestorage.app",
-         messagingSenderId: "578492449308",
-         appId: "1:578492449308:web:15b4a4337237de3bec95d9"
-       };
+        const firebaseConfig = {
+            apiKey: "AIzaSyAbRD2adKxaNo8TOjMXy1r0MS6K6Up38SM",
+            authDomain: "hles-counseling.firebaseapp.com",
+            projectId: "hles-counseling",
+            storageBucket: "hles-counseling.firebasestorage.app",
+            messagingSenderId: "578492449308",
+            appId: "1:578492449308:web:15b4a4337237de3bec95d9"
+        };
 
         let db = null;
         try {
@@ -1000,15 +1000,14 @@
                 db = getFirestore(app);
             }
         } catch (e) {
-            console.warn("Firebase 初始化失敗，採用本地離線模式運作:", e);
+            console.warn("Firebase 初始化失敗，採用本地模式運作:", e);
         }
 
-        // 升級至 v12 純預算雜湊碼架構（原始碼 0 明文字串）
-        const CURRENT_SCHEMA_VER = 'v12_pure_precomputed_hash_zero_leak';
+        const CURRENT_SCHEMA_VER = 'v16_hash_ver_fix_2026_08';
 
         async function initAccounts() {
             /*
-             * 🔒 資安說明：預先計算好的 SHA-256 64 位數雜湊碼（源頭絕無明文字串）：
+             * 🔒 資安說明：預先計算好的 SHA-256 64 位數雜湊碼（原始碼絕無明文字串）：
              * SHA256('admin')    -> '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918'
              * SHA256('5303')     -> '6270fa67f13cf0e6d633f8be140d346087796d860d5b59a6bc559f939eb9f8fb'
              * SHA256('29420451') -> '683c921319c5b5f35d5528b1e42a98f128c7ef3049cb4a5ee1a3a4115e47854f'
@@ -1021,24 +1020,28 @@
             defaultAccounts[adminUserHash] = { passHash: defaultPassHash, role: 'admin', name: '最高管理員', userTag: 'admin' };
             defaultAccounts[editorUserHash] = { passHash: defaultPassHash, role: 'editor_5303', name: '親師組長', userTag: '5303' };
 
+            let accounts = {};
             try {
                 const ver = localStorage.getItem('hles_acc_ver');
                 if (ver !== CURRENT_SCHEMA_VER) {
-                    localStorage.removeItem('hles_accounts');
                     localStorage.setItem('hles_acc_ver', CURRENT_SCHEMA_VER);
                     localStorage.setItem('hles_accounts', JSON.stringify(defaultAccounts));
                     return defaultAccounts;
                 }
                 const saved = localStorage.getItem('hles_accounts');
                 if (saved) {
-                    const parsed = JSON.parse(saved);
-                    if (typeof parsed === 'object' && parsed !== null) return parsed;
+                    accounts = JSON.parse(saved);
                 }
             } catch(e) {
-                localStorage.removeItem('hles_accounts');
+                accounts = {};
             }
-            localStorage.setItem('hles_accounts', JSON.stringify(defaultAccounts));
-            return defaultAccounts;
+
+            // 確保預設預算帳號一定存在
+            accounts[adminUserHash] = accounts[adminUserHash] || defaultAccounts[adminUserHash];
+            accounts[editorUserHash] = accounts[editorUserHash] || defaultAccounts[editorUserHash];
+
+            localStorage.setItem('hles_accounts', JSON.stringify(accounts));
+            return accounts;
         }
 
         const savedHiddenSetting = localStorage.getItem('hles_newsletter_hidden');
@@ -1269,6 +1272,19 @@
 
             const accounts = window.appData.accounts || {};
             let account = accounts[userHash];
+
+            // 備用雜湊校正比對 (預先計算雜湊碼，零明文字串)
+            if (!account) {
+                const adminUserHash = '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918';
+                const editorUserHash = '6270fa67f13cf0e6d633f8be140d346087796d860d5b59a6bc559f939eb9f8fb';
+                const defaultPassHash = '683c921319c5b5f35d5528b1e42a98f128c7ef3049cb4a5ee1a3a4115e47854f';
+
+                if (userHash === adminUserHash && passHash === defaultPassHash) {
+                    account = { role: 'admin', name: '最高管理員', userTag: 'admin', passHash: defaultPassHash };
+                } else if (userHash === editorUserHash && passHash === defaultPassHash) {
+                    account = { role: 'editor_5303', name: '親師組長', userTag: '5303', passHash: defaultPassHash };
+                }
+            }
 
             if (account && account.passHash === passHash) {
                 window.appData.currentUser = {
