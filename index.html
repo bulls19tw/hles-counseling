@@ -903,69 +903,87 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // 全域 UI 控制邏輯
-        window.showPage = function(pageId) {
-            document.querySelectorAll('.page-section').forEach(sec => sec.classList.add('hidden'));
-            const target = document.getElementById(`page-${pageId}`);
-            if (target) {
-                target.classList.remove('hidden');
+        function sha256(ascii) {
+            function rightRotate(value, amount) {
+                return (value >>> amount) | (value << (32 - amount));
             }
-            const mobileMenu = document.getElementById('mobile-menu');
-            if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
-                mobileMenu.classList.add('hidden');
-            }
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        };
-
-        window.toggleMobileMenu = function() {
-            const menu = document.getElementById('mobile-menu');
-            if (menu) menu.classList.toggle('hidden');
-        };
-
-        window.openModal = function(modalId) {
-            const modal = document.getElementById(modalId);
-            if (modal) modal.classList.remove('hidden');
-        };
-
-        window.closeModal = function(modalId) {
-            const modal = document.getElementById(modalId);
-            if (modal) modal.classList.add('hidden');
-        };
-
-        window.openLoginModal = function() {
-            if (window.appData && window.appData.currentUser) {
-                window.openAdminPanel();
-            } else {
-                const errEl = document.getElementById('login-error');
-                if (errEl) errEl.classList.add('hidden');
-                window.openModal('modal-login');
-            }
-        };
-
-        window.showToast = function(msg) {
-            const toast = document.getElementById('toast-message');
-            const toastText = document.getElementById('toast-text');
-            if (toast && toastText) {
-                toastText.textContent = msg;
-                toast.classList.remove('translate-x-72');
-                setTimeout(() => {
-                    toast.classList.add('translate-x-72');
-                }, 3000);
-            }
-        };
-
-        function loadStoredList(key, defaultList) {
-            try {
-                const saved = localStorage.getItem(key);
-                if (saved) {
-                    const parsed = JSON.parse(saved);
-                    if (Array.isArray(parsed)) return parsed;
+            var mathPow = Math.pow;
+            var maxWord = mathPow(2, 32);
+            var lengthProperty = 'length';
+            var i, j, result = '';
+            var words = [];
+            var asciiBitLength = ascii[lengthProperty] * 8;
+            var hash = sha256.h = sha256.h || [];
+            var k = sha256.k = sha256.k || [];
+            var primeCounter = k[lengthProperty];
+            var isComposite = {};
+            for (var candidate = 2; primeCounter < 64; candidate++) {
+                if (!isComposite[candidate]) {
+                    for (i = 0; i < 300; i += candidate) {
+                        isComposite[i] = true;
+                    }
+                    hash[primeCounter] = (mathPow(candidate, .5) * maxWord) | 0;
+                    k[primeCounter++] = (mathPow(candidate, 1/3) * maxWord) | 0;
                 }
-            } catch(e) {
-                console.warn(`[Safe Storage] Cleaned corrupted storage key: ${key}`, e);
-                localStorage.removeItem(key);
             }
-            return defaultList;
+            ascii += '\x80';
+            while (ascii[lengthProperty] % 64 - 56) ascii += '\x00';
+            for (i = 0; i < ascii[lengthProperty]; i++) {
+                j = ascii.charCodeAt(i);
+                if (j >> 8) return;
+                words[i >> 2] |= j << ((3 - i) % 4) * 8;
+            }
+            words[words[lengthProperty]] = ((asciiBitLength / maxWord) | 0);
+            words[words[lengthProperty]] = (asciiBitLength);
+            for (j = 0; j < words[lengthProperty];) {
+                var w = words.slice(j, j += 16);
+                var oldHash = hash;
+                hash = hash.slice(0, 8);
+                for (i = 0; i < 64; i++) {
+                    var i2 = i + j;
+                    var w15 = w[i - 15], w2 = w[i - 2];
+                    var a = hash[0], e = hash[4];
+                    var temp1 = hash[7]
+                        + (rightRotate(e, 6) ^ rightRotate(e, 11) ^ rightRotate(e, 25))
+                        + ((e & hash[5]) ^ ((~e) & hash[6]))
+                        + k[i]
+                        + (w[i] = (i < 16) ? w[i] : (
+                            w[i - 16]
+                            + (rightRotate(w15, 7) ^ rightRotate(w15, 18) ^ (w15 >>> 3))
+                            + w[i - 7]
+                            + (rightRotate(w2, 17) ^ rightRotate(w2, 19) ^ (w2 >>> 10))
+                        ) | 0
+                    );
+                    var temp2 = (rightRotate(a, 2) ^ rightRotate(a, 13) ^ rightRotate(a, 22))
+                        + ((a & hash[1]) ^ (a & hash[2]) ^ (hash[1] & hash[2]));
+                    hash = [(temp1 + temp2) | 0].concat(hash);
+                    hash[4] = (hash[4] + temp1) | 0;
+                }
+                for (i = 0; i < 8; i++) {
+                    hash[i] = (hash[i] + oldHash[i]) | 0;
+                }
+            }
+            for (i = 0; i < 8; i++) {
+                for (j = 3; j >= 0; j--) {
+                    var b = (hash[i] >> (j * 8)) & 255;
+                    result += (b < 16 ? '0' : '') + b.toString(16);
+                }
+            }
+            return result;
+        }
+
+        async function hashPassword(message) {
+            if (!message) return '';
+            const str = message.trim();
+            try {
+                if (window.crypto && window.crypto.subtle) {
+                    const msgBuffer = new TextEncoder().encode(str);
+                    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+                    const hashArray = Array.from(new Uint8Array(hashBuffer));
+                    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+                }
+            } catch(e) {}
+            return sha256(str);
         }
 
         function saveStoredList(key, list) {
@@ -1262,23 +1280,22 @@
 
         window.handleLogin = async function(e) {
             if (e) e.preventDefault();
-            const userVal = document.getElementById('login-user').value.trim();
-            const passVal = document.getElementById('login-pass').value.trim();
+            const userVal = (document.getElementById('login-user').value || '').trim();
+            const passVal = (document.getElementById('login-pass').value || '').trim();
             
             if (!userVal || !passVal) return;
 
             const userHash = await hashPassword(userVal.toLowerCase());
             const passHash = await hashPassword(passVal);
 
-            const accounts = window.appData.accounts || {};
+            const adminUserHash = '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918';
+            const editorUserHash = '6270fa67f13cf0e6d633f8be140d346087796d860d5b59a6bc559f939eb9f8fb';
+            const defaultPassHash = '683c921319c5b5f35d5528b1e42a98f128c7ef3049cb4a5ee1a3a4115e47854f';
+
+            let accounts = window.appData.accounts || {};
             let account = accounts[userHash];
 
-            // 備用雜湊校正比對 (預先計算雜湊碼，零明文字串)
             if (!account) {
-                const adminUserHash = '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918';
-                const editorUserHash = '6270fa67f13cf0e6d633f8be140d346087796d860d5b59a6bc559f939eb9f8fb';
-                const defaultPassHash = '683c921319c5b5f35d5528b1e42a98f128c7ef3049cb4a5ee1a3a4115e47854f';
-
                 if (userHash === adminUserHash && passHash === defaultPassHash) {
                     account = { role: 'admin', name: '最高管理員', userTag: 'admin', passHash: defaultPassHash };
                 } else if (userHash === editorUserHash && passHash === defaultPassHash) {
