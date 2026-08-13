@@ -224,7 +224,7 @@
             </div>
 
             <div class="grid md:grid-cols-3 gap-8">
-                <!-- 輔導處榮譽榜 (齊平對齊版) -->
+                <!-- 輔導處榮譽榜 -->
                 <div class="md:col-span-2 bg-white rounded-3xl p-6 sm:p-8 border-2 border-orange-100 shadow-sm">
                     <div class="flex items-center justify-between mb-6 border-b-2 border-orange-100 pb-4">
                         <h2 class="text-2xl font-bold font-rounded text-gray-800 flex items-center gap-2">
@@ -815,7 +815,7 @@
         </div>
     </div>
 
-    <!-- 3. 榮譽事項表單 Modal (限制標籤最多7字) -->
+    <!-- 3. 榮譽事項表單 Modal -->
     <div id="modal-honor-form" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-3xl max-w-lg w-full p-6 border-4 border-warm-orange shadow-2xl">
             <h3 id="honor-form-title" class="text-xl font-bold text-gray-800 mb-4">新增榮譽事項</h3>
@@ -1024,22 +1024,16 @@
             console.warn("Firebase 初始化失敗，採用本地模式運作:", e);
         }
 
-        const CURRENT_SCHEMA_VER = 'v17_zero_plaintext_2026';
+        const CURRENT_SCHEMA_VER = 'v18_zero_trace_clean_2026';
 
         async function initAccounts() {
-            /*
-             * 🔒 資安防護：預先計算好的 SHA-256 64 位數雜湊碼（零明文字串）：
-             * SHA256('admin')    -> '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918'
-             * SHA256('5303')     -> '6270fa67f13cf0e6d633f8be140d346087796d860d5b59a6bc559f939eb9f8fb'
-             * SHA256('29420451') -> '683c921319c5b5f35d5528b1e42a98f128c7ef3049cb4a5ee1a3a4115e47854f'
-             */
-            const adminUserHash = '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918';
-            const editorUserHash = '6270fa67f13cf0e6d633f8be140d346087796d860d5b59a6bc559f939eb9f8fb';
-            const defaultPassHash = '683c921319c5b5f35d5528b1e42a98f128c7ef3049cb4a5ee1a3a4115e47854f';
+            const k1 = '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918';
+            const k2 = '6270fa67f13cf0e6d633f8be140d346087796d860d5b59a6bc559f939eb9f8fb';
+            const p1 = '683c921319c5b5f35d5528b1e42a98f128c7ef3049cb4a5ee1a3a4115e47854f';
 
             const defaultAccounts = {};
-            defaultAccounts[adminUserHash] = { passHash: defaultPassHash, role: 'admin', name: '最高管理員', userTag: 'admin' };
-            defaultAccounts[editorUserHash] = { passHash: defaultPassHash, role: 'editor_5303', name: '親師組長', userTag: '5303' };
+            defaultAccounts[k1] = { passHash: p1, role: 'admin', name: '最高管理員', userTag: 'sys_admin' };
+            defaultAccounts[k2] = { passHash: p1, role: 'editor_5303', name: '親師組長', userTag: 'sys_editor' };
 
             let accounts = {};
             try {
@@ -1057,8 +1051,8 @@
                 accounts = {};
             }
 
-            accounts[adminUserHash] = accounts[adminUserHash] || defaultAccounts[adminUserHash];
-            accounts[editorUserHash] = accounts[editorUserHash] || defaultAccounts[editorUserHash];
+            accounts[k1] = accounts[k1] || defaultAccounts[k1];
+            accounts[k2] = accounts[k2] || defaultAccounts[k2];
 
             localStorage.setItem('hles_accounts', JSON.stringify(accounts));
             return accounts;
@@ -1087,7 +1081,6 @@
             ])
         };
 
-        // --- 全域導覽與彈窗 UI 函式掛載 ---
         window.showPage = function(pageId) {
             document.querySelectorAll('.page-section').forEach(sec => sec.classList.add('hidden'));
             const target = document.getElementById(`page-${pageId}`);
@@ -1342,18 +1335,18 @@
             const userHash = await hashPassword(userVal.toLowerCase());
             const passHash = await hashPassword(passVal);
 
-            const adminUserHash = '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918';
-            const editorUserHash = '6270fa67f13cf0e6d633f8be140d346087796d860d5b59a6bc559f939eb9f8fb';
-            const defaultPassHash = '683c921319c5b5f35d5528b1e42a98f128c7ef3049cb4a5ee1a3a4115e47854f';
+            const k1 = '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918';
+            const k2 = '6270fa67f13cf0e6d633f8be140d346087796d860d5b59a6bc559f939eb9f8fb';
+            const p1 = '683c921319c5b5f35d5528b1e42a98f128c7ef3049cb4a5ee1a3a4115e47854f';
 
             let accounts = window.appData.accounts || {};
             let account = accounts[userHash];
 
             if (!account) {
-                if (userHash === adminUserHash && passHash === defaultPassHash) {
-                    account = { role: 'admin', name: '最高管理員', userTag: 'admin', passHash: defaultPassHash };
-                } else if (userHash === editorUserHash && passHash === defaultPassHash) {
-                    account = { role: 'editor_5303', name: '親師組長', userTag: '5303', passHash: defaultPassHash };
+                if (userHash === k1 && passHash === p1) {
+                    account = { role: 'admin', name: '最高管理員', userTag: 'sys_admin', passHash: p1 };
+                } else if (userHash === k2 && passHash === p1) {
+                    account = { role: 'editor_5303', name: '親師組長', userTag: 'sys_editor', passHash: p1 };
                 }
             }
 
@@ -1713,7 +1706,7 @@
                 passHash: passHash,
                 role: 'assistant',
                 name: nameVal,
-                userTag: idVal
+                userTag: 'sub_user'
             };
 
             localStorage.setItem('hles_accounts', JSON.stringify(window.appData.accounts));
@@ -1745,7 +1738,7 @@
                 <div class="flex items-center justify-between p-2.5 bg-white rounded-xl border border-gray-200 text-xs">
                     <div>
                         <span class="font-bold text-gray-800">${item.name}</span>
-                        <span class="text-gray-400 ml-2">(${item.userTag || '協助帳號'})</span>
+                        <span class="text-gray-400 ml-2">(協助帳號)</span>
                     </div>
                     <button onclick="deleteAssistantAccount('${item.userHash}')" class="text-rose-600 hover:bg-rose-50 px-2 py-1 rounded font-bold">
                         刪除帳號
@@ -1798,7 +1791,6 @@
                     syncStatusEl.innerHTML = `<i class="fa-solid fa-cloud-check text-emerald-600"></i> <span>Firebase 雲端即時同步中 (全網連動生效)</span>`;
                 }
 
-                // 1. 監聽公開狀態
                 try {
                     onSnapshot(doc(db, "settings", "newsletter"), (snapshot) => {
                         if (snapshot.exists()) {
@@ -1812,7 +1804,6 @@
                     });
                 } catch(e) {}
 
-                // 2. 監聽心靈金句雲端同步
                 try {
                     onSnapshot(doc(db, "content", "quotes"), (snapshot) => {
                         if (snapshot.exists() && Array.isArray(snapshot.data().list)) {
@@ -1826,7 +1817,6 @@
                     });
                 } catch(e) {}
 
-                // 3. 監聽榮譽榜雲端同步
                 try {
                     onSnapshot(doc(db, "content", "honor"), (snapshot) => {
                         if (snapshot.exists() && Array.isArray(snapshot.data().list)) {
@@ -1840,7 +1830,6 @@
                     });
                 } catch(e) {}
 
-                // 4. 監聽親子橋期刊雲端同步
                 try {
                     onSnapshot(doc(db, "content", "newsletters"), (snapshot) => {
                         if (snapshot.exists() && Array.isArray(snapshot.data().list)) {
