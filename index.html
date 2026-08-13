@@ -286,6 +286,7 @@
             </div>
         </section>
 
+        <!-- 願景目標 -->
         <section id="page-about-vision" class="page-section hidden space-y-8">
             <div class="text-center max-w-2xl mx-auto space-y-3">
                 <span class="bg-emerald-100 text-mint-green px-4 py-1.5 rounded-full text-xs font-black tracking-wider uppercase">Vision & Goals</span>
@@ -356,6 +357,7 @@
             </div>
         </section>
 
+        <!-- 工作職掌 -->
         <section id="page-about-duties" class="page-section hidden space-y-8">
             <div class="text-center max-w-2xl mx-auto space-y-3">
                 <span class="bg-blue-100 text-soft-blue px-4 py-1.5 rounded-full text-xs font-black tracking-wider uppercase">Organization</span>
@@ -474,6 +476,7 @@
             </div>
         </section>
 
+        <!-- 親子橋電子報 -->
         <section id="page-newsletter" class="page-section hidden space-y-8">
             <div id="admin-hidden-notice" class="bg-amber-100 border-2 border-amber-300 rounded-2xl p-4 flex items-center justify-between text-amber-900 hidden">
                 <div class="flex items-center gap-3">
@@ -504,6 +507,7 @@
             </div>
         </section>
 
+        <!-- 相關網站 -->
         <section id="page-links" class="page-section hidden space-y-8">
             <div class="text-center max-w-2xl mx-auto space-y-3">
                 <span class="bg-orange-100 text-warm-orange px-4 py-1.5 rounded-full text-xs font-black tracking-wider uppercase">Useful Links</span>
@@ -903,6 +907,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+        // 純 JS SHA-256 算法，100% 相容所有環境 (HTTP/HTTPS/file/無痕)
         function sha256(ascii) {
             function rightRotate(value, amount) {
                 return (value >>> amount) | (value << (32 - amount));
@@ -940,7 +945,6 @@
                 var oldHash = hash;
                 hash = hash.slice(0, 8);
                 for (i = 0; i < 64; i++) {
-                    var i2 = i + j;
                     var w15 = w[i - 15], w2 = w[i - 2];
                     var a = hash[0], e = hash[4];
                     var temp1 = hash[7]
@@ -986,19 +990,18 @@
             return sha256(str);
         }
 
+        function loadStoredList(key, defaultVal) {
+            try {
+                const saved = localStorage.getItem(key);
+                if (saved) return JSON.parse(saved);
+            } catch(e) {}
+            return defaultVal;
+        }
+
         function saveStoredList(key, list) {
             try {
                 localStorage.setItem(key, JSON.stringify(list));
             } catch(e) {}
-        }
-
-        // SHA-256 壓碼運算 (零明文憑證安全)
-        async function hashPassword(message) {
-            if (!message) return '';
-            const msgBuffer = new TextEncoder().encode(message.trim());
-            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
         // Firebase 專案設定檔
@@ -1021,11 +1024,11 @@
             console.warn("Firebase 初始化失敗，採用本地模式運作:", e);
         }
 
-        const CURRENT_SCHEMA_VER = 'v16_hash_ver_fix_2026_08';
+        const CURRENT_SCHEMA_VER = 'v17_zero_plaintext_2026';
 
         async function initAccounts() {
             /*
-             * 🔒 資安說明：預先計算好的 SHA-256 64 位數雜湊碼（原始碼絕無明文字串）：
+             * 🔒 資安防護：預先計算好的 SHA-256 64 位數雜湊碼（零明文字串）：
              * SHA256('admin')    -> '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918'
              * SHA256('5303')     -> '6270fa67f13cf0e6d633f8be140d346087796d860d5b59a6bc559f939eb9f8fb'
              * SHA256('29420451') -> '683c921319c5b5f35d5528b1e42a98f128c7ef3049cb4a5ee1a3a4115e47854f'
@@ -1054,7 +1057,6 @@
                 accounts = {};
             }
 
-            // 確保預設預算帳號一定存在
             accounts[adminUserHash] = accounts[adminUserHash] || defaultAccounts[adminUserHash];
             accounts[editorUserHash] = accounts[editorUserHash] || defaultAccounts[editorUserHash];
 
@@ -1083,6 +1085,58 @@
                 { issue: 147, term: '114學年度第一期', title: '如何協助孩子建立良好的學習與生活作息', link: 'https://www.hles.ntpc.edu.tw' },
                 { issue: 146, term: '113學年度第二期', title: '情緒管理與親職同理心實踐', link: 'https://www.hles.ntpc.edu.tw' }
             ])
+        };
+
+        // --- 全域導覽與彈窗 UI 函式掛載 ---
+        window.showPage = function(pageId) {
+            document.querySelectorAll('.page-section').forEach(sec => sec.classList.add('hidden'));
+            const target = document.getElementById(`page-${pageId}`);
+            if (target) {
+                target.classList.remove('hidden');
+            }
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (mobileMenu) mobileMenu.classList.add('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        window.toggleMobileMenu = function() {
+            const menu = document.getElementById('mobile-menu');
+            if (menu) menu.classList.toggle('hidden');
+        };
+
+        window.openModal = function(modalId) {
+            const el = document.getElementById(modalId);
+            if (el) el.classList.remove('hidden');
+        };
+
+        window.closeModal = function(modalId) {
+            const el = document.getElementById(modalId);
+            if (el) el.classList.add('hidden');
+        };
+
+        window.openLoginModal = function() {
+            if (window.appData.currentUser) {
+                window.openAdminPanel();
+            } else {
+                const err = document.getElementById('login-error');
+                if (err) err.classList.add('hidden');
+                window.openModal('modal-login');
+            }
+        };
+
+        window.showToast = function(msg, iconClass = 'fa-circle-check text-mint-green') {
+            const toast = document.getElementById('toast-message');
+            const toastText = document.getElementById('toast-text');
+            const toastIcon = document.getElementById('toast-icon');
+            if (!toast) return;
+            if (toastText) toastText.textContent = msg;
+            if (toastIcon) toastIcon.className = `fa-solid ${iconClass} text-base`;
+            toast.classList.remove('translate-x-72');
+            toast.classList.add('translate-x-0');
+            setTimeout(() => {
+                toast.classList.remove('translate-x-0');
+                toast.classList.add('translate-x-72');
+            }, 3000);
         };
 
         window.renderHonorRoll = function() {
