@@ -716,7 +716,7 @@
                 <button id="tab-btn-newsletter" onclick="switchAdminTab('newsletter')" class="admin-tab-btn border-b-4 border-transparent text-gray-500 hover:text-gray-700 font-bold px-4 py-2 text-sm flex items-center gap-2 shrink-0">
                     <i class="fa-solid fa-book"></i> 親子橋期刊管理
                 </button>
-                <button id="tab-btn-accounts" onclick="switchAdminTab('accounts')" class="admin-tab-btn border-b-4 border-transparent text-gray-500 hover:text-gray-700 font-bold px-4 py-2 text-sm flex items-center gap-2 shrink-0">
+                <button id="tab-btn-accounts" onclick="switchAdminTab('accounts')" class="admin-tab-btn border-b-4 border-transparent text-gray-500 hover:text-gray-700 font-bold px-4 py-2 text-sm flex items-center gap-2 shrink-0 hidden">
                     <i class="fa-solid fa-users-gear"></i> 帳號權限管理
                 </button>
                 <button id="tab-btn-changepass" onclick="switchAdminTab('changepass')" class="admin-tab-btn border-b-4 border-transparent text-gray-500 hover:text-gray-700 font-bold px-4 py-2 text-sm flex items-center gap-2 shrink-0 hidden">
@@ -1005,14 +1005,14 @@
         }
 
         // Firebase 專案設定檔
-       const firebaseConfig = {
+        const firebaseConfig = {
           apiKey: "AIzaSyAbRD2adKxaNo8TOjMXy1r0MS6K6Up38SM",
           authDomain: "hles-counseling.firebaseapp.com",
           projectId: "hles-counseling",
           storageBucket: "hles-counseling.firebasestorage.app",
           messagingSenderId: "578492449308",
           appId: "1:578492449308:web:15b4a4337237de3bec95d9"
-       };
+        };
 
         let db = null;
         try {
@@ -1403,6 +1403,8 @@
             const roleLabel = document.getElementById('current-user-role-label');
             if (roleLabel) roleLabel.textContent = window.appData.currentUser.name;
 
+            const isAdmin = window.appData.currentUser.role === 'admin';
+
             const tabAcc = document.getElementById('tab-btn-accounts');
             const tabPass = document.getElementById('tab-btn-changepass');
             const toggleBox = document.getElementById('admin-newsletter-toggle-box');
@@ -1410,17 +1412,9 @@
             const editQuote = document.getElementById('btn-edit-quote');
             const manageBookshelf = document.getElementById('btn-manage-bookshelf');
 
-            const isAdmin = window.appData.currentUser.role === 'admin';
-
-            if (isAdmin) {
-                if (tabAcc) tabAcc.classList.remove('hidden');
-                if (tabPass) tabPass.classList.add('hidden');
-                if (toggleBox) toggleBox.classList.remove('hidden'); // 最高管理員顯示切換按鈕
-            } else {
-                if (tabAcc) tabAcc.classList.add('hidden');
-                if (tabPass) tabPass.classList.remove('hidden');
-                if (toggleBox) toggleBox.classList.add('hidden');    // 協助帳號隱藏切換按鈕
-            }
+            if (tabAcc) tabAcc.classList.toggle('hidden', !isAdmin);
+            if (tabPass) tabPass.classList.toggle('hidden', isAdmin);
+            if (toggleBox) toggleBox.classList.toggle('hidden', !isAdmin);
 
             if (editHonor) editHonor.classList.remove('hidden');
             if (editQuote) editQuote.classList.remove('hidden');
@@ -1431,14 +1425,25 @@
         };
 
         window.switchAdminTab = function(tabName) {
+            const isAdmin = window.appData.currentUser && window.appData.currentUser.role === 'admin';
+            
             // 安全阻斷：非 admin 嘗試切換至帳號頁面時強制轉向 honor
-            if (tabName === 'accounts' && (!window.appData.currentUser || window.appData.currentUser.role !== 'admin')) {
+            if (tabName === 'accounts' && !isAdmin) {
                 tabName = 'honor';
             }
 
             document.querySelectorAll('.admin-tab-btn').forEach(btn => {
-                btn.className = 'admin-tab-btn border-b-4 border-transparent text-gray-500 hover:text-gray-700 font-bold px-4 py-2 text-sm flex items-center gap-2 shrink-0';
+                const isAccountsTab = btn.id === 'tab-btn-accounts';
+                const isPassTab = btn.id === 'tab-btn-changepass';
+                
+                let isHidden = false;
+                if (isAccountsTab && !isAdmin) isHidden = true;
+                if (isPassTab && isAdmin) isHidden = true;
+
+                const baseClass = 'admin-tab-btn border-b-4 border-transparent text-gray-500 hover:text-gray-700 font-bold px-4 py-2 text-sm flex items-center gap-2 shrink-0';
+                btn.className = isHidden ? `${baseClass} hidden` : baseClass;
             });
+
             document.querySelectorAll('.admin-tab-content').forEach(content => {
                 content.classList.add('hidden');
             });
@@ -1447,7 +1452,14 @@
             const activeContent = document.getElementById(`admin-tab-${tabName}`);
 
             if (activeBtn) {
-                activeBtn.className = 'admin-tab-btn border-b-4 border-warm-orange text-warm-orange font-bold px-4 py-2 text-sm flex items-center gap-2 shrink-0';
+                const isAccountsTab = activeBtn.id === 'tab-btn-accounts';
+                const isPassTab = activeBtn.id === 'tab-btn-changepass';
+                let isHidden = false;
+                if (isAccountsTab && !isAdmin) isHidden = true;
+                if (isPassTab && isAdmin) isHidden = true;
+
+                const activeClass = 'admin-tab-btn border-b-4 border-warm-orange text-warm-orange font-bold px-4 py-2 text-sm flex items-center gap-2 shrink-0';
+                activeBtn.className = isHidden ? `${activeClass} hidden` : activeClass;
             }
             if (activeContent) {
                 activeContent.classList.remove('hidden');
@@ -1456,7 +1468,7 @@
             if (tabName === 'honor') window.renderAdminHonorList();
             if (tabName === 'quotes') window.renderAdminQuoteList();
             if (tabName === 'newsletter') window.renderAdminNewsletterList();
-            if (tabName === 'accounts') window.renderAdminAssistantList();
+            if (tabName === 'accounts' && isAdmin) window.renderAdminAssistantList();
         };
 
         window.renderAdminHonorList = function() {
