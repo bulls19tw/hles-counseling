@@ -696,7 +696,8 @@
                         <i class="fa-solid fa-circle-info text-amber-600"></i> <span>預設為單機記憶模式（將 Firebase 金鑰填入即可啟用跨瀏覽器雲端同步）</span>
                     </div>
                 </div>
-                <div class="flex items-center gap-3 bg-white p-2 rounded-xl border border-amber-200 shrink-0">
+                <!-- 新增 id: admin-newsletter-toggle-box 以利權限控制 -->
+                <div id="admin-newsletter-toggle-box" class="flex items-center gap-3 bg-white p-2 rounded-xl border border-amber-200 shrink-0">
                     <span id="mode-status-text" class="text-xs font-black text-rose-500 px-2">隱藏中 (未公開)</span>
                     <button onclick="toggleNewsletterMode()" class="bg-warm-orange hover:bg-orange-600 text-white font-bold text-xs px-4 py-2 rounded-lg shadow-sm transition-all">
                         一鍵切換公開/隱藏
@@ -1004,14 +1005,14 @@
         }
 
         // Firebase 專案設定檔
-        const firebaseConfig = {
+       const firebaseConfig = {
           apiKey: "AIzaSyAbRD2adKxaNo8TOjMXy1r0MS6K6Up38SM",
           authDomain: "hles-counseling.firebaseapp.com",
           projectId: "hles-counseling",
           storageBucket: "hles-counseling.firebasestorage.app",
           messagingSenderId: "578492449308",
           appId: "1:578492449308:web:15b4a4337237de3bec95d9"
-        };
+       };
 
         let db = null;
         try {
@@ -1312,6 +1313,12 @@
         };
 
         window.toggleNewsletterMode = function() {
+            // 安全限制：僅限最高管理員 admin 可操作
+            if (!window.appData.currentUser || window.appData.currentUser.role !== 'admin') {
+                window.showToast('權限不足：僅最高管理員可切換公開狀態', 'fa-circle-xmark text-rose-500');
+                return;
+            }
+
             window.appData.newsletterHidden = !window.appData.newsletterHidden;
             localStorage.setItem('hles_newsletter_hidden', window.appData.newsletterHidden ? 'true' : 'false');
             
@@ -1322,6 +1329,14 @@
             }
 
             window.updateNewsletterVisibility();
+
+            if (window.appData.newsletterHidden) {
+                const pageNewsletter = document.getElementById('page-newsletter');
+                if (pageNewsletter && !pageNewsletter.classList.contains('hidden')) {
+                    window.showPage('home');
+                }
+            }
+
             window.showToast(window.appData.newsletterHidden ? '已切換為：隱藏模式（未公開）' : '已切換為：公開模式（全站可見）');
         };
 
@@ -1390,16 +1405,21 @@
 
             const tabAcc = document.getElementById('tab-btn-accounts');
             const tabPass = document.getElementById('tab-btn-changepass');
+            const toggleBox = document.getElementById('admin-newsletter-toggle-box');
             const editHonor = document.getElementById('btn-edit-honor');
             const editQuote = document.getElementById('btn-edit-quote');
             const manageBookshelf = document.getElementById('btn-manage-bookshelf');
 
-            if (window.appData.currentUser.role === 'admin') {
+            const isAdmin = window.appData.currentUser.role === 'admin';
+
+            if (isAdmin) {
                 if (tabAcc) tabAcc.classList.remove('hidden');
                 if (tabPass) tabPass.classList.add('hidden');
+                if (toggleBox) toggleBox.classList.remove('hidden'); // 最高管理員顯示切換按鈕
             } else {
                 if (tabAcc) tabAcc.classList.add('hidden');
                 if (tabPass) tabPass.classList.remove('hidden');
+                if (toggleBox) toggleBox.classList.add('hidden');    // 協助帳號隱藏切換按鈕
             }
 
             if (editHonor) editHonor.classList.remove('hidden');
@@ -1410,16 +1430,12 @@
             window.openModal('modal-admin-panel');
         };
 
-        window.openAdminTab = function(tabName) {
-            if (!window.appData.currentUser) {
-                window.openLoginModal();
-                return;
-            }
-            window.openAdminPanel();
-            window.switchAdminTab(tabName);
-        };
-
         window.switchAdminTab = function(tabName) {
+            // 安全阻斷：非 admin 嘗試切換至帳號頁面時強制轉向 honor
+            if (tabName === 'accounts' && (!window.appData.currentUser || window.appData.currentUser.role !== 'admin')) {
+                tabName = 'honor';
+            }
+
             document.querySelectorAll('.admin-tab-btn').forEach(btn => {
                 btn.className = 'admin-tab-btn border-b-4 border-transparent text-gray-500 hover:text-gray-700 font-bold px-4 py-2 text-sm flex items-center gap-2 shrink-0';
             });
@@ -1696,6 +1712,12 @@
 
         window.handleAddAssistantAccount = async function(e) {
             if (e) e.preventDefault();
+            // 安全限制：僅限最高管理員可新增帳號
+            if (!window.appData.currentUser || window.appData.currentUser.role !== 'admin') {
+                window.showToast('權限不足：僅最高管理員可新增帳號', 'fa-circle-xmark text-rose-500');
+                return;
+            }
+
             const idVal = document.getElementById('new-user-id').value.trim();
             const nameVal = document.getElementById('new-user-name').value.trim();
             const passVal = document.getElementById('new-user-pass').value.trim();
