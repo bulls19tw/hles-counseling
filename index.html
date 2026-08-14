@@ -1005,7 +1005,7 @@
         }
 
         // Firebase 專案設定檔
-        const firebaseConfig = {
+       const firebaseConfig = {
           apiKey: "AIzaSyAbRD2adKxaNo8TOjMXy1r0MS6K6Up38SM",
           authDomain: "hles-counseling.firebaseapp.com",
           projectId: "hles-counseling",
@@ -1013,7 +1013,6 @@
           messagingSenderId: "578492449308",
           appId: "1:578492449308:web:15b4a4337237de3bec95d9"
         };
-
         let db = null;
         try {
             if (firebaseConfig.apiKey && !firebaseConfig.apiKey.includes("YOUR_")) {
@@ -1405,16 +1404,20 @@
 
             const isAdmin = window.appData.currentUser.role === 'admin';
 
-            const tabAcc = document.getElementById('tab-btn-accounts');
-            const tabPass = document.getElementById('tab-btn-changepass');
             const toggleBox = document.getElementById('admin-newsletter-toggle-box');
             const editHonor = document.getElementById('btn-edit-honor');
             const editQuote = document.getElementById('btn-edit-quote');
             const manageBookshelf = document.getElementById('btn-manage-bookshelf');
 
-            if (tabAcc) tabAcc.classList.toggle('hidden', !isAdmin);
-            if (tabPass) tabPass.classList.toggle('hidden', isAdmin);
-            if (toggleBox) toggleBox.classList.toggle('hidden', !isAdmin);
+            if (toggleBox) {
+                if (isAdmin) {
+                    toggleBox.style.display = 'flex';
+                    toggleBox.classList.remove('hidden');
+                } else {
+                    toggleBox.style.display = 'none';
+                    toggleBox.classList.add('hidden');
+                }
+            }
 
             if (editHonor) editHonor.classList.remove('hidden');
             if (editQuote) editQuote.classList.remove('hidden');
@@ -1436,31 +1439,31 @@
                 const isAccountsTab = btn.id === 'tab-btn-accounts';
                 const isPassTab = btn.id === 'tab-btn-changepass';
                 
-                let isHidden = false;
-                if (isAccountsTab && !isAdmin) isHidden = true;
-                if (isPassTab && isAdmin) isHidden = true;
+                let shouldHide = false;
+                if (isAccountsTab && !isAdmin) shouldHide = true;
+                if (isPassTab && isAdmin) shouldHide = true;
 
-                const baseClass = 'admin-tab-btn border-b-4 border-transparent text-gray-500 hover:text-gray-700 font-bold px-4 py-2 text-sm flex items-center gap-2 shrink-0';
-                btn.className = isHidden ? `${baseClass} hidden` : baseClass;
+                if (shouldHide) {
+                    btn.style.display = 'none';
+                    btn.classList.add('hidden');
+                } else {
+                    btn.style.display = 'inline-flex';
+                    btn.classList.remove('hidden');
+                }
+
+                const isActive = (btn.id === `tab-btn-${tabName}`);
+                if (isActive) {
+                    btn.className = 'admin-tab-btn border-b-4 border-warm-orange text-warm-orange font-bold px-4 py-2 text-sm flex items-center gap-2 shrink-0' + (shouldHide ? ' hidden' : '');
+                } else {
+                    btn.className = 'admin-tab-btn border-b-4 border-transparent text-gray-500 hover:text-gray-700 font-bold px-4 py-2 text-sm flex items-center gap-2 shrink-0' + (shouldHide ? ' hidden' : '');
+                }
             });
 
             document.querySelectorAll('.admin-tab-content').forEach(content => {
                 content.classList.add('hidden');
             });
 
-            const activeBtn = document.getElementById(`tab-btn-${tabName}`);
             const activeContent = document.getElementById(`admin-tab-${tabName}`);
-
-            if (activeBtn) {
-                const isAccountsTab = activeBtn.id === 'tab-btn-accounts';
-                const isPassTab = activeBtn.id === 'tab-btn-changepass';
-                let isHidden = false;
-                if (isAccountsTab && !isAdmin) isHidden = true;
-                if (isPassTab && isAdmin) isHidden = true;
-
-                const activeClass = 'admin-tab-btn border-b-4 border-warm-orange text-warm-orange font-bold px-4 py-2 text-sm flex items-center gap-2 shrink-0';
-                activeBtn.className = isHidden ? `${activeClass} hidden` : activeClass;
-            }
             if (activeContent) {
                 activeContent.classList.remove('hidden');
             }
