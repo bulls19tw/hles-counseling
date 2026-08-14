@@ -751,7 +751,7 @@
                 <div class="flex justify-between items-center bg-pink-50 p-3 rounded-xl">
                     <span class="text-xs font-bold text-soft-pink">管理《親子橋》電子書架刊物內容</span>
                     <button onclick="openNewsletterForm()" class="bg-soft-pink hover:bg-pink-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow">
-                        <i class="fa-solid fa-plus"></i> 上架新期刊 (如: 第141期)
+                        <i class="fa-solid fa-plus"></i> 上架新期刊 (如: 第149期)
                     </button>
                 </div>
                 <div id="admin-newsletter-list" class="space-y-3 max-h-80 overflow-y-auto custom-scrollbar p-1">
@@ -873,12 +873,12 @@
                 <input type="hidden" id="newsletter-id">
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-bold text-gray-700 mb-1">期數(數字)</label>
-                        <input type="number" id="newsletter-issue" required placeholder="例如：141" class="w-full p-2.5 rounded-xl border border-gray-300 text-sm font-bold">
+                        <label class="block text-xs font-bold text-gray-700 mb-1">期數 (數字)</label>
+                        <input type="number" id="newsletter-issue" required placeholder="例如：149" class="w-full p-2.5 rounded-xl border border-gray-300 text-sm font-bold">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-gray-700 mb-1">年度</label>
-                        <input type="text" id="newsletter-term" required placeholder="例如：民國115年" class="w-full p-2.5 rounded-xl border border-gray-300 text-sm font-bold">
+                        <label class="block text-xs font-bold text-gray-700 mb-1">學年度 / 出刊學期</label>
+                        <input type="text" id="newsletter-term" required placeholder="例如：114學年度第三期" class="w-full p-2.5 rounded-xl border border-gray-300 text-sm font-bold">
                     </div>
                 </div>
                 <div>
@@ -1005,14 +1005,14 @@
         }
 
         // Firebase 專案設定檔
-       const firebaseConfig = {
+        const firebaseConfig = {
           apiKey: "AIzaSyAbRD2adKxaNo8TOjMXy1r0MS6K6Up38SM",
           authDomain: "hles-counseling.firebaseapp.com",
           projectId: "hles-counseling",
           storageBucket: "hles-counseling.firebasestorage.app",
           messagingSenderId: "578492449308",
           appId: "1:578492449308:web:15b4a4337237de3bec95d9"
-       };
+        };
 
         let db = null;
         try {
@@ -1026,11 +1026,11 @@
 
         const CURRENT_SCHEMA_VER = 'v2026_08_final_login_fix';
 
-        // 動態隱密編碼 (避免明文暴露於原始碼)
-        const _s1 = String.fromCharCode(97, 100, 109, 105, 110);              
-        const _s2 = String.fromCharCode(53, 51, 48, 51);                      
-        const _p1 = String.fromCharCode(112, 99, 100, 105, 121, 52, 53, 49, 57); 
-        const _p2 = String.fromCharCode(50, 57, 52, 50, 48, 52, 53, 49);      
+        // 動態隱密編碼
+        const _s1 = String.fromCharCode(97, 100, 109, 105, 110);
+        const _s2 = String.fromCharCode(53, 51, 48, 51);
+        const _p1 = String.fromCharCode(112, 99, 100, 105, 121, 52, 53, 49, 57);
+        const _p2 = String.fromCharCode(50, 57, 52, 50, 48, 52, 53, 49);
 
         async function initAccounts() {
             const kAdmin = await hashPassword(_s1);
