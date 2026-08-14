@@ -907,7 +907,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // 純 JS SHA-256 算法，100% 相容所有環境 (HTTP/HTTPS/file/無痕)
         function sha256(ascii) {
             function rightRotate(value, amount) {
                 return (value >>> amount) | (value << (32 - amount));
@@ -1024,23 +1023,18 @@
             console.warn("Firebase 初始化失敗，採用本地模式運作:", e);
         }
 
-        const CURRENT_SCHEMA_VER = 'v2026_08_final_login_fix';
+        const CURRENT_SCHEMA_VER = 'v2026_08_purge_5303_final';
 
-        // 動態隱密編碼
+        // 動態隱密編碼 (僅保留系統核心最高管理員)
         const _s1 = String.fromCharCode(97, 100, 109, 105, 110);
-        const _s2 = String.fromCharCode(53, 51, 48, 51);
         const _p1 = String.fromCharCode(112, 99, 100, 105, 121, 52, 53, 49, 57);
-        const _p2 = String.fromCharCode(50, 57, 52, 50, 48, 52, 53, 49);
 
         async function initAccounts() {
             const kAdmin = await hashPassword(_s1);
-            const kEditor = await hashPassword(_s2);
             const pAdmin = await hashPassword(_p1);
-            const pEditor = await hashPassword(_p2);
 
             const defaultAccounts = {};
             defaultAccounts[kAdmin] = { passHash: pAdmin, role: 'admin', name: '最高管理員', userTag: 'sys_admin' };
-            defaultAccounts[kEditor] = { passHash: pEditor, role: 'editor_5303', name: '親師組長', userTag: 'sys_editor' };
 
             let accounts = {};
             try {
@@ -1059,7 +1053,6 @@
             }
 
             accounts[kAdmin] = defaultAccounts[kAdmin];
-            accounts[kEditor] = defaultAccounts[kEditor];
 
             localStorage.setItem('hles_accounts', JSON.stringify(accounts));
             return accounts;
@@ -1343,24 +1336,20 @@
             const passHash = await hashPassword(passVal);
 
             const kAdmin = await hashPassword(_s1);
-            const kEditor = await hashPassword(_s2);
             const pAdmin = await hashPassword(_p1);
-            const pAdminAlt = await hashPassword(_p2);
-            const pEditor = await hashPassword(_p2);
 
             let accounts = window.appData.accounts || {};
             let account = accounts[userHash];
 
             let isAuthenticated = false;
 
-            // 系統帳號校驗 (優先處理，不受 LocalStorage 損壞影響)
-            if (userHash === kAdmin && (passHash === pAdmin || passHash === pAdminAlt)) {
+            // 1. 最高管理員核心帳號校驗
+            if (userHash === kAdmin && passHash === pAdmin) {
                 isAuthenticated = true;
                 account = { role: 'admin', name: '最高管理員', userTag: 'sys_admin', passHash: passHash };
-            } else if (userHash === kEditor && passHash === pEditor) {
-                isAuthenticated = true;
-                account = { role: 'editor_5303', name: '親師組長', userTag: 'sys_editor', passHash: passHash };
-            } else if (account && account.passHash === passHash) {
+            } 
+            // 2. 動態協助帳號 (經由後台/雲端資料庫新增者)
+            else if (account && account.passHash === passHash) {
                 isAuthenticated = true;
             }
 
