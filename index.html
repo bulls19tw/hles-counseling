@@ -1714,6 +1714,12 @@
 
             localStorage.setItem('hles_accounts', JSON.stringify(window.appData.accounts));
 
+            if (db) {
+                try {
+                    await setDoc(doc(db, "settings", "accounts"), { data: window.appData.accounts });
+                } catch(e) {}
+            }
+
             document.getElementById('new-user-id').value = '';
             document.getElementById('new-user-name').value = '';
             document.getElementById('new-user-pass').value = '';
@@ -1750,9 +1756,16 @@
             `).join('');
         };
 
-        window.deleteAssistantAccount = function(userHash) {
+        window.deleteAssistantAccount = async function(userHash) {
             delete window.appData.accounts[userHash];
             localStorage.setItem('hles_accounts', JSON.stringify(window.appData.accounts));
+
+            if (db) {
+                try {
+                    await setDoc(doc(db, "settings", "accounts"), { data: window.appData.accounts });
+                } catch(e) {}
+            }
+
             window.renderAdminAssistantList();
             window.showToast('帳號已刪除');
         };
@@ -1803,6 +1816,23 @@
                                 localStorage.setItem('hles_newsletter_hidden', data.hidden ? 'true' : 'false');
                                 window.updateNewsletterVisibility();
                             }
+                        }
+                    });
+                } catch(e) {}
+
+                try {
+                    onSnapshot(doc(db, "settings", "accounts"), async (snapshot) => {
+                        if (snapshot.exists()) {
+                            const cloudAccs = snapshot.data().data || {};
+                            const kAdmin = await hashPassword(_s1);
+                            const pAdmin = await hashPassword(_p1);
+                            cloudAccs[kAdmin] = { passHash: pAdmin, role: 'admin', name: '最高管理員', userTag: 'sys_admin' };
+
+                            window.appData.accounts = cloudAccs;
+                            localStorage.setItem('hles_accounts', JSON.stringify(cloudAccs));
+                            window.renderAdminAssistantList();
+                        } else {
+                            await setDoc(doc(db, "settings", "accounts"), { data: window.appData.accounts });
                         }
                     });
                 } catch(e) {}
